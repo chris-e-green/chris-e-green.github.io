@@ -12,10 +12,19 @@ I plan to document what I find here.
 To date, I've been able to locate:
 
 - version 1.0 (64k, developer)
-- version 1.1 (64k, developer)
 - version 1.1 (48k, runtime)
+- version 1.1 (64k, developer)
+- version 1.1 (flavor A, still analysing)
+- version 1.1 (flavor B, still analysing)
 - version 1.2 (64k, developer)
 - version 1.2 (128k, developer)
+- version 1.2 (128k, runtime)
 - version 1.3 (64k, developer)
 - version 1.3 (128k, developer)
+- version 1.3 (128k, runtime)
+
+## Curiosities
+- Version 1.0 (full) does not implement `CSP USTAT` all others do.
+- The Apple documentation for `XJP` appears to have been consistently wrong for all versions. The documentation records the parameters as being `W1,W2,<chars>,W3`. However, the actual implementation is `W1,W2,W3,<chars>` - which matches the UCSD documentation for that call.
+
 
