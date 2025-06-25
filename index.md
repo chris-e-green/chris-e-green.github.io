@@ -1,3 +1,6 @@
+# New:
+I've started [documenting](./apple-pascal-notes.md) my exploration of the Apple II Pascal p-code runtimes.
+
 # Projects here:
 
 [BBoot](https://github.com/chris-e-green/b-boot) - an ancient DOS boot sector (in 80x86 assembler) to allow booting from the second floppy drive

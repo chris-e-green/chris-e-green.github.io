@@ -17,19 +17,19 @@ $BF22, for versions 1.1 and above).
 
 To date, I've been able to locate:
 
-| User-facing version | Internal version | Flavor | RAM | Type | Notes |
-|---------------------|------------------|--------|-----|------|-------|
-| 1.0 | 1 | 0 | 64K | developer | |
-| 1.1 | 2 | 5 | 48K | runtime | |
-| 1.1 | 2 | 1 | 64K | developer | |
-| 1.1 | 2 | A | 64K(?) | runtime(?) | flavor not documented! |
-| 1.1 | 2 | B | 64K(?) | runtime(?) | flavor not documented! |
-| 1.2 | 3 | 0 | 64K | developer | |
-| 1.2 | 3 | 40 | 128K | developer | |
-| 1.2 | 3 | 41 | 128K | runtime | |
-| 1.3 | 4 | 0 | 64K | developer | |
-| 1.3 | 4 | 40 | 128K | developer | |
-| 1.3 | 4 | 41 | 128K | developer | |
+| User-facing version | Internal version | Flavor | RAM    | Type      | Notes                                                                                             |
+| ------------------- | ---------------- | ------ | ------ | --------- | ------------------------------------------------------------------------------------------------- |
+| 1.0                 | 1                | 0      | 64K    | developer |                                                                                                   |
+| 1.1                 | 2                | 5      | 48K    | runtime   |                                                                                                   |
+| 1.1                 | 2                | 1      | 64K    | developer |                                                                                                   |
+| 1.1                 | 2                | A      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor B but the interpreter is different. |
+| 1.1                 | 2                | B      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor A but the interpreter is different. |
+| 1.2                 | 3                | 0      | 64K    | developer |                                                                                                   |
+| 1.2                 | 3                | 40     | 128K   | developer |                                                                                                   |
+| 1.2                 | 3                | 41     | 128K   | runtime   |                                                                                                   |
+| 1.3                 | 4                | 0      | 64K    | developer |                                                                                                   |
+| 1.3                 | 4                | 40     | 128K   | developer |                                                                                                   |
+| 1.3                 | 4                | 41     | 128K   | developer |                                                                                                   |
 
 ## Curiosities
 
@@ -44,21 +44,32 @@ To date, I've been able to locate:
 it was a bit field. As a result, there is no relationship between the values in
 1.1 and 1.2/1.3.
 
+Pascal 1.0 SYSTEM.PASCAL doesn't have the SEGINFO field in the segment dictionary. In Pascal 1.1, the segment version number is 2, but in 1.2, it is 5, and in 1.3 it's 6. 
 ## Boot code
 
 To fully understand the load behaviour of the interpreter, you have to first
 understand the behaviour of the boot code on an Apple Pascal disk.
 
-One aspect to remember: as the boot code is loaded from the disk controller firmware, it treats the disk as a DOS-formatted (256-byte sectors rather than Pascal 512-byte blocks) volume. When extracting the boot sectors, don't forget the DOS sector interleave... 
+First point: as the boot code is loaded from the disk controller firmware, it treats the disk as a DOS-formatted (256-byte sectors rather than Pascal 512-byte blocks) volume. When extracting the boot sectors, don't forget the DOS sector interleave... 
 
 So, on a 16-sector track, the boot code will load logical DOS sectors 0, 2, 4 and 6 (physical sectors $0, $E, $D and $C) into $0800-$0BFF.
 
+The boot code contains a subset of the Pascal code to read blocks and also simplified code to scan a Pascal directory so that it can find the interpreter file. 
 ### Developer boot code
 
 It appears that versions 1.0, 1.1 and 1.2 all used the same boot loader, while
 1.3 used a new loader.
 
-The main functional difference between the 1.3 boot loader and the previous ones is that the newer one supported booting from slots 4, 5 or 6, rather than only slot 6 as had been the case previously.
+The main functional difference between the 1.3 boot loader and the previous ones is that the newer one supported booting from slots 4, 5 or 6, rather than only slot 6 as had been the case previously. Once the 1.3 boot code has loaded the interpreter, it adjusts the internal `DISKNUM` table in memory to match the drive sequence:
+
+| Pascal Unit# | Slot 4 boot | Slot 5 boot | Slot 6 boot |
+| ------------ | ----------- | ----------- | ----------- |
+| 4            | 4 (S4, D1)  | 2 (S5, D1)  | 0 (S6, D1)  |
+| 5            | 5 (S4, D2)  | 3 (S5, D2)  | 1 (S6, D2)  |
+| 9            | 0 (S6, D1)  | 4 (S4, D1)  | 4 (S4, D1)  |
+| 10           | 1 (S6, D2)  | 5 (S4, D2)  | 5 (S4, D2)  |
+| 11           | 2 (S5, D1)  | 0 (S6, D1)  | 2 (S5, D1)  |
+| 12           | 3 (S5, D2)  | 1 (S6, D2)  | 3 (S5, D2)  |
 
 All of the boot loaders do the same thing as far as load addresses are
 concerned.
