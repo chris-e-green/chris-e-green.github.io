@@ -110,6 +110,7 @@ These ones are indexed by slot number x 0x10, so typically referenced as `LDA ad
 | C08E    | COM_STATUS  |
 | C08F    | COM_DATA    |
 | C08F    | IWMQ7ON     |
+
 The switches that change between RAM, ROM, and \$D000-\$DFFF memory banks are quite important to note, because without them your memory references are going to be completely wrong...
 
 The chunk that we loaded into `BANK1` starts with a table (well, technically two tables) of pointers The first table runs from \$D000-\$D0FF and contains the addresses of P-Code primary op-code handlers, while the second from \$D100-\$D151 contains the addresses of the CSP sub-opcode handlers. Each pointer is to a Pascal P-Code routine, so it is useful to tell Ghidra that these are actually pointers. Ghidra will sometimes correctly disassemble the corresponding code without any further effort on your part. 
