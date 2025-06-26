@@ -59,7 +59,9 @@ cat /tmp/boot0.bin /tmp/boot1.bin /tmp/boot2.bin /tmp/boot3.bin > /tmp/boot.bin
 12. At this point we have more or less replicated the memory layout at the conclusion of the boot load process.
 13. There are also some RAM regions that we can add at this point to the project. Ghidra should have already created `ZERO_PAGE` at 0x0000 length 0x100 and `STACK` at 0x0100 length 0x100. We can add to that: `IN` at 0x0200 length 0x100, `BUF` from 0x0300 length 0x100, `TEXT1` at 0x0400 length 0x400, `PDATA` at 0xBD00 length 0x300 and `SSW` at 0xC000 length 0x100. These can all be created in the Memory Map window in Ghidra. While there we can turn on the Write and Execute flags for BANK2 and turn on the Execute flag for ROM. 
 14. We can now start disassembly.
+
 ## Disassembly
+
 I often start by running an automatic disassembly at \$C600. The last bit of that code is a jump to \$0801, which we can follow into the boot code we loaded earlier. You'll find that Ghidra has already disassembled a chunk of the boot code. 
 At this point it's quite useful to associate names with the various soft-switches in the \$C0 page.
 
