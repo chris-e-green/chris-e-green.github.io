@@ -91,7 +91,8 @@ First, the ones that are absolute/fixed locations (there are other soft switches
 | C014    | RDRAMWRT       | C05F    | CLRAN3    | C0EC    | S6L6OFF      |
 | C015    | RDCXROM        | C060    | TAPEIN    |         |              |
 
-These ones are indexed by slot number x 0x10, so typically referenced as `LDA addr,X`. Distinguishing the indexed soft switches from the absolute ones is essential when making sense of the code, but fortunately you can search memory in Ghidra and look for byte sequences - so for example searching for bytes `bd .. c0` will find all `LDA C0xx,X` (indexed) references, as opposed to `ad .. c0` which are absolute `LDA C0xx` references.
+These ones are indexed by slot number x 0x10, so typically referenced as `LDA addr,X`. 
+
 (Note that the last five in the table above are technically slot-indexed, but are used in the code as pre-indexed/fixed locations.)
 
 | Address | Label       |
@@ -110,6 +111,24 @@ These ones are indexed by slot number x 0x10, so typically referenced as `LDA ad
 | C08E    | COM_STATUS  |
 | C08F    | COM_DATA    |
 | C08F    | IWMQ7ON     |
+
+Distinguishing the indexed soft switches from the absolute ones is essential when making sense of the code, but fortunately (1) they are all in the 0xc08n range, and (2) you can search memory in Ghidra and look for byte sequences - so for example searching for bytes `bd 8. c0` will find all `LDA C08x,X` (indexed) references, as opposed to `ad 8. c0` which are absolute `LDA C08x` references.
+
+Indexed, absolute address instructions are `.9`, `bc`, `.d` and `.e` on a 6502, with `3c` added on a 65C02, but the p-code runtime is designed to run on any 6502. So far I have only found the following instructions referencing these particular soft-switches:
+
+| Opcode | Mnemonic         |
+| ------ | ---------------- |
+| `AD`   | `LDA `*abs*      |
+| `8D`   | `STA `*abs*      |
+| `1D`   | `ORA ` *abs*`,X` |
+| `99`   | `STA `*abs*`,Y`  |
+| `9D`   | `STA ` *abs*`,X` |
+| `B9`   | `LDA `*abs*`,Y`  |
+| `BC`   | `LDY `*abs*`,X`  |
+| `BD`   | `LDA `*abs*`,X`  |
+| `D9`   | `CMP `*abs*`,Y`  |
+| `DD`   | `CMP `*abs*`,X`  |
+So, the `ad 8? c0` and `bd 8? c0` sequences will always be absolute (typically memory bank switches) while all of the others are indexed, and they'll be almost always disk accesses. 
 
 The switches that change between RAM, ROM, and \$D000-\$DFFF memory banks are quite important to note, because without them your memory references are going to be completely wrong...
 
