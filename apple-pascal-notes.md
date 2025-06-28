@@ -7,6 +7,25 @@ progressively pulling apart and deciphering the different flavours.
 So that the information I work out isn't lost, I plan to document what I find
 here.
 
+## Acknowledgements and References 
+
+I have read a wide collection of documentation to get to where I am so far in this exercise. 
+These include:
+
+- Apple II Pascal 1.3 
+
+I have also used various websites that cover different related Apple II components.
+
+I have also of course used various programs (and web apps) along the way to help with disassembly and annotation.
+Some of those programs and web apps are:
+
+- WFDIS 
+- Ghidra
+- izApple emulator
+- UCSD Pascal OS project
+
+## Sources
+
 Getting the developer versions is relatively straightforward, as they are the
 ones that shipped with Apple Pascal. The runtime versions are harder to find
 because it seems your best bet is to find something that was written in Apple
