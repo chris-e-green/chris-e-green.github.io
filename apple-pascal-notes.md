@@ -12,17 +12,41 @@ here.
 I have read a wide collection of documentation to get to where I am so far in this exercise. 
 These include:
 
-- Apple II Pascal 1.3 
+- Apple Pascal Operating System Reference Manual
+- Apple Pascal Language Reference Manual
+- Apple Pascal Update 1.1
+- Apple II Pascal 1.2 Device and Interrupt Support Tools Manual
+- Apple IIe Reference Manual
+- Apple Pascal 1.2 Update Manual
+- Apple IIe Technical Reference Manual
+- Apple II Pascal 1.3 (Workbench)
+- Addendum to the Apple Pascal Language Reference Manual
+- Apple IIe Reference Manual Addendum Monitor ROM Listings
+- Addendum to the Apple II Pascal 1.2 Update
+- Apple II Pascal ATTACH
+- Apple IIc Delta Guide
+- Apple II Pascal 1.1 P-Code Interpreter 6502 Disassembly (Willi Kusche)
+- Beneath Apple DOS ProDOS
+- Hyde's P-Source A guide to the Apple Pascal System 1983
+- Software Control of IWM
+- Apple II Technical Notes
 
 I have also used various websites that cover different related Apple II components.
+Some of those websites include:
+- [Apple II ROM Disassembly](https://6502disassembly.com/a2-rom/) is useful when making sense of the boot process. It also documents the Disk II ROM (some of which is effectively replicated in the Pascal boot code *and* in the runtime)
+- [Undocumented Secrets of Apple Pascal](https://llx.com/Neil/a2/passec.html) has some useful information.
+- [ProDOS 8 Technical Reference Manual](https://prodos8.com/docs/techref/) has useful information for the later runtimes that were able to use ProDOS block devices 
 
 I have also of course used various programs (and web apps) along the way to help with disassembly and annotation.
 Some of those programs and web apps are:
 
-- WFDIS 
-- Ghidra
-- izApple emulator
-- UCSD Pascal OS project
+- [White Flame interactive 6502 disassembler (WFDis)](https://www.white-flame.com/wfdis/) I used this disassembler for quite a while as it's great for quickly getting an idea what the code does
+- [DiskBrowser](https://github.com/dmolony/DiskBrowser) is very useful for browsing Apple II disk images and extracting files
+- [Ghidra](https://github.com/NationalSecurityAgency/ghidra) This is like using a sledgehammer to crack a walnut but it is very powerful
+- [Ivan Izaguirre's izApple2 emulator](https://github.com/ivanizag/izapple2) is the emulator that I started playing around with, which led me down a lonnng rabbit hole leading to wanting to know how the P-machine on the Apple II worked.... 
+- [Peter Miller's UCSD P-System tools - Operating System](https://github.com/jdykstra/ucsd-psystem-os) A fork of the original which seems harder to locate. Handy for getting an idea what was intended to be stored in the SYSCOM memory area (the Apple II versions are at least similar where they're not the same)
+
+I'm bound to have missed some but these have all been very useful. Even when they were not 100% correct, they were close enough to make it easier to work out what was actually happening. 
 
 ## Sources
 
@@ -82,7 +106,14 @@ cat /tmp/boot0.bin /tmp/boot1.bin /tmp/boot2.bin /tmp/boot3.bin > /tmp/boot.bin
 ## Disassembly
 
 I often start by running an automatic disassembly at \$C600. The last bit of that code is a jump to \$0801, which we can follow into the boot code we loaded earlier. You'll find that Ghidra has already disassembled a chunk of the boot code. 
-At this point it's quite useful to associate names with the various soft-switches in the \$C0 page.
+
+At this point it's quite useful to associate names with the various soft-switches in the \$C0 page (and also some names associated with fixed locations in the zero page).
+
+This file contains the soft switch names below in a format that can be imported directly into ghidra using the ImportSymbolsScript.py:
+![[soft_switches.txt]]
+
+This file contains key zero-page named locations that can be imported in the same fashion:
+![[zero_page.txt]]
 
 First, the ones that are absolute/fixed locations (there are other soft switches, but these are the ones referenced in the Pascal runtimes):
 
@@ -155,7 +186,7 @@ The chunk that we loaded into `BANK1` starts with a table (well, technically two
 
 Our efforts earlier when we loaded the runtime in three parts, and loaded the Apple ROM into an overlay, now pays off - the tables are all pointing at the correct bank by default. (If we had loaded them exactly as contained in the file, we would have had to manually adjust all of the references to addresses above \$E000 to point to the correct page.)
 
-Immediately following the tables (at \$D152) is the start of some code, so disassemble that. You'll find that it is a jump to an address fairly high in RAM that contains a routine to copy the runtime's initialisation code to \$6800
+Immediately following the tables (at \$D152) is the start of some code, so disassemble that. You'll find that it is a jump to an address fairly high in RAM that contains a routine to copy the runtime's initialisation code to \$6800.
 
 ## Curiosities
 
@@ -170,7 +201,9 @@ Immediately following the tables (at \$D152) is the start of some code, so disas
 it was a bit field. As a result, there is no relationship between the values in
 1.1 and 1.2/1.3.
 
-Pascal 1.0 SYSTEM.PASCAL doesn't have the SEGINFO field in the segment dictionary. In Pascal 1.1, the segment version number is 2, but in 1.2, it is 5, and in 1.3 it's 6. 
+- Pascal 1.0 SYSTEM.PASCAL doesn't have the SEGINFO field in the segment dictionary. In Pascal 1.1, the segment version number is 2, but in 1.2, it is 5, and in 1.3 it's 6. 
+
+- There are more than a few instances of clever coding in the interpreter (where *clever* has all the pros and cons often associated with the word). Examples are using `BEQ` and `BNE` on consecutive lines, so that the second instruction is effectively a `JMP` without the extra overhead. Another pattern (particularly in later interpreters) is avoiding relatively costly `PHA` and `PLA` instructions by copying the stack pointer across to the `X` register and then using indexed memory access to retrieve values directly out of the stack, doing whatever needs to be done with the values, and putting them back into the stack, and adjusting the stack pointer accordingly. In a stack-based 16-bit pseudo-machine like the UCSD one, this can avoid a dozen 8-bit `PLA` instructions to manipulate six word-length parameters...
 ## Boot code
 
 To fully understand the load behaviour of the interpreter, you have to first
