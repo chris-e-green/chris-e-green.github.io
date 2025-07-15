@@ -190,6 +190,18 @@ Immediately following the tables (at \$D152) is the start of some code, so disas
 
 ## Curiosities
 
+- I have not found any mention of this in the Apple Pascal documentation but I 
+  have found that some buffers (specifically, those used in `UNITREAD` and 
+  `UNITWRITE`, but there are others) are not actually passed as single `WORD`
+  pointers. The code in the interpreter pops *two* `WORD` values for the buffer
+  address. I had seen that the two values were added together to create the 
+  actual buffer address, and concluded that they must have represented the 
+  base buffer address and an offset into that buffer. I have now discovered 
+  that the Softech manuals refer to passing this sort of buffer using two
+  words, one being the word base and the other being a byte offset. Apparently,
+  the purpose is to accommodate word-addressable machines. As the 6502 is byte
+  addressable, the two words are simply added together in the interpreter.
+
 - Version 1.0 (full) does not implement `CSP USTAT`, all others do.
 
 - The Apple documentation for `XJP` appears to have been consistently wrong for
@@ -204,6 +216,8 @@ it was a bit field. As a result, there is no relationship between the values in
 - Pascal 1.0 SYSTEM.PASCAL doesn't have the SEGINFO field in the segment dictionary. In Pascal 1.1, the segment version number is 2, but in 1.2, it is 5, and in 1.3 it's 6. 
 
 - There are more than a few instances of clever coding in the interpreter (where *clever* has all the pros and cons often associated with the word). Examples are using `BEQ` and `BNE` on consecutive lines, so that the second instruction is effectively a `JMP` without the extra overhead. Another pattern (particularly in later interpreters) is avoiding relatively costly `PHA` and `PLA` instructions by copying the stack pointer across to the `X` register and then using indexed memory access to retrieve values directly out of the stack, doing whatever needs to be done with the values, and putting them back into the stack, and adjusting the stack pointer accordingly. In a stack-based 16-bit pseudo-machine like the UCSD one, this can avoid a dozen 8-bit `PLA` instructions to manipulate six word-length parameters...
+
+
 ## Boot code
 
 To fully understand the load behaviour of the interpreter, you have to first
