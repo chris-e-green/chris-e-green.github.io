@@ -190,6 +190,10 @@ Immediately following the tables (at \$D152) is the start of some code, so disas
 
 ## Curiosities
 
+- SYSTEM.PASCAL is in two parts... the first part shows up in the directory listing but only contains the first half of the operating system core. The balance is stored in a separate unnamed file in slot 15 of
+the segment directory, and is loaded by the interpreter at a fixed memory location during initialisation.
+I'm still working out how the procedure table points to these procedures!
+
 - I have not found any mention of this in the Apple Pascal documentation but I 
   have found that some buffers (specifically, those used in `UNITREAD` and 
   `UNITWRITE`, but there are others) are not actually passed as single `WORD`
