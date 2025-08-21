@@ -60,19 +60,19 @@ at runtime by the initialisation code (version number into \$BF21, flavor into
 
 To date, I've been able to locate:
 
-| User-facing version | Internal version | Flavor | RAM    | Type      | Notes                                                                                             |
-| ------------------- | ---------------- | ------ | ------ | --------- | ------------------------------------------------------------------------------------------------- |
-| 1.0                 | 1                | 0      | 64K    | developer |                                                                                                   |
-| 1.1                 | 2                | 5      | 48K    | runtime   |                                                                                                   |
-| 1.1                 | 2                | 1      | 64K    | developer |                                                                                                   |
-| 1.1                 | 2                | A      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor B but the interpreter is different. |
-| 1.1                 | 2                | B      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor A but the interpreter is different. |
-| 1.2                 | 3                | 0      | 64K    | developer |                                                                                                   |
-| 1.2                 | 3                | 40     | 128K   | developer |                                                                                                   |
-| 1.2                 | 3                | 41     | 128K   | runtime   |                                                                                                   |
-| 1.3                 | 4                | 0      | 64K    | developer |                                                                                                   |
-| 1.3                 | 4                | 40     | 128K   | developer |                                                                                                   |
-| 1.3                 | 4                | 41     | 128K   | developer |                                                                                                   |
+| User-facing version | Internal version | System version | Flavor | RAM    | Type      | Notes                                                                                             |
+| ------------------- | ---------------- | -------------- | ------ | ------ | --------- | ------------------------------------------------------------------------------------------------- |
+| 1.0                 | 1                | 0              | 0      | 64K    | developer |                                                                                                   |
+| 1.1                 | 2                | 2              | 5      | 48K    | runtime   |                                                                                                   |
+| 1.1                 | 2                | 2              | 1      | 64K    | developer |                                                                                                   |
+| 1.1                 | 2                | 2              | A      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor B but the interpreter is different. |
+| 1.1                 | 2                | 2              | B      | 64K(?) | runtime   | flavor not documented. The Pascal OS is identical with flavor A but the interpreter is different. |
+| 1.2                 | 3                | 5              | 0      | 64K    | developer |                                                                                                   |
+| 1.2                 | 3                | 5              | 40     | 128K   | developer |                                                                                                   |
+| 1.2                 | 3                | 5              | 41     | 128K   | runtime   |                                                                                                   |
+| 1.3                 | 4                | 6              | 0      | 64K    | developer |                                                                                                   |
+| 1.3                 | 4                | 6              | 40     | 128K   | developer |                                                                                                   |
+| 1.3                 | 4                | 6              | 41     | 128K   | developer |                                                                                                   |
 
 ## Methodology
 
@@ -190,9 +190,11 @@ Immediately following the tables (at \$D152) is the start of some code, so disas
 
 ## Curiosities
 
-- SYSTEM.PASCAL is in two parts... the first part shows up in the directory listing but only contains the first half of the operating system core. The balance is stored in a separate unnamed file in slot 15 of
+- SYSTEM.PASCAL is in two parts... the first part shows up in the directory listing but only contains the first part of the operating system core. The balance is stored in a separate unnamed file in slot 15 of
 the segment directory, and is loaded by the interpreter at a fixed memory location during initialisation.
 I'm still working out how the procedure table points to these procedures!
+In version 1.3, the part in slot 15 is \$0D20 bytes long and loaded so that it finishes at \$BD1C, so starting at \$AFFC, 
+and the part in slot 0 (\$0C56 bytes long) is loaded to finish at \$FE7C, so starting at \$F226. 
 
 - I have not found any mention of this in the Apple Pascal documentation but I 
   have found that some buffers (specifically, those used in `UNITREAD` and 
