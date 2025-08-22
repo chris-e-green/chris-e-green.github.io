@@ -63,7 +63,7 @@ let cspNames: [Int:String] = [
     38:"UNITCLEAR", 39:"HALT", 40:"MEMAVAIL"]
 
 do {
-    let fileURL = URL(fileURLWithPath: "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-04-00.bin")
+    let fileURL = URL(fileURLWithPath: "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-01-00.bin")
     let binaryData = try Data(contentsOf: fileURL)
     let diskInfo = binaryData.subdata(in: 0..<64)
     let segName = binaryData.subdata(in: 64..<192)
@@ -215,13 +215,19 @@ do {
     
     print(segDict)
     
+    var offset = 0
     for seg in segDict.segTable.values.sorted(by: {$0.segNum < $1.segNum}) {
         let code = getCodeBlock(at: seg.codeaddr, length: seg.codeleng)
-        var extraCode: Data?
+        var extraCode: Data = Data()
         if seg.segNum == 0 {
             if seg.name == "PASCALSY" {
                 if let extraSeg = segDict.segTable[15] {
                     extraCode = getCodeBlock(at: extraSeg.codeaddr, length: extraSeg.codeleng)
+                    let v = Int(code[code.endIndex - 1])
+                    let w = code.endIndex - 2 - v * 2
+                    let x = readWord(data: code, index: w)
+                    let xx = x - w
+                    offset = xx + extraCode.endIndex - 2
                 }
             } else if seg.name == "        " {
                 continue
@@ -247,14 +253,18 @@ do {
             }
             codeSeg.procedureDictionary = procDict
         }
+        
         for p in procDict.procedurePointers {
             var proc: Procedure = Procedure()
             var inCode: Data
             var addr = p
             if addr < 0 // contained in the hidden segment
             {
-                inCode = extraCode!
-                addr = addr + 0x422a
+                inCode = extraCode
+                addr = addr + offset
+                // 04-40 offset = 0x4c36 (-0xB3CA) b1 0x059e b4 0x13d8 0x600e
+                // 04-00 offset = 0x422a (-0xBDD6) b1 0x0c56 b8 0x0d20 0x4f4a
+                // diff           0x0a0c (-0x0a0c)    0x06b8    0x06b8
             } else {
                 inCode = code
             }
@@ -279,7 +289,10 @@ do {
             } else {
                 if proc.parameterSize > 2 { isFunc = true }
             }
-            if isFunc { procType += "FUNCTION FUNC" } else { procType += "PROCEDURE PROC" }
+            if isFunc {
+                procType += "FUNCTION FUNC"
+                proc.parameterSize -= 2 // two words of param are the function return
+            } else { procType += "PROCEDURE PROC" }
             procType += String(format:"%d",proc.procedureNumber)
             if proc.parameterSize > 0 {
                 procType += "("
