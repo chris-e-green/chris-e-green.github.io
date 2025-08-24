@@ -64,6 +64,7 @@ let cspNames: [Int:String] = [
 
 do {
     let fileURL = URL(fileURLWithPath: "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-01-00.bin")
+    print("# ", fileURL.lastPathComponent,"\n")
     let binaryData = try Data(contentsOf: fileURL)
     let diskInfo = binaryData.subdata(in: 0..<64)
     let segName = binaryData.subdata(in: 64..<192)
@@ -77,6 +78,7 @@ do {
         return binaryData.subdata(in: from*512..<to*512)
     }
     
+    // retrieves a Data object of length blocks from binaryData starting at block blockNum
     func getCodeBlock(at blockNum:UInt16, length:UInt16) -> Data {
         return binaryData.subdata(in: Int(blockNum)*512..<(Int(blockNum)*512)+Int(length))
     }
@@ -94,7 +96,7 @@ do {
         var mType: UInt8 = 0
         var version: UInt8 = 0
         var description: String {
-            return "segNum \(segNum), name: \(name): addr \(String(format:"%04X",codeaddr)), length \(codeleng), kind \(segkind), textAddr \(String(format:"%04X",textaddr)), mType \(mType), version \(version)"
+            return "| \(segNum) | \(name) | \(String(format:"%04X",codeaddr)) | \(codeleng) | \(segkind) | \(String(format:"%04X",textaddr)) | \(mType) | \(version) |"
         }
     }
     
@@ -102,11 +104,14 @@ do {
     
     struct segDictionary: CustomStringConvertible {
         var description: String {
-            var s = "segTable:\n"
-            for (_,v) in segTable {
-                s.append("\(v)\n")
+            var s = "## Segment Table\n"
+            s.append("| slot |segNum | name | block | length | kind | textAddr | mType | version |\n")
+            s.append("|-----:|------:|------|------:|-------:|------|---------:|-------|--------:|\n")
+            for (slot,v) in segTable.sorted(by: {$0.value.codeaddr < $1.value.codeaddr}) {
+                s.append("| \(slot) \(v)\n")
             }
-            s.append("intrinsics: \(intrinsics)\n")
+            s.append("\n")
+            s.append("intrinsics: \(intrinsics)\n\n")
             s.append("comment: \(comment)\n")
             return s
         }
@@ -144,6 +149,9 @@ do {
         var procedures: [Procedure]
     }
     
+    // read and decode a 'BIG' value from Data at index, returning a tuple
+    // containing the decoded value and the # of bytes that contained the value
+    // (needed so that the IPC can be incremented correctly)
     func readBig(data: Data, index: Int) -> (Int, Int) {
         var retval: Int = 0
         var indexInc = 0
@@ -157,6 +165,7 @@ do {
         return (retval, indexInc)
     }
     
+    // return a word from Data at index
     func readWord(data: Data, index: Int) -> Int {
         return Int(data[index]) | Int(data[index+1]) << 8
     }
@@ -172,32 +181,31 @@ do {
         default : return ""
         }
     }
+    
     // decode Segment Dictionary
+    // first, decode the per-segment parts
     for i in 0...15 {
-        let addr = UInt16(diskInfo[i*4+1]) << 8 | UInt16(diskInfo[i*4])
-        let leng = UInt16(diskInfo[i*4+3]) << 8 | UInt16(diskInfo[i*4+2])
+        let codeaddr = UInt16(diskInfo[i*4+1]) << 8 | UInt16(diskInfo[i*4])
+        let codeleng = UInt16(diskInfo[i*4+3]) << 8 | UInt16(diskInfo[i*4+2])
         var name = ""
         for j in 0...7 {
             name.append(String(UnicodeScalar(Int(segName[i*8+j]))!))
         }
+        name = name.trimmingCharacters(in: [" "])
         let kind = SegmentKind(rawValue: segKind[i*2+1] << 8 | segKind[i*2])
-        let segNum = UInt8(segInfo[i*2])
+        var segNum = UInt8(segInfo[i*2])
+        if segNum == 0 { segNum = UInt8(i) } // early versions didn't have a segnum in the seg dictionary
         let mType = UInt8((segInfo[i*2+1] & 0x0F))
         let version = UInt8((segInfo[i*2+1] & 0xE0)>>5)
         let text = UInt16(textAddr[i*2+1]) << 8 | UInt16(textAddr[i*2])
-        if leng > 0 {
-            segTable[i] = Segment(codeaddr: addr, codeleng: leng, name: name, segkind: kind ?? .dataseg, textaddr: text, segNum: segNum, mType: mType, version: version)
+        if codeleng > 0 {
+            segTable[i] = Segment(codeaddr: codeaddr, codeleng: codeleng, name: name, segkind: kind ?? .dataseg, textaddr: text, segNum: segNum, mType: mType, version: version)
         }
     }
     
+    // then decode the per-dictionary parts - the intrinsic set...
+   
     var intrinsicSet: Set<UInt8> = []
-    var commentStr: String = ""
-    for i in 0..<comment.count {
-        if comment[i] > 0 {
-            commentStr += String(UnicodeScalar(Int(comment[i]))!)
-        }
-    }
-    
     var i = intrinsSegs.count - 1
     repeat {
         var j = 0
@@ -211,48 +219,76 @@ do {
         } while (j < 8)
         i -= 1
     } while i >= 0
+    
+    // ... and the comment string.
+    var commentStr: String = ""
+    for i in 0..<comment.count {
+        if comment[i] > 0 {
+            commentStr += String(UnicodeScalar(Int(comment[i]))!)
+        }
+    }
+    // ... and put it all together into a segDict object.
     let segDict = segDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
     
+    // for the moment, print it out to validate it.
     print(segDict)
     
-    var offset = 0
-    for seg in segDict.segTable.values.sorted(by: {$0.segNum < $1.segNum}) {
+    // for each segment (sorted by segment number), extract the code block from the file
+    // if it's the PASCALSYSTEM segment, load the hidden half of the segment too.
+
+    for segment in segDict.segTable.sorted(by: {$0.key < $1.key}) {
+        let seg = segment.value
+        var offset = 0
         let code = getCodeBlock(at: seg.codeaddr, length: seg.codeleng)
         var extraCode: Data = Data()
-        if seg.segNum == 0 {
+        if seg.segNum == 0  || seg.segNum == 15 {
             if seg.name == "PASCALSY" {
                 if let extraSeg = segDict.segTable[15] {
                     extraCode = getCodeBlock(at: extraSeg.codeaddr, length: extraSeg.codeleng)
-                    let v = Int(code[code.endIndex - 1])
-                    let w = code.endIndex - 2 - v * 2
-                    let x = readWord(data: code, index: w)
-                    let xx = x - w
-                    offset = xx + extraCode.endIndex - 2
+                    // all procedures are listed in the segment dictionary at the end of
+                    // the primary (block 1) segment. The last byte is the number of
+                    // procedures in PASCALSYS altogether.
+                    let pascalProcCount = Int(code[code.endIndex - 1]) // how many procedures in total
+                    // code.endIndex -2 is the '0'th procedure entry in the table
+                    // subtracting 2 * pascalProcCount gets us to the entry for the last procedure
+                    let lastProcHdrLoc = code.endIndex - 2 - pascalProcCount * 2
+                    // now we get the relative address from that location
+                    let lastProcRelativeAddr = readWord(data: code, index: lastProcHdrLoc)
+                    // and subtract the header location from the relative address
+                    let lastProcAbsAddr = lastProcRelativeAddr - lastProcHdrLoc
+                    // that address + the 0'th procedure entry location is what we will
+                    // need to add to the negative address stored for the procedures in the hidden
+                    // segment to get them to match the physical address in the hidden segment
+                    // which is NOT the same address that they'll be loaded in memory by the
+                    // runtime but that doesn't actually matter because the procedures themselves
+                    // are relative-addressed.
+                    offset = lastProcAbsAddr + extraCode.endIndex - 2
                 }
-            } else if seg.name == "        " {
+            } else if seg.name == "         " || seg.segNum == 15 {
+                // we have processed the hidden segment already so we don't need to do
+                // anything else with it.
                 continue
             }
         }
-        
+
         var procDict: ProcedureDictionary = ProcedureDictionary(segmentNumber: 0, procedureCount: 0, procedurePointers: [])
+        
         var codeSeg: CodeSegment = CodeSegment(procedureDictionary: procDict, procedures: [])
         
         let segnum = code[code.endIndex - 2]
-        if segnum == seg.segNum {
-            procDict.segmentNumber = Int(segnum)
-            procDict.procedureCount = Int(code[code.endIndex - 1])
-            
-            print(seg.segNum, seg.name, segnum, procDict.procedureCount)
-            var curProcStart:UInt16 = 0
-            var curProcEnd:UInt16 = 0
-            for i in 1...procDict.procedureCount {
-                let procPtr = code.endIndex - i * 2 - 2
-                let relAddr = Int(code[procPtr + 1]) << 8 | Int(code[procPtr])
-                var addr = procPtr - relAddr // the actual address in the file where the proc header is
-                procDict.procedurePointers.append(addr)
-            }
-            codeSeg.procedureDictionary = procDict
+
+        procDict.segmentNumber = Int(segnum)
+        procDict.procedureCount = Int(code[code.endIndex - 1])
+        
+        print("Processing segment \(seg.segNum) named '\(seg.name)' containing \(procDict.procedureCount) procedures/functions...\n")
+        
+        for i in 1...procDict.procedureCount {
+            let procPtr = code.endIndex - i * 2 - 2
+            let relAddr = Int(code[procPtr + 1]) << 8 | Int(code[procPtr])
+            let addr = procPtr - relAddr // the actual address in the file where the proc header is
+            procDict.procedurePointers.append(addr)
         }
+        codeSeg.procedureDictionary = procDict
         
         for p in procDict.procedurePointers {
             var proc: Procedure = Procedure()
@@ -262,9 +298,8 @@ do {
             {
                 inCode = extraCode
                 addr = addr + offset
-                // 04-40 offset = 0x4c36 (-0xB3CA) b1 0x059e b4 0x13d8 0x600e
-                // 04-00 offset = 0x422a (-0xBDD6) b1 0x0c56 b8 0x0d20 0x4f4a
-                // diff           0x0a0c (-0x0a0c)    0x06b8    0x06b8
+                // 04-40 offset = 0x4c36
+                // 04-00 offset = 0x422a
             } else {
                 inCode = code
             }
@@ -279,80 +314,126 @@ do {
             proc.parameterSize = (Int(inCode[parmPtr + 1]) << 8 | Int(inCode[parmPtr])) >> 1
             let dataPtr = addr - 8
             proc.dataSize = (Int(inCode[dataPtr + 1]) << 8 | Int(inCode[dataPtr])) >> 1
-            let exitByte1 = inCode[proc.exitIC]
-            let exitByte2 = inCode[proc.exitIC+1]
             var procType: String = "";
             var isFunc: Bool = false
-            if proc.lexicalLevel >= 0 { procType += String(repeating:" ", count:Int(proc.lexicalLevel)*2) }
-            if (exitByte1 == 0xad || exitByte1 == 0xc1) && exitByte2 > 0 {
-                isFunc = true
-            } else {
-                if proc.parameterSize > 2 { isFunc = true }
-            }
-            if isFunc {
-                procType += "FUNCTION FUNC"
-                proc.parameterSize -= 2 // two words of param are the function return
-            } else { procType += "PROCEDURE PROC" }
-            procType += String(format:"%d",proc.procedureNumber)
-            if proc.parameterSize > 0 {
-                procType += "("
-                for parmnum in 1...proc.parameterSize {
-                    if parmnum > 1 /*&& parmnum < parms*/ { procType += "; "}
-                    procType += "PARM"+String(format:"%d",parmnum)
-                }
-                procType += ")"
-            }
-            if isFunc { procType += ": RETVAL" }
+            var prefix: String = ""
+            if proc.lexicalLevel >= 0 { prefix = String(repeating:" ", count:Int(proc.lexicalLevel)*2) }
+            procType += prefix
             
-            //                    print(exitInstr, String(format:"%02x", exitByte2))
-            print(procType)
             print (String(format:"LL %d entry %04x exit %04x parms=%d words data=%d words", proc.lexicalLevel, proc.enterIC, proc.exitIC, proc.parameterSize, proc.dataSize))
             var ic = proc.enterIC
             var done: Bool = false
+            var entryPoints: Set<Int> = []
+            entryPoints.insert(proc.enterIC)
+            entryPoints.insert(proc.exitIC)
+            var instructions: [Int:String] = [:]
+            
             while ic < addr && !done {
-                if ic == proc.enterIC { print("->", terminator: "") }
-                else if ic == proc.exitIC { print("->", terminator: "") }
-                else {print("  ", terminator: "")}
-                print(String(format:"%04x:",ic), terminator: " ")
                 switch inCode[ic] {
-                case 0x00..<0x80:print(String(format:"SLDC %02x          Short load constant %d", inCode[ic], inCode[ic])); ic+=1; break;
-                case 0x80: print("ABI              Absolute value of integer (TOS)"); ic+=1; break;
-                case 0x81: print("ABR              Absolute value of real (TOS)"); ic+=1; break;
-                case 0x82: print("ADI              Add integers (TOS + TOS-1)"); ic+=1; break;
-                case 0x83: print("ADR              Add reals (TOS + TOS-1)"); ic+=1; break;
-                case 0x84: print("LAND             Logical AND (TOS & TOS-1)"); ic+=1; break;
-                case 0x85: print("DIF              Set difference (TOS-1 AND NOT TOS)"); ic+=1; break;
-                case 0x86: print("DVI              Divide integers (TOS-1 / TOS)"); ic+=1; break;
-                case 0x87: print("DVR              Divide reals (TOS-1 / TOS)"); ic+=1; break;
-                case 0x88: print("CHK              Check subrange (TOS-1 <= TOS-2 <= TOS"); ic+=1; break;
-                case 0x89: print("FLO              Float next to TOS (int TOS-1 to real TOS)"); ic+=1; break;
-                case 0x8A: print("FLT              Float TOS (int TOS to real TOS)"); ic+=1; break;
-                case 0x8B: print("INN              Set membership (TOS-1 in set TOS)"); ic+=1; break;
-                case 0x8C: print("INT              Set intersection (TOS AND TOS-1)"); ic+=1; break;
-                case 0x8D: print("LOR              Logical OR (TOS | TOS-1)"); ic+=1; break;
-                case 0x8E: print("MODI             Modulo integers (TOS-1 % TOS)"); ic+=1; break;
-                case 0x8F: print("MPI              Multiply integers (TOS * TOS-1)"); ic+=1; break;
-                case 0x90: print("MPR              Multiply reals (TOS * TOS-1)"); ic+=1; break;
-                case 0x91: print("NGI              Negate integer"); ic+=1; break;
-                case 0x92: print("NGR              Negate real"); ic+=1; break;
-                case 0x93: print("LNOT             Logical NOT (~TOS)"); ic+=1; break;
-                case 0x94: print("SRS              Subrange set [TOS-1..TOS]"); ic+=1; break;
-                case 0x95: print("SBI              Subtract integers (TOS-1 - TOS)"); ic+=1; break;
-                case 0x96: print("SBR              Subtract reals (TOS-1 - TOS)"); ic+=1; break;
-                case 0x97: print("SGS              Build singleton set [TOS]"); ic+=1; break;
-                case 0x98: print("SQI              Square integer (TOS * TOS)"); ic+=1; break;
-                case 0x99: print("SQR              Square real (TOS * TOS)"); ic+=1; break;
-                case 0x9A: print("STO              Store indirect (TOS into TOS-1)"); ic+=1; break;
-                case 0x9B: print("IXS              Index string array (check 1<=TOS<=len of str TOS-1)"); ic+=1; break;
-                case 0x9C: print("UNI              Set union (TOS OR TOS-1"); ic+=1; break;
+                case 0x00..<0x80:
+                    instructions[ic] = String(format:"SLDC %02x          Short load constant %d", inCode[ic], inCode[ic])
+                    ic+=1; break;
+                case 0x80:
+                    instructions[ic] = "ABI              Absolute value of integer (TOS)"
+                    ic += 1; break;
+                case 0x81:
+                    instructions[ic] = "ABR              Absolute value of real (TOS)"
+                    ic+=1; break;
+                case 0x82:
+                    instructions[ic] = "ADI              Add integers (TOS + TOS-1)"
+                    ic+=1; break;
+                case 0x83:
+                    instructions[ic] = "ADR              Add reals (TOS + TOS-1)"
+                    ic+=1; break;
+                case 0x84:
+                    instructions[ic] = "LAND             Logical AND (TOS & TOS-1)"
+                    ic+=1; break;
+                case 0x85:
+                    instructions[ic] = "DIF              Set difference (TOS-1 AND NOT TOS)"
+                    ic+=1; break;
+                case 0x86:
+                    instructions[ic] = "DVI              Divide integers (TOS-1 / TOS)"
+                    ic+=1; break;
+                case 0x87:
+                    instructions[ic] = "DVR              Divide reals (TOS-1 / TOS)"
+                    ic+=1; break;
+                case 0x88:
+                    instructions[ic] = "CHK              Check subrange (TOS-1 <= TOS-2 <= TOS"
+                    ic+=1; break;
+                case 0x89:
+                    instructions[ic] = "FLO              Float next to TOS (int TOS-1 to real TOS)"
+                    ic+=1; break;
+                case 0x8A:
+                    instructions[ic] = "FLT              Float TOS (int TOS to real TOS)"
+                    ic+=1; break;
+                case 0x8B:
+                    instructions[ic] = "INN              Set membership (TOS-1 in set TOS)"
+                    ic+=1; break;
+                case 0x8C:
+                    instructions[ic] = "INT              Set intersection (TOS AND TOS-1)"
+                    ic+=1; break;
+                case 0x8D:
+                    instructions[ic] = "LOR              Logical OR (TOS | TOS-1)"
+                    ic+=1; break;
+                case 0x8E:
+                    instructions[ic] = "MODI             Modulo integers (TOS-1 % TOS)"
+                    ic+=1; break;
+                case 0x8F:
+                    instructions[ic] = "MPI              Multiply integers (TOS * TOS-1)"
+                    ic+=1; break;
+                case 0x90:
+                    instructions[ic] = "MPR              Multiply reals (TOS * TOS-1)"
+                    ic+=1; break;
+                case 0x91:
+                    instructions[ic] = "NGI              Negate integer"
+                    ic+=1; break;
+                case 0x92:
+                    instructions[ic] = "NGR              Negate real"
+                    ic+=1; break;
+                case 0x93:
+                    instructions[ic] = "LNOT             Logical NOT (~TOS)"
+                    ic+=1; break;
+                case 0x94:
+                    instructions[ic] = "SRS              Subrange set [TOS-1..TOS]"
+                    ic+=1; break;
+                case 0x95:
+                    instructions[ic] = "SBI              Subtract integers (TOS-1 - TOS)"
+                    ic+=1; break;
+                case 0x96:
+                    instructions[ic] = "SBR              Subtract reals (TOS-1 - TOS)"
+                    ic+=1; break;
+                case 0x97:
+                    instructions[ic] = "SGS              Build singleton set [TOS]"
+                    ic+=1; break;
+                case 0x98:
+                    instructions[ic] = "SQI              Square integer (TOS * TOS)"
+                    ic+=1; break;
+                case 0x99:
+                    instructions[ic] = "SQR              Square real (TOS * TOS)"
+                    ic+=1; break;
+                case 0x9A:
+                    instructions[ic] = "STO              Store indirect (TOS into TOS-1)"
+                    ic+=1; break;
+                case 0x9B:
+                    instructions[ic] = "IXS              Index string array (check 1<=TOS<=len of str TOS-1)"
+                    ic+=1; break;
+                case 0x9C:
+                    instructions[ic] = "UNI              Set union (TOS OR TOS-1"
+                    ic+=1; break;
                 case 0x9D:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"LDE  %02x %04x      Load extended word (word offset %d in data seg %d)",inCode[ic+1],val, val,inCode[ic+1]))
+                    instructions[ic] = String(format:"LDE  %02x %04x      Load extended word (word offset %d in data seg %d)",inCode[ic+1],val, val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
-                case 0x9E: print(String(format:"CSP  %02x          Call standard procedure %d ", inCode[ic+1], inCode[ic+1]), cspNames[Int(inCode[ic+1])] ?? ""); ic+=2; break;
-                case 0x9F: print("LDCN             Load constant NIL"); ic+=1; break;
-                case 0xA0: print(String(format:"ADJ  %02x          Adjust set to %d words", inCode[ic+1], inCode[ic+1])); ic+=2; break;
+                case 0x9E:
+                    instructions[ic] = String(format:"CSP  %02x          Call standard procedure %d ", inCode[ic+1], inCode[ic+1]) + (cspNames[Int(inCode[ic+1])] ?? "")
+                    ic+=2; break;
+                case 0x9F:
+                    instructions[ic] = "LDCN             Load constant NIL"
+                    ic+=1; break;
+                case 0xA0:
+                    instructions[ic] = String(format:"ADJ  %02x          Adjust set to %d words", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
                 case 0xA1:
                     var dest: Int = 0
                     let offset = Int(inCode[ic+1])
@@ -362,30 +443,47 @@ do {
                     } else {
                         dest = ic + offset + 2
                     }
-                    print(String(format:"FJP  %02x (%04x)   Jump if TOS false", inCode[ic+1], dest)); ic+=2; break;
-                case 0xA2: print(String(format:"INCP %02x          Inc field ptr (TOS+%d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xA3: print(String(format:"IND  %02x          Static index and load word (TOS+%d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xA4: print(String(format:"IXA  %02x          Index array (TOS-1 + TOS * %d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xA5: print(String(format:"LAO  %02x          Load global (BASE%d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
+                    entryPoints.insert(dest)
+                    instructions[ic] = String(format:"FJP  $%04x       Jump if TOS false", dest)
+                    ic+=2; break;
+                case 0xA2:
+                    instructions[ic] = String(format:"INCP %02x          Inc field ptr (TOS+%d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xA3:
+                    instructions[ic] = String(format:"IND  %02x          Static index and load word (TOS+%d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xA4:
+                    instructions[ic] = String(format:"IXA  %02x          Index array (TOS-1 + TOS * %d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xA5:
+                    instructions[ic] = String(format:"LAO  %02x          Load global (BASE%d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
                 case 0xA6:
-                    print(String(format:"LSA  %02x          Load string address", inCode[ic+1]))
-                    print("                         '",terminator:"")
+                    var s = String(format:"LSA  %02x          Load string address", inCode[ic+1]) +
+                    "\n                         '"
                     if inCode[ic+1] > 0 {
                         for i in 1...inCode[ic+1] {
-                            print(String(format:"%c", inCode[ic+1+Int(i)]),terminator: "") }
+                            s += String(format:"%c", inCode[ic+1+Int(i)])
+                        }
                     }
-                    print("'")
+                    s += "'"
+                    instructions[ic] = s
                     ic+=2 + Int(inCode[ic+1])
                     break;
                 case 0xA7:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"LAE  %02x %04x      Load extended address (address offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1]))
+                    instructions[ic] = String(format:"LAE  %02x %04x      Load extended address (address offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
-                case 0xA8: print(String(format:"MOV  %02x          Move %d words (TOS to TOS-1)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xA9: print(String(format:"LDO  %02x          Load global word (BASE%d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xAA: print(String(format:"SAS  %02x          String assign (TOS to TOS-1, %d chars)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xAB: print(String(format:"SRO  %02x          Store global word (BASE%d)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
+                case 0xA8:
+                    instructions[ic] = String(format:"MOV  %02x          Move %d words (TOS to TOS-1)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xA9: instructions[ic] = String(format:"LDO  %02x          Load global word (BASE%d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xAA: instructions[ic] = String(format:"SAS  %02x          String assign (TOS to TOS-1, %d chars)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xAB: instructions[ic] = String(format:"SRO  %02x          Store global word (BASE%d)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
                 case 0xAC:
                     ic += 1
                     if ic % 2 != 0 { ic += 1 } // word align
@@ -401,58 +499,87 @@ do {
                     } else {
                         dest = ic + offset + 2
                     }
-                    print(String(format:"XJP  %04x %04x %04x Case jump", first, last, dest))
+                    entryPoints.insert(dest)
+                    var s = String(format:"XJP  %04x %04x %04x Case jump\n", first, last, dest)
                     ic += 2
                     var c1 = 0
                     for c in first...last {
                         if c1 == 0 {
-                            print(String(repeating: " ", count: 8), terminator: "")
+                            s += String(repeating: " ", count: 8)
                         }
-                        print(String(format:"   %04x -> %04x", c, ic - readWord(data:inCode, index: ic)), terminator: " ")
+                        s += String(format:"   %04x -> %04x", c, ic - readWord(data:inCode, index: ic))
                         ic += 2
                         c1 += 1
                         if c1 == 4 {
                             c1 = 0
-                            print()
+                            s += "\n"
                         }
                     }
-                    if c1 != 0 { print() }
-                    print(String(repeating: " ", count: 7), String(format:"default -> %04x", dest))
-                case 0xad: print(String(format:"RNP  %02x          Return from nonbase procedure", inCode[ic+1])); ic+=2; done = true; break
+                    if c1 != 0 { s += "\n" }
+                    s += String(repeating: " ", count: 7)
+                    s += String(format:"default -> %04x", dest)
+                    instructions[ic] = s
+                case 0xad:
+                    instructions[ic] = String(format:"RNP  %02x          Return from nonbase procedure", inCode[ic+1])
+                    if inCode[ic+1] > 0 { isFunc = true } else { isFunc = false }
+                    ic+=2
+                    done = true
+                    break
                 case 0xAE:
-                    print(String(format:"CIP  %02x          Call intermediate procedure %d ", inCode[ic+1], inCode[ic+1]), terminator: "")
-                    if let n = names[Int(seg.segNum)] { print(n.procNames[Int(inCode[ic+1])] ?? "") } else { print() }
+                    var s = String(format:"CIP  %02x          Call intermediate procedure %d ", inCode[ic+1], inCode[ic+1])
+                    if let n = names[Int(seg.segNum)] {
+                        s += (n.procNames[Int(inCode[ic+1])] ?? "")
+                    }
+                    instructions[ic] = s
                     ic+=2; break;
-                case 0xAF: print("EQL", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 = TOS", separator: ""); ic+=2; break;
-                case 0xB0: print("GEQ", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 >= TOS", separator: ""); ic+=2; break;
-                case 0xB1: print("GRT", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 > TOS", separator: ""); ic+=2; break;
+                case 0xAF:
+                    instructions[ic] = "EQL" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 = TOS"
+                    ic+=2; break;
+                case 0xB0:
+                    instructions[ic] = "GEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 >= TOS"
+                    ic+=2; break;
+                case 0xB1:
+                    instructions[ic] = "GRT" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 > TOS"
+                    ic+=2; break;
                 case 0xB2:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"LDA %02x %04x      Load intermediate addr (%d in AR-%d)",inCode[ic+1],val,val,inCode[ic+1]))
+                    let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
+                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
+                    instructions[ic] = String(format:"LDA  %02x %04x      Load addr \(label)",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
                 case 0xB3:
                     let count = Int(inCode[ic+1])
-                    print(String(format:"LDC  %02x          Load multiple-word constant", inCode[ic+1]));
-                    print("                         ", terminator: "")
+                    var s = String(format:"LDC  %02x          Load multiple-word constant", inCode[ic+1]) +
+                    "\n                         "
                     ic += 2
                     if ic % 2 != 0 { ic += 1 } // word aligned data
                     for i in 0..<count {
-                        print(String(format:"%04x", readWord(data: inCode,index: ic+i*2)), terminator: " ")
+                        s += String(format:"%04x", readWord(data: inCode,index: ic+i*2))
                     }
-                    print()
+                    instructions[ic] = s
                     ic += count*2; break;
-                case 0xB4: print("LEQ", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 <= TOS", separator: ""); ic+=2; break;
-                case 0xB5: print("LES", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 < TOS", separator: ""); ic+=2; break;
+                case 0xB4: 
+                    instructions[ic] = "LEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 <= TOS"
+                    ic+=2; break;
+                case 0xB5:
+                    instructions[ic] = "LES" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 < TOS"
+                    ic+=2; break;
                 case 0xB6:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"LOD  %02x %04x     Load intermediate word (%d in AR-%d)",inCode[ic+1],val,val,inCode[ic+1]))
+                    let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
+                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)_\(val)"
+                    instructions[ic] = String(format:"LOD  %02x %04x     Load word at \(label)",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
-                case 0xB7: print("NEQ", decodeComparator(idx: Int(inCode[ic+1])),"TOS-1 <> TOS", separator: ""); ic+=2; break;
+                case 0xB7:
+                    instructions[ic] = "NEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 <> TOS"
+                    ic+=2; break;
                 case 0xB8:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"STR  %02x %04x     Store intermediate word (TOS to %04x in AR-%d)",inCode[ic+1],val,val,inCode[ic+1]))
+                    let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
+                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
+                    instructions[ic] = String(format:"STR  %02x %04x     Store TOS to \(label))",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
                 case 0xB9:
@@ -464,83 +591,180 @@ do {
                     } else {
                         dest = ic + offset + 2
                     }
-                    print(String(format:"UJP  %02x (%04x)   Unconditional jump", inCode[ic+1], dest)); ic+=2; break;
-                case 0xBA: print("LDP              Load packed field (TOS)"); ic+=1; break;
-                case 0xBB: print("STP              Store packed field (TOS into TOS-1)"); ic+=1; break;
-                case 0xBC: print(String(format:"LDM  %02x          Load %d words from (TOS)", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xBD: print(String(format:"STM  %02x          Store %d words at TOS to TOS-1", inCode[ic+1], inCode[ic+1])); ic+=2; break;
-                case 0xBE: print("LDB              Load byte at byte ptr TOS-1 + TOS"); ic+=1; break;
-                case 0xBF: print("STB              Store byte at TOS to byte ptr TOS-2 + TOS-1"); ic+=1; break;
-                case 0xC0: print(String(format:"IXP  %02x %02x       Index packed array TOS-1[TOS], %d elts/word, %d field width", inCode[ic+1], inCode[ic+2], inCode[ic+1], inCode[ic+2])); ic+=3; break;
-                case 0xc1: print(String(format:"RBP  %02x          Return from base procedure", inCode[ic+1])); ic+=2; done = true; break
-                case 0xC2: print(String(format:"CBP  %02x          Call base procedure %d ", inCode[ic+1], inCode[ic+1]), terminator: "")
-                    if let n = names[Int(seg.segNum)] { print(n.procNames[Int(inCode[ic+1])] ?? "")} else { print("") }
+                    entryPoints.insert(dest)
+                    instructions[ic] = String(format:"UJP  $%04x       Unconditional jump", dest)
                     ic+=2; break;
-                case 0xC3: print("EQUI             Integer TOS-1 = TOS"); ic+=1; break;
-                case 0xC4: print("GEQI             Integer TOS-1 >= TOS"); ic+=1; break;
-                case 0xC5: print("GRTI             Integer TOS-1 > TOS"); ic+=1; break;
+                case 0xBA:
+                    instructions[ic] = "LDP              Load packed field (TOS)"
+                    ic+=1; break;
+                case 0xBB:
+                    instructions[ic] = "STP              Store packed field (TOS into TOS-1)"
+                    ic+=1; break;
+                case 0xBC:
+                    instructions[ic] = String(format:"LDM  %02x          Load %d words from (TOS)", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xBD: instructions[ic] = String(format:"STM  %02x          Store %d words at TOS to TOS-1", inCode[ic+1], inCode[ic+1])
+                    ic+=2; break;
+                case 0xBE:
+                    instructions[ic] = "LDB              Load byte at byte ptr TOS-1 + TOS"
+                    ic+=1; break;
+                case 0xBF:
+                    instructions[ic] = "STB              Store byte at TOS to byte ptr TOS-2 + TOS-1"
+                    ic+=1; break;
+                case 0xC0:
+                    instructions[ic] = String(format:"IXP  %02x %02x       Index packed array TOS-1[TOS], %d elts/word, %d field width", inCode[ic+1], inCode[ic+2], inCode[ic+1], inCode[ic+2])
+                    ic+=3; break;
+                case 0xc1:
+                    instructions[ic] = String(format:"RBP  %02x          Return from base procedure", inCode[ic+1])
+                    if inCode[ic+1] > 0 { isFunc = true } else { isFunc = false }
+                    ic+=2
+                    done = true
+                    break
+                case 0xC2:
+                    var s = String(format:"CBP  %02x          Call base procedure %d ", inCode[ic+1], inCode[ic+1])
+                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? "" }
+                    instructions[ic] = s
+                    ic+=2; break;
+                case 0xC3:
+                    instructions[ic] = "EQUI             Integer TOS-1 = TOS"
+                    ic+=1; break;
+                case 0xC4:
+                    instructions[ic] = "GEQI             Integer TOS-1 >= TOS"
+                    ic+=1; break;
+                case 0xC5:
+                    instructions[ic] = "GRTI             Integer TOS-1 > TOS"
+                    ic+=1; break;
                 case 0xC6:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    print(String(format:"LLA  %04x        Load local address MP%d",val, val))
+                    instructions[ic] = String(format:"LLA  %04x        Load local address MP%d",val, val)
                     ic+=(1+inc)
                     break;
                 case 0xC7:
                     let val = readWord(data: inCode, index: ic+1)
-                    print(String(format:"LDCI %04x        Load word %d",val,val))
+                    instructions[ic] = String(format:"LDCI %04x        Load word %d",val,val)
                     ic+=3; break;
-                case 0xC8: print("LEQI             Integer TOS-1 <= TOS"); ic+=1; break;
-                case 0xC9: print("LESI             Integer TOS-1 < TOS"); ic+=1; break;
+                case 0xC8:
+                    instructions[ic] = "LEQI             Integer TOS-1 <= TOS"
+                    ic+=1; break;
+                case 0xC9:
+                    instructions[ic] = "LESI             Integer TOS-1 < TOS"
+                    ic+=1; break;
                 case 0xCA:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    print(String(format:"LDL  %04x        Load local word MP%d",val,val))
+                    instructions[ic] = String(format:"LDL  %04x        Load local word MP%d",val,val)
                     ic+=(1+inc)
                     break;
-                case 0xCB: print("NEQI             Integer TOS-1 <> TOS"); ic+=1; break;
+                case 0xCB:
+                    instructions[ic] = "NEQI             Integer TOS-1 <> TOS"
+                    ic+=1; break;
                 case 0xCC:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    print(String(format:"STL  %04x        Store TOS into MP%d",val,val))
+                    instructions[ic] = String(format:"STL  %04x        Store TOS into MP%d",val,val)
                     ic+=(1+inc)
                     break;
-                case 0xCD:print(String(format:"CXP  %02x %02x       Call external procedure %d in seg %d ", inCode[ic+1], inCode[ic+2],inCode[ic+2],inCode[ic+1]), terminator: "");
-                    if let n = names[Int(inCode[ic+1])] { print(n.procNames[Int(inCode[ic+2])] ?? "")} else { print() }
+                case 0xCD:
+                    var s = String(format:"CXP  %02x %02x       Call external procedure %d in seg %d ", inCode[ic+1], inCode[ic+2],inCode[ic+2],inCode[ic+1])
+                    if let n = names[Int(inCode[ic+1])] { s += n.procNames[Int(inCode[ic+2])] ?? ""}
+                    instructions[ic] = s
                     ic+=3; break;
-                case 0xCE: print(String(format:"CLP  %02x          Call local procedure %d (immediate child)",inCode[ic+1], inCode[ic+1]), terminator: "")
-                    if let n = names[Int(seg.segNum)] { print(n.procNames[Int(inCode[ic+1])] ?? "")} else { print() }
+                case 0xCE:
+                    var s = String(format:"CLP  %02x          Call local procedure %d (immediate child)",inCode[ic+1], inCode[ic+1])
+                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? ""}
+                    instructions[ic] = s
                     ic+=2; break;
-                case 0xCF: print(String(format:"CGP  %02x          Call global procedure %d (lexLevel 1, curr seg)", inCode[ic+1], inCode[ic+1]), terminator:"" )
-                    if let n = names[Int(seg.segNum)] { print(n.procNames[Int(inCode[ic+1])] ?? "")} else { print() }
+                case 0xCF:
+                    var s = String(format:"CGP  %02x          Call global procedure %d (lexLevel 1, curr seg)", inCode[ic+1], inCode[ic+1])
+                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? ""}
+                    instructions[ic] = s
                     ic+=2; break;
                 case 0xD0:
                     let count = Int(inCode[ic+1])
-                    print(String(format:"LPA  %02x          Load packed array", inCode[ic+1]));
-                    print("                         ", terminator: "")
+                    var s = String(format:"LPA  %02x          Load packed array", inCode[ic+1])
+                    s += "\n                         "
                     for i in 1...count {
-                        print(String(format:"%02x", inCode[ic+1+i]), terminator: " ")
+                        s += String(format:"%02x", inCode[ic+1+i])
                     }
-                    print()
                     ic+=(2+count); break;
                 case 0xD1:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
-                    print(String(format:"STE  %02x %04x      Store extended word (TOS into word offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1]))
+                    instructions[ic] = String(format:"STE  %02x %04x      Store extended word (TOS into word offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
-                case 0xD2: print("NOP              No operation"); ic+=1;break
-                case 0xD3: print(String(format:"---  %02x", inCode[ic+1])); ic+=2; break;
-                case 0xD4: print(String(format:"---  %02x", inCode[ic+1])); ic+=2; break;
+                case 0xD2: instructions[ic] = "NOP              No operation"
+                    ic+=1;break
+                case 0xD3:
+                    instructions[ic] = String(format:"---  %02x", inCode[ic+1])
+                    ic+=2; break;
+                case 0xD4:
+                    instructions[ic] = String(format:"---  %02x", inCode[ic+1])
+                    ic+=2; break;
                 case 0xd5:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    print(String(format:"BPT  %04x      Breakpoint",val))
+                    instructions[ic] = String(format:"BPT  %04x      Breakpoint",val)
                     ic+=(1+inc)
                     break;
-                case 0xd6: print("XIT            Exit the operating system"); ic+=1;done=true; break
-                case 0xd7: print("NOP              No operation"); ic+=1;break
-                case 0xd8...0xe7: print(String(format:"SLDL %02x          Short load local MP%d", inCode[ic]-0xd7, inCode[ic]-0xd7)); ic+=1; break;
-                case 0xe8...0xf7: print(String(format:"SLDO %02x          Short load global BASE%d", inCode[ic]-0xe7, inCode[ic]-0xe7)); ic+=1; break
-                case 0xf8...0xff: print(String(format:"SIND %02x          Short index load *TOS+%d", inCode[ic]-0xf8, inCode[ic]-0xf8)); ic+=1; break;
-                default:print(String(format:"%02x", inCode[ic])); ic+=1; break
+                case 0xd6:
+                    instructions[ic] = "XIT              Exit the operating system"
+                    ic+=1
+                    done=true
+                    isFunc = false // AFAIK only the PASCALSYSTEM.PASCALSYSTEM procedure ever calls this
+                    break
+                case 0xd7:
+                    instructions[ic] = "NOP              No operation"
+                    ic+=1;break
+                case 0xd8...0xe7:
+                    instructions[ic] = String(format:"SLDL %02x          Short load local MP%d", inCode[ic]-0xd7, inCode[ic]-0xd7)
+                    ic+=1; break;
+                case 0xe8...0xf7:
+                    instructions[ic] = String(format:"SLDO %02x          Short load global BASE%d", inCode[ic]-0xe7, inCode[ic]-0xe7)
+                    ic+=1; break
+                case 0xf8...0xff: instructions[ic] = String(format:"SIND %02x          Short index load *TOS+%d", inCode[ic]-0xf8, inCode[ic]-0xf8)
+                    ic+=1; break;
+                default:
+                    instructions[ic] = String(format:"%02x", inCode[ic])
+                    ic+=1; break
                 }
-                
             }
+
+            if isFunc {
+                procType += "FUNCTION \(seg.name)."
+                proc.parameterSize -= 2 // two words of param are the function return
+            } else {
+                procType += "PROCEDURE \(seg.name)."
+            }
+            
+            if proc.procedureNumber == 1 {
+                procType += "\(seg.name)"
+            } else {
+                if isFunc {
+                    procType += "FUNC\(proc.procedureNumber)"
+                } else {
+                    procType += "PROC\(proc.procedureNumber)"
+                }
+            }
+            
+            if proc.parameterSize > 0 {
+                procType += "("
+                for parmnum in 1...proc.parameterSize {
+                    if parmnum > 1 { procType += "; "}
+                    procType += "PARAM\(parmnum)"
+//                    procType += "PARM"+String(format:"%d",parmnum)
+                }
+                procType += ")"
+            }
+            if isFunc { procType += ": RETVAL" }
+            
+            print(procType)
+            print(prefix + "BEGIN")
+
+            for i in instructions.sorted(by: {$0.key < $1.key}) {
+                if entryPoints.contains(i.key) { print("->", terminator: " ") }
+                else { print("  ", terminator: " ") }
+                print(String(format:"%04x:",i.key), terminator: " ")
+                print(i.value)
+            }
+
+            print(prefix + "END")
         }
         
     }
