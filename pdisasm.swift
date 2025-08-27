@@ -62,6 +62,18 @@ let cspNames: [Int:String] = [
     33:"RELEASE", 34:"IORESULT", 35:"UNITBUSY", 36:"POT", 37:"UNITWAIT",
     38:"UNITCLEAR", 39:"HALT", 40:"MEMAVAIL"]
 
+let globalLocations: [Int:String] = [
+    1:"SYSCOM", 2:"INPUT", 3:"OUTPUT", 4:"SYSTERM", 8:"USERINFO.CODEFIBP",
+    9: "USERINFO.SYMFIB", 10:"USERINFO.ERRNUM", 11:"USERINFO.ERRBLK",
+    12:"USERINFO.ERRSYM", 13:"USERINFO.STUPID", 14:"USERINFO.SLOWTERM",
+    15:"USERINFO.ALTMODE", 16:"USERINFO.GOTCODE", 17:"USERINFO.GOTSYM",
+    18:"USERINFO.CODEVID", 22:"USERINFO.SYMVID", 26:"USERINFO.WORKVID",
+    30:"USERINFO.CODETID", 38:"USERINFO.SYMTID", 46:"USERINFO.WORKTID",
+    54:"EMPTYHEAP", 55:"SWAPFIB", 56:"SYSTERM", 57:"OUTPUTFIB", 58:"INPUTFIB",
+    59:"DKVID", 63:"SYVID", 67:"THEDATE", 68:"DEBUGINFO", 69:"STATE",
+    70:"PL", 111:"IPOT", 116:"FILLER", 122:"DIGITS", 126:"UNITABLE"
+]
+
 do {
     let fileURL = URL(fileURLWithPath: "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-01-00.bin")
     print("# ", fileURL.lastPathComponent,"\n")
@@ -327,6 +339,9 @@ do {
             entryPoints.insert(proc.enterIC)
             entryPoints.insert(proc.exitIC)
             var instructions: [Int:String] = [:]
+            var globalLocs: Set<Int> = []
+            var baseLocs: Set<Int> = []
+            var localLocs: Set<Int> = []
             
             while ic < addr && !done {
                 switch inCode[ic] {
@@ -418,7 +433,7 @@ do {
                     instructions[ic] = "IXS              Index string array (check 1<=TOS<=len of str TOS-1)"
                     ic+=1; break;
                 case 0x9C:
-                    instructions[ic] = "UNI              Set union (TOS OR TOS-1"
+                    instructions[ic] = "UNI              Set union (TOS OR TOS-1)"
                     ic+=1; break;
                 case 0x9D:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
@@ -456,11 +471,12 @@ do {
                     instructions[ic] = String(format:"IXA  %02x          Index array (TOS-1 + TOS * %d)", inCode[ic+1], inCode[ic+1])
                     ic+=2; break;
                 case 0xA5:
-                    instructions[ic] = String(format:"LAO  %02x          Load global (BASE%d)", inCode[ic+1], inCode[ic+1])
+                    instructions[ic] = String(format:"LAO  %02x          Load global BASE%d", inCode[ic+1], inCode[ic+1])
+                    baseLocs.insert(Int(inCode[ic+1]))
                     ic+=2; break;
                 case 0xA6:
-                    var s = String(format:"LSA  %02x          Load string address", inCode[ic+1]) +
-                    "\n                         '"
+                    var s = String(format:"LSA  %02x          Load string address:", inCode[ic+1]) +
+                    " '"
                     if inCode[ic+1] > 0 {
                         for i in 1...inCode[ic+1] {
                             s += String(format:"%c", inCode[ic+1+Int(i)])
@@ -478,11 +494,13 @@ do {
                 case 0xA8:
                     instructions[ic] = String(format:"MOV  %02x          Move %d words (TOS to TOS-1)", inCode[ic+1], inCode[ic+1])
                     ic+=2; break;
-                case 0xA9: instructions[ic] = String(format:"LDO  %02x          Load global word (BASE%d)", inCode[ic+1], inCode[ic+1])
+                case 0xA9: instructions[ic] = String(format:"LDO  %02x          Load global word BASE%d", inCode[ic+1], inCode[ic+1])
+                    baseLocs.insert(Int(inCode[ic+1]))
                     ic+=2; break;
                 case 0xAA: instructions[ic] = String(format:"SAS  %02x          String assign (TOS to TOS-1, %d chars)", inCode[ic+1], inCode[ic+1])
                     ic+=2; break;
-                case 0xAB: instructions[ic] = String(format:"SRO  %02x          Store global word (BASE%d)", inCode[ic+1], inCode[ic+1])
+                case 0xAB: instructions[ic] = String(format:"SRO  %02x          Store global word BASE%d", inCode[ic+1], inCode[ic+1])
+                    baseLocs.insert(Int(inCode[ic+1]))
                     ic+=2; break;
                 case 0xAC:
                     ic += 1
@@ -544,8 +562,14 @@ do {
                 case 0xB2:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
-                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
-                    instructions[ic] = String(format:"LDA  %02x %04x      Load addr \(label)",inCode[ic+1],val)
+                    var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
+                    if refLexLevel < 0 {
+                        globalLocs.insert(Int(val))
+                    }
+                    if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
+                        label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
+                    }
+                    instructions[ic] = String(format:"LDA  %02x %04x     Load addr \(label)",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
                 case 0xB3:
@@ -559,7 +583,7 @@ do {
                     }
                     instructions[ic] = s
                     ic += count*2; break;
-                case 0xB4: 
+                case 0xB4:
                     instructions[ic] = "LEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 <= TOS"
                     ic+=2; break;
                 case 0xB5:
@@ -568,7 +592,13 @@ do {
                 case 0xB6:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
-                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)_\(val)"
+                    var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)_\(val)"
+                    if refLexLevel < 0 {
+                        globalLocs.insert(Int(val))
+                    }
+                    if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
+                        label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
+                    }
                     instructions[ic] = String(format:"LOD  %02x %04x     Load word at \(label)",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
@@ -578,8 +608,14 @@ do {
                 case 0xB8:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
-                    let label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
-                    instructions[ic] = String(format:"STR  %02x %04x     Store TOS to \(label))",inCode[ic+1],val)
+                    var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
+                    if refLexLevel < 0 {
+                        globalLocs.insert(Int(val))
+                    }
+                    if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
+                        label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
+                    }
+                    instructions[ic] = String(format:"STR  %02x %04x     Store TOS to \(label)",inCode[ic+1],val)
                     ic+=(2+inc)
                     break;
                 case 0xB9:
@@ -637,6 +673,7 @@ do {
                 case 0xC6:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
                     instructions[ic] = String(format:"LLA  %04x        Load local address MP%d",val, val)
+                    localLocs.insert(val)
                     ic+=(1+inc)
                     break;
                 case 0xC7:
@@ -652,6 +689,7 @@ do {
                 case 0xCA:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
                     instructions[ic] = String(format:"LDL  %04x        Load local word MP%d",val,val)
+                    localLocs.insert(val)
                     ic+=(1+inc)
                     break;
                 case 0xCB:
@@ -660,6 +698,7 @@ do {
                 case 0xCC:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
                     instructions[ic] = String(format:"STL  %04x        Store TOS into MP%d",val,val)
+                    localLocs.insert(val)
                     ic+=(1+inc)
                     break;
                 case 0xCD:
@@ -668,13 +707,13 @@ do {
                     instructions[ic] = s
                     ic+=3; break;
                 case 0xCE:
-                    var s = String(format:"CLP  %02x          Call local procedure %d (immediate child)",inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? ""}
+                    var s = String(format:"CLP  %02x          Call local procedure %d (child)",inCode[ic+1], inCode[ic+1])
+                    if let n = names[Int(seg.segNum)] { s += " " + (n.procNames[Int(inCode[ic+1])] ?? "")}
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xCF:
                     var s = String(format:"CGP  %02x          Call global procedure %d (lexLevel 1, curr seg)", inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? ""}
+                    if let n = names[Int(seg.segNum)] { s += " " + (n.procNames[Int(inCode[ic+1])] ?? "")}
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xD0:
@@ -714,9 +753,11 @@ do {
                     ic+=1;break
                 case 0xd8...0xe7:
                     instructions[ic] = String(format:"SLDL %02x          Short load local MP%d", inCode[ic]-0xd7, inCode[ic]-0xd7)
+                    localLocs.insert(Int(inCode[ic])-0xd7)
                     ic+=1; break;
                 case 0xe8...0xf7:
                     instructions[ic] = String(format:"SLDO %02x          Short load global BASE%d", inCode[ic]-0xe7, inCode[ic]-0xe7)
+                    baseLocs.insert(Int(inCode[ic])-0xe7)
                     ic+=1; break
                 case 0xf8...0xff: instructions[ic] = String(format:"SIND %02x          Short index load *TOS+%d", inCode[ic]-0xf8, inCode[ic]-0xf8)
                     ic+=1; break;
@@ -725,10 +766,12 @@ do {
                     ic+=1; break
                 }
             }
-
+            
+            var actualParams = proc.parameterSize // how many words of params, minus function
+            
             if isFunc {
                 procType += "FUNCTION \(seg.name)."
-                proc.parameterSize -= 2 // two words of param are the function return
+                actualParams -= 2 // two words of param are the function return
             } else {
                 procType += "PROCEDURE \(seg.name)."
             }
@@ -743,18 +786,83 @@ do {
                 }
             }
             
-            if proc.parameterSize > 0 {
+            if actualParams > 0 {
                 procType += "("
-                for parmnum in 1...proc.parameterSize {
+                for parmnum in 1...actualParams {
                     if parmnum > 1 { procType += "; "}
                     procType += "PARAM\(parmnum)"
-//                    procType += "PARM"+String(format:"%d",parmnum)
                 }
                 procType += ")"
             }
             if isFunc { procType += ": RETVAL" }
             
             print(procType)
+            
+            // TODO:: FIX ME - param count vs local variables is not taking into account
+            // the possibility that there was no reference to a parameter (eg a junk param)
+            // param num needs to be independent of how many reference entries there are
+            // so if a function, MP/BASE1 and MP/BASE2 are always return val,
+            // followed by param count words in reverse number order
+            // proc is the same except 1 and 2 aren't return values
+            // function with 3 params:
+            // 1=RETVAL
+            // 2=nothing
+            // 3=P3
+            // 4=P2
+            // 5=P1
+            // proc with 3 params:
+            // 1=P3
+            // 2=P2
+            // 3=P1
+            
+            if proc.lexicalLevel == 0 {
+                var p = actualParams
+                for ll in baseLocs.sorted() {
+                    if isFunc {
+                        if ll == 1 || ll == 2 {
+                            print(prefix + "  BASE\(ll)=RETVAL\(ll)")
+                        } else {
+                            if p > 0 {
+                                print(prefix + "  BASE\(ll)=PARAM\(p)")
+                            } else {
+                                print(prefix + "  BASE\(ll)")
+                            }
+                            p -= 1
+                        }
+                    } else {
+                        if p > 0 {
+                            print(prefix + "  BASE\(ll)=PARAM\(p)")
+                        } else {
+                            print(prefix + "  BASE\(ll)")
+                        }
+                        p -= 1
+                    }
+                }
+            } else if proc.lexicalLevel >= 1 {
+                for bl in baseLocs.sorted() { print(prefix + "  BASE\(bl)") }
+                var p = actualParams
+                for ll in localLocs.sorted() {
+                    if isFunc {
+                        if ll == 1 || ll == 2 {
+                            print(prefix + "  MP\(ll)=RETVAL\(ll)")
+                        } else {
+                            if p > 0 {
+                                print(prefix + "  MP\(ll)=PARAM\(p)")
+                            } else {
+                                print(prefix + "  MP\(ll)")
+                            }
+                            p -= 1
+                        }
+                    } else {
+                        if p > 0 {
+                            print(prefix + "  MP\(ll)=PARAM\(p)")
+                        } else {
+                            print(prefix + "  MP\(ll)")
+                        }
+                        p -= 1
+                    }
+                }
+            }
             print(prefix + "BEGIN")
 
             for i in instructions.sorted(by: {$0.key < $1.key}) {
