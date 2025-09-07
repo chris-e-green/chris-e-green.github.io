@@ -469,18 +469,22 @@ do {
                     proc.instructions[ic] = String(format:"FJP  $%04x       Jump if TOS false", dest)
                     ic+=2; break;
                 case 0xA2:
-                    proc.instructions[ic] = String(format:"INCP %02x          Inc field ptr (TOS+%d)", inCode[ic+1], inCode[ic+1])
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"INC  %04x          Inc field ptr (TOS+%d)", val, val)
+                    ic+=(1+inc); break;
                 case 0xA3:
-                    proc.instructions[ic] = String(format:"IND  %02x          Static index and load word (TOS+%d)", inCode[ic+1], inCode[ic+1])
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"IND  %04x          Static index and load word (TOS+%d)", val, val)
+                    ic+=(1+inc); break;
                 case 0xA4:
-                    proc.instructions[ic] = String(format:"IXA  %02x          Index array (TOS-1 + TOS * %d)", inCode[ic+1], inCode[ic+1])
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"IXA  %04x          Index array (TOS-1 + TOS * %d)", val, val)
+                    ic+=(1+inc); break;
                 case 0xA5:
-                    proc.instructions[ic] = String(format:"LAO  %02x          Load global BASE%d", inCode[ic+1], inCode[ic+1])
-                    baseLocs.insert(Int(inCode[ic+1]))
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"LAO  %04x          Load global BASE%d", val, val)
+                    baseLocs.insert(val)
+                    ic+=(1+inc); break;
                 case 0xA6:
                     var s = String(format:"LSA  %02x          Load string address:", inCode[ic+1]) +
                     " '"
@@ -499,19 +503,22 @@ do {
                     ic+=(2+inc)
                     break;
                 case 0xA8:
-                    proc.instructions[ic] = String(format:"MOV  %02x          Move %d words (TOS to TOS-1)", inCode[ic+1], inCode[ic+1])
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"MOV  %04x          Move %d words (TOS to TOS-1)", val, val)
+                    ic+=(1+inc); break;
                 case 0xA9:
-                    proc.instructions[ic] = String(format:"LDO  %02x          Load global word BASE%d", inCode[ic+1], inCode[ic+1])
-                    baseLocs.insert(Int(inCode[ic+1]))
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"LDO  %04x          Load global word BASE%d", val,val)
+                    baseLocs.insert(val)
+                    ic+=(1+inc); break;
                 case 0xAA:
                     proc.instructions[ic] = String(format:"SAS  %02x          String assign (TOS to TOS-1, %d chars)", inCode[ic+1], inCode[ic+1])
                     ic+=2; break;
                 case 0xAB:
-                    proc.instructions[ic] = String(format:"SRO  %02x          Store global word BASE%d", inCode[ic+1], inCode[ic+1])
-                    baseLocs.insert(Int(inCode[ic+1]))
-                    ic+=2; break;
+                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    proc.instructions[ic] = String(format:"SRO  %04x          Store global word BASE%d", val, val)
+                    baseLocs.insert(val)
+                    ic+=(1+inc; break;
                 case 0xAC:
                     ic += 1
                     if ic % 2 != 0 { ic += 1 } // word align
