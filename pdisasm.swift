@@ -518,7 +518,7 @@ do {
                     let (val, inc) = readBig(data: inCode, index: ic+1)
                     proc.instructions[ic] = String(format:"SRO  %04x          Store global word BASE%d", val, val)
                     baseLocs.insert(val)
-                    ic+=(1+inc; break;
+                    ic+=(1+inc); break;
                 case 0xAC:
                     ic += 1
                     if ic % 2 != 0 { ic += 1 } // word align
