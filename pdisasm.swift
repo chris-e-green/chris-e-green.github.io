@@ -16,20 +16,21 @@ let names:[Int:Name] = [
             16:"FREADCHAR", 17:"FWRITECHAR", 18:"FREADSTRING",
             19:"FWRITESTRING", 20:"FWRITEBYTES", 21:"FREADLN", 22:"FWRITELN",
             23:"SCONCAT", 24:"SINSERT", 25:"SCOPY", 26:"SDELETE", 27:"SPOS",
-            28:"FBLOCKIO", 29: "FGOTOXY", 30:"VOLSEARCH", 31:"WRITEDIR",
-            32:"DIRSEARCH", 33:"SCANTITLE", 34:"DELENTRY", 35:"INSENTRY",
-            36:"HOMECURSOR", 37:"CLEARSCREEN", 38:"CLEARLINE", 39:"PROMPT",
-            40:"SPACEWAIT", 41:"GETCHAR", 42:"FETCHDIR", 43:"PARSECMD",
-            48:"COMMAND", 49:"CANTSTRETCH", 50:"WAITSYSVOL", 51:"PRINTLOCS",
-            52:"PRINTEXECERR", 53:"PUTPREFIXED", 54:"CHECKDEL", 55:"DOBLOCKIO"]),
+            28:"FBLOCKIO", 29: "FGOTOXY"//, 30:"VOLSEARCH", 31:"WRITEDIR",
+//            32:"DIRSEARCH", 33:"SCANTITLE", 34:"DELENTRY", 35:"INSENTRY",
+//            36:"HOMECURSOR", 37:"CLEARSCREEN", 38:"CLEARLINE", 39:"PROMPT",
+//            40:"SPACEWAIT", 41:"GETCHAR", 42:"FETCHDIR", 43:"PARSECMD",
+//            48:"COMMAND", 49:"CANTSTRETCH", 50:"WAITSYSVOL", 51:"PRINTLOCS",
+//            52:"PRINTEXECERR", 53:"PUTPREFIXED", 54:"CHECKDEL", 55:"DOBLOCKIO"
+        ]),
     1:Name(
         segName: "USERPROG",
         procNames: [
             1:"USERPROGRAM"]),
-    2:Name(
-        segName: "FIOPRIMS",
-        procNames: [
-            1:"PROC1", 2:"FGETSOFTBUF", 3:"PROCESSDLE", 4:"DOENDOFPAGE", 5:"FPUTSOFTBUF"]),
+//    2:Name(
+//        segName: "FIOPRIMS",
+//        procNames: [
+//            1:"PROC1", 2:"FGETSOFTBUF", 3:"PROCESSDLE", 4:"DOENDOFPAGE", 5:"FPUTSOFTBUF"]),
     3:Name(
         segName: "PRINTERR",
         procNames: [1:"PRINTERROR"]),
@@ -38,22 +39,23 @@ let names:[Int:Name] = [
         procNames:[
             1:"INITIALIZE", 2:"INITSYSCOM", 3:"INIT_FILLER",
             4:"SETPREFIXEDCRTCTL", 5:"SETPREFIXEDCRTINFO", 6:"INITUNITABLE",
-            7:"INIT_ENTRY", 8:"INITHEAP", 9:"INITWORKFILE", 10:"TRY_OPEN",
-            11:"INITFILES"]),
-    5:Name(
-        segName: "GETCMD",
-        procNames: [
-            1:"GETCMD", 2:"RUNWORKFILE", 3:"SYS_ASSOCIATE", 4:"YESORNO",
-            5:"GETSEGNUM", 6:"MISSINGFILE", 7:"FUNC7", 8:"PROC8",9:"PROC9",
-            10:"LOADUSERSEGS", 11:"FINDSEGSOFKIND", 12:"LOADINTRINSICS",
-            13:"ASSOCIATE", 14:"STARTCOMPILE", 15:"DELETELEADINGSPACES",
-            16:"FINISHCOMPILE", 17:"EXECERROR", 18: "PROC18", 19:"EXECUTE",
-            20:"SWAPPING", 21:"MAKEEXEC"]),
-    6:Name(
-        segName: "FILEPROC",
-        procNames: [
-            1:"PROC1", 2:"RESETER", 3:"FRESET", 4:"FOPEN", 5:"ENTERTEMP",
-            6:"PROC6", 7:"FCLOSE", 8:"PARSECMD"]),
+//            7:"INIT_ENTRY", 8:"INITHEAP", 9:"INITWORKFILE", 10:"TRY_OPEN",
+//            11:"INITFILES"
+        ]),
+//    5:Name(
+//        segName: "GETCMD",
+//        procNames: [
+//            1:"GETCMD", 2:"RUNWORKFILE", 3:"SYS_ASSOCIATE", 4:"YESORNO",
+//            5:"GETSEGNUM", 6:"MISSINGFILE", 7:"FUNC7", 8:"PROC8",9:"PROC9",
+//            10:"LOADUSERSEGS", 11:"FINDSEGSOFKIND", 12:"LOADINTRINSICS",
+//            13:"ASSOCIATE", 14:"STARTCOMPILE", 15:"DELETELEADINGSPACES",
+//            16:"FINISHCOMPILE", 17:"EXECERROR", 18: "PROC18", 19:"EXECUTE",
+//            20:"SWAPPING", 21:"MAKEEXEC"]),
+//    6:Name(
+//        segName: "FILEPROC",
+//        procNames: [
+//            1:"PROC1", 2:"RESETER", 3:"FRESET", 4:"FOPEN", 5:"ENTERTEMP",
+//            6:"PROC6", 7:"FCLOSE", 8:"PARSECMD"]),
 ]
 let cspNames: [Int:String] = [
     0:"IOC", 1:"NEW", 2:"MOVL", 3:"MOVR", 4:"EXIT", 5:"UNITREAD", 6:"UNITWRITE",
@@ -63,19 +65,26 @@ let cspNames: [Int:String] = [
     38:"UNITCLEAR", 39:"HALT", 40:"MEMAVAIL"]
 
 let globalLocations: [Int:String] = [
-    1:"SYSCOM", 2:"INPUT", 3:"OUTPUT", 4:"SYSTERM", 8:"USERINFO.CODEFIBP",
-    9: "USERINFO.SYMFIB", 10:"USERINFO.ERRNUM", 11:"USERINFO.ERRBLK",
-    12:"USERINFO.ERRSYM", 13:"USERINFO.STUPID", 14:"USERINFO.SLOWTERM",
-    15:"USERINFO.ALTMODE", 16:"USERINFO.GOTCODE", 17:"USERINFO.GOTSYM",
-    18:"USERINFO.CODEVID", 22:"USERINFO.SYMVID", 26:"USERINFO.WORKVID",
-    30:"USERINFO.CODETID", 38:"USERINFO.SYMTID", 46:"USERINFO.WORKTID",
-    54:"EMPTYHEAP", 55:"SWAPFIB", 56:"SYSTERM", 57:"OUTPUTFIB", 58:"INPUTFIB",
-    59:"DKVID", 63:"SYVID", 67:"THEDATE", 68:"DEBUGINFO", 69:"STATE",
-    70:"PL", 111:"IPOT", 116:"FILLER", 122:"DIGITS", 126:"UNITABLE"
+    1:"SYSCOM", 2:"INPUT", 3:"OUTPUT", 4:"SYSTERM",
+//    8:"USERINFO.CODEFIBP",
+//    9: "USERINFO.SYMFIB", 10:"USERINFO.ERRNUM", 11:"USERINFO.ERRBLK",
+//    12:"USERINFO.ERRSYM", 13:"USERINFO.STUPID", 14:"USERINFO.SLOWTERM",
+//    15:"USERINFO.ALTMODE", 16:"USERINFO.GOTCODE", 17:"USERINFO.GOTSYM",
+//    18:"USERINFO.CODEVID", 22:"USERINFO.SYMVID", 26:"USERINFO.WORKVID",
+//    30:"USERINFO.CODETID", 38:"USERINFO.SYMTID", 46:"USERINFO.WORKTID",
+//    54:"EMPTYHEAP", 55:"SWAPFIB", 56:"SYSTERM", 57:"OUTPUTFIB", 58:"INPUTFIB",
+//    59:"DKVID", 63:"SYVID", 67:"THEDATE", 68:"DEBUGINFO", 69:"STATE",
+//    70:"PL", 111:"IPOT", 116:"FILLER", 122:"DIGITS", 126:"UNITABLE"
 ]
 
 do {
-    let fileURL = URL(fileURLWithPath: "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-01-00.bin")
+    var filename = ""
+    if CommandLine.arguments.count < 2 {
+        filename = "/Users/chris/Documents/Legacy OS and Programming Languages/Apple/Pascal_PCode_Interpreters/SYSTEM.PASCAL-02-0A.bin"
+    } else {
+        filename = CommandLine.arguments[1]
+    }
+    let fileURL = URL(fileURLWithPath: filename)
     print("# ", fileURL.lastPathComponent,"\n")
     let binaryData = try Data(contentsOf: fileURL)
     let diskInfo = binaryData.subdata(in: 0..<64)
@@ -182,15 +191,20 @@ do {
         return Int(data[index]) | Int(data[index+1]) << 8
     }
     
-    func decodeComparator(idx:Int)->String{
-        switch idx {
-        case 2: return "REAL          Real "
-        case 4: return "STR           String "
-        case 6: return "BOOL          Boolean "
-        case 8: return "SET           Set "
-        case 10:return "BYTE          Byte array "
-        case 12:return "WORD          Word array "
-        default : return ""
+    func decodeComparator(data: Data, index:Int)->(String, Int) {
+        
+        switch data[index] {
+        case 2: return ("REAL          Real ",1)
+        case 4: return ("STR           String ",1)
+        case 6: return ("BOOL          Boolean ",1)
+        case 8: return ("SET           Set ",1)
+        case 10:
+            let (val, inc) = readBig(data: data, index: index+1)
+            return ("BYTE          Byte array (\(val) long) ", inc+1)
+        case 12:
+            let (val, inc) = readBig(data: data, index: index+1)
+            return ("WORD          Word array (\(val) long) ", inc+1)
+        default : return ("",1)
         }
     }
     
@@ -245,9 +259,11 @@ do {
     // for the moment, print it out to validate it.
     print(segDict)
     
+    var allGlobalLocs: Set<Int> = []
+
     // for each segment (sorted by segment number), extract the code block from the file
     // if it's the PASCALSYSTEM segment, load the hidden half of the segment too.
-
+    
     for segment in segDict.segTable.sorted(by: {$0.key < $1.key}) {
         let seg = segment.value
         var offset = 0
@@ -301,6 +317,7 @@ do {
             procDict.procedurePointers.append(addr)
         }
         codeSeg.procedureDictionary = procDict
+        var segGlobalLocs: Set<Int> = []
         
         for p in procDict.procedurePointers {
             var proc: Procedure = Procedure()
@@ -339,7 +356,7 @@ do {
             entryPoints.insert(proc.enterIC)
             entryPoints.insert(proc.exitIC)
             var instructions: [Int:String] = [:]
-            var globalLocs: Set<Int> = []
+            var procGlobalLocs: Set<Int> = []
             var baseLocs: Set<Int> = []
             var localLocs: Set<Int> = []
             
@@ -441,7 +458,7 @@ do {
                     ic+=(2+inc)
                     break;
                 case 0x9E:
-                    instructions[ic] = String(format:"CSP  %02x          Call standard procedure %d ", inCode[ic+1], inCode[ic+1]) + (cspNames[Int(inCode[ic+1])] ?? "")
+                    instructions[ic] = String(format:"CSP  %02x          Call standard procedure ", inCode[ic+1]) + (cspNames[Int(inCode[ic+1])] ?? "\(inCode[ic+1])")
                     ic+=2; break;
                 case 0x9F:
                     instructions[ic] = "LDCN             Load constant NIL"
@@ -545,26 +562,28 @@ do {
                     break
                 case 0xAE:
                     var s = String(format:"CIP  %02x          Call intermediate procedure %d ", inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] {
-                        s += (n.procNames[Int(inCode[ic+1])] ?? "")
-                    }
+                    s += "\(seg.name)."
+                    if let n = names[Int(seg.segNum)] { s += "\(n.procNames[Int(inCode[ic+1])] ?? "\(inCode[ic+1])")" } else { s += "\(inCode[ic+1])" }
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xAF:
-                    instructions[ic] = "EQL" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 = TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "EQL" + comp + "TOS-1 = TOS"
+                    ic+=inc+1; break;
                 case 0xB0:
-                    instructions[ic] = "GEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 >= TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "GEQ" + comp + "TOS-1 >= TOS"
+                    ic+=inc+1; break;
                 case 0xB1:
-                    instructions[ic] = "GRT" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 > TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "GRT" + comp + "TOS-1 > TOS"
+                    ic+=inc+1; break;
                 case 0xB2:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
                     if refLexLevel < 0 {
-                        globalLocs.insert(Int(val))
+                        procGlobalLocs.insert(Int(val))
                     }
                     if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
                         label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
@@ -584,17 +603,19 @@ do {
                     instructions[ic] = s
                     ic += count*2; break;
                 case 0xB4:
-                    instructions[ic] = "LEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 <= TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "LEQ" + comp + "TOS-1 <= TOS"
+                    ic+=inc+1; break;
                 case 0xB5:
-                    instructions[ic] = "LES" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 < TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "LES" + comp + "TOS-1 < TOS"
+                    ic+=inc+1; break;
                 case 0xB6:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)_\(val)"
                     if refLexLevel < 0 {
-                        globalLocs.insert(Int(val))
+                        procGlobalLocs.insert(Int(val))
                     }
                     if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
                         label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
@@ -603,14 +624,15 @@ do {
                     ic+=(2+inc)
                     break;
                 case 0xB7:
-                    instructions[ic] = "NEQ" + decodeComparator(idx: Int(inCode[ic+1])) + "TOS-1 <> TOS"
-                    ic+=2; break;
+                    let (comp, inc) = decodeComparator(data: inCode, index: ic+1)
+                    instructions[ic] = "NEQ" + comp + "TOS-1 <> TOS"
+                    ic+=inc+1; break;
                 case 0xB8:
                     let (val, inc) = readBig(data: inCode, index: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
                     if refLexLevel < 0 {
-                        globalLocs.insert(Int(val))
+                        procGlobalLocs.insert(Int(val))
                     }
                     if refLexLevel < 0 && globalLocations.contains(where: { $0.key == Int(val) }) {
                         label += (" (" + (globalLocations[Int(val)] ?? "") + ")")
@@ -657,8 +679,9 @@ do {
                     done = true
                     break
                 case 0xC2:
-                    var s = String(format:"CBP  %02x          Call base procedure %d ", inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] { s += n.procNames[Int(inCode[ic+1])] ?? "" }
+                    var s = String(format:"CBP  %02x          Call base procedure ", inCode[ic+1], inCode[ic+1])
+                    s += "\(seg.name)."
+                    if let n = names[Int(seg.segNum)] { s += "\(n.procNames[Int(inCode[ic+1])] ?? "\(inCode[ic+1])")" } else { s += "\(inCode[ic+1])" }
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xC3:
@@ -702,18 +725,21 @@ do {
                     ic+=(1+inc)
                     break;
                 case 0xCD:
-                    var s = String(format:"CXP  %02x %02x       Call external procedure %d in seg %d ", inCode[ic+1], inCode[ic+2],inCode[ic+2],inCode[ic+1])
-                    if let n = names[Int(inCode[ic+1])] { s += n.procNames[Int(inCode[ic+2])] ?? ""}
+                    var s = String(format:"CXP  %02x %02x       Call external procedure ", inCode[ic+1], inCode[ic+2])
+                    s += "\(segDict.segTable[Int(inCode[ic+1])]?.name ?? "unknown!")."
+                    if let n = names[Int(inCode[ic+1])] { s += "\(n.procNames[Int(inCode[ic+2])] ?? "\(inCode[ic+2])")" } else { s += "\(inCode[ic+2])" }
                     instructions[ic] = s
                     ic+=3; break;
                 case 0xCE:
-                    var s = String(format:"CLP  %02x          Call local procedure %d (child)",inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] { s += " " + (n.procNames[Int(inCode[ic+1])] ?? "")}
+                    var s = String(format:"CLP  %02x          Call local procedure ",inCode[ic+1])
+                    s += "\(seg.name)."
+                    if let n = names[Int(seg.segNum)] { s += "\(n.procNames[Int(inCode[ic+1])] ?? "\(inCode[ic+1])")" } else { s += "\(inCode[ic+1])" }
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xCF:
-                    var s = String(format:"CGP  %02x          Call global procedure %d (lexLevel 1, curr seg)", inCode[ic+1], inCode[ic+1])
-                    if let n = names[Int(seg.segNum)] { s += " " + (n.procNames[Int(inCode[ic+1])] ?? "")}
+                    var s = String(format:"CGP  %02x          Call global procedure ", inCode[ic+1])
+                    s += "\(seg.name)."
+                    if let n = names[Int(seg.segNum)] { s += "\(n.procNames[Int(inCode[ic+1])] ?? "\(inCode[ic+1])")" } else { s += "\(inCode[ic+1])" }
                     instructions[ic] = s
                     ic+=2; break;
                 case 0xD0:
@@ -779,11 +805,14 @@ do {
             if proc.procedureNumber == 1 {
                 procType += "\(seg.name)"
             } else {
-                if isFunc {
-                    procType += "FUNC\(proc.procedureNumber)"
-                } else {
-                    procType += "PROC\(proc.procedureNumber)"
+                if let n = names[Int(seg.segNum)], let pn = n.procNames[Int(proc.procedureNumber)] { procType += pn } else {
+                    if isFunc {
+                        procType += "FUNC\(proc.procedureNumber)"
+                    } else {
+                        procType += "PROC\(proc.procedureNumber)"
+                    }
                 }
+
             }
             
             if actualParams > 0 {
@@ -798,68 +827,79 @@ do {
             
             print(procType)
             
-            // TODO:: FIX ME - param count vs local variables is not taking into account
-            // the possibility that there was no reference to a parameter (eg a junk param)
-            // param num needs to be independent of how many reference entries there are
-            // so if a function, MP/BASE1 and MP/BASE2 are always return val,
-            // followed by param count words in reverse number order
-            // proc is the same except 1 and 2 aren't return values
-            // function with 3 params:
-            // 1=RETVAL
-            // 2=nothing
-            // 3=P3
-            // 4=P2
-            // 5=P1
-            // proc with 3 params:
-            // 1=P3
-            // 2=P2
-            // 3=P1
-            
+            for g in procGlobalLocs.sorted() {
+                print(prefix + "  G\(g)")
+            }
             if proc.lexicalLevel == 0 {
-                var p = actualParams
+                var done = (actualParams == 0)
                 for ll in baseLocs.sorted() {
                     if isFunc {
                         if ll == 1 || ll == 2 {
                             print(prefix + "  BASE\(ll)=RETVAL\(ll)")
                         } else {
-                            if p > 0 {
-                                print(prefix + "  BASE\(ll)=PARAM\(p)")
+                            if !done {
+                                let paramNum = proc.parameterSize - ll + 1
+                                print(prefix + "  BASE\(ll)=PARAM\(paramNum)")
+                                if paramNum <= 1 {
+                                    done = true
+                                }
                             } else {
                                 print(prefix + "  BASE\(ll)")
                             }
-                            p -= 1
                         }
                     } else {
-                        if p > 0 {
-                            print(prefix + "  BASE\(ll)=PARAM\(p)")
+                        if !done {
+                            let paramNum = proc.parameterSize - ll + 1
+                            print(prefix + "  BASE\(ll)=PARAM\(paramNum)")
+                            if paramNum <= 1 {
+                                done = true
+                            }
                         } else {
                             print(prefix + "  BASE\(ll)")
                         }
-                        p -= 1
                     }
                 }
             } else if proc.lexicalLevel >= 1 {
                 for bl in baseLocs.sorted() { print(prefix + "  BASE\(bl)") }
-                var p = actualParams
+                var done = (actualParams == 0)
                 for ll in localLocs.sorted() {
                     if isFunc {
                         if ll == 1 || ll == 2 {
                             print(prefix + "  MP\(ll)=RETVAL\(ll)")
                         } else {
-                            if p > 0 {
-                                print(prefix + "  MP\(ll)=PARAM\(p)")
+                            if !done {
+                                let paramNum = proc.parameterSize - ll + 1
+                                print(prefix + "  MP\(ll)=PARAM\(paramNum)")
+                                if paramNum <= 1 {
+                                    done = true
+                                }
                             } else {
                                 print(prefix + "  MP\(ll)")
                             }
-                            p -= 1
                         }
                     } else {
-                        if p > 0 {
-                            print(prefix + "  MP\(ll)=PARAM\(p)")
+                        if !done {
+                            let paramNum = proc.parameterSize - ll + 1
+                            print(prefix + "  MP\(ll)=PARAM\(paramNum)")
+                            if paramNum <= 1 {
+                                done = true
+                            }
                         } else {
                             print(prefix + "  MP\(ll)")
                         }
-                        p -= 1
+                    }
+                }
+            } else if proc.lexicalLevel == -1 { // only one of these and it's a procedure
+                var done = (actualParams == 0)
+                for ll in localLocs.sorted() {
+                    if !done {
+                        let paramNum = proc.parameterSize - ll + 1
+                        print(prefix + "  G\(ll)=PARAM\(paramNum)")
+                        if paramNum <= 1 {
+                            done = true
+                        }
+                    } else {
+                        print(prefix + "  G\(ll)")
                     }
                 }
             }
@@ -873,9 +913,19 @@ do {
             }
 
             print(prefix + "END")
+            print(prefix)
+            segGlobalLocs.formUnion(procGlobalLocs)
         }
         
+        print("Segment globals:")
+        for g in segGlobalLocs.sorted() { print("G\(g)") }
+        print()
+        allGlobalLocs.formUnion(segGlobalLocs)
     }
+    
+    print("All globals:")
+    for g in allGlobalLocs.sorted() { print("G\(g)") }
+    print()
     
 } catch {
     print("Error reading binary file: \(error.localizedDescription)")
