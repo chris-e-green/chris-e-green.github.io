@@ -470,19 +470,19 @@ do {
                     ic+=2; break;
                 case 0xA2:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"INC  %04x          Inc field ptr (TOS+%d)", val, val)
+                    proc.instructions[ic] = String(format:"INC  %04x        Inc field ptr (TOS+%d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA3:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"IND  %04x          Static index and load word (TOS+%d)", val, val)
+                    proc.instructions[ic] = String(format:"IND  %04x        Static index and load word (TOS+%d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA4:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"IXA  %04x          Index array (TOS-1 + TOS * %d)", val, val)
+                    proc.instructions[ic] = String(format:"IXA  %04x        Index array (TOS-1 + TOS * %d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA5:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"LAO  %04x          Load global BASE%d", val, val)
+                    proc.instructions[ic] = String(format:"LAO  %04x        Load global BASE%d", val, val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
                 case 0xA6:
@@ -504,11 +504,11 @@ do {
                     break;
                 case 0xA8:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"MOV  %04x          Move %d words (TOS to TOS-1)", val, val)
+                    proc.instructions[ic] = String(format:"MOV  %04x        Move %d words (TOS to TOS-1)", val, val)
                     ic+=(1+inc); break;
                 case 0xA9:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"LDO  %04x          Load global word BASE%d", val,val)
+                    proc.instructions[ic] = String(format:"LDO  %04x        Load global word BASE%d", val,val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
                 case 0xAA:
@@ -516,7 +516,7 @@ do {
                     ic+=2; break;
                 case 0xAB:
                     let (val, inc) = readBig(data: inCode, index: ic+1)
-                    proc.instructions[ic] = String(format:"SRO  %04x          Store global word BASE%d", val, val)
+                    proc.instructions[ic] = String(format:"SRO  %04x        Store global word BASE%d", val, val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
                 case 0xAC:
