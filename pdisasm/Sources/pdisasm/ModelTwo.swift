@@ -125,8 +125,8 @@ class ModelTwo {
     func process(inCode: Data, enterIC: Int, addr: Int) {
         var code = CodeData(data: inCode, ipc: enterIC, header:addr)
         var done: Bool = false
-        var ic = 0
-        while ic < addr && !done {
+        while code.ipc < addr && !done {
+            let ic = code.ipc // save current IPC so we can sequence instructions
             let opcode = code.readByte()
             var instrDetail = opTable[opcode]
             if instrDetail == nil {
@@ -199,6 +199,11 @@ class ModelTwo {
                     instrDetail?.offset = code.readBig()
                 }
             }
+
+            if instrDetail?.mnemonic == "RNP" || instrDetail?.mnemonic == "RBP" || instrDetail?.mnemonic == "XIT" {
+                done = true
+            }
+            
             var ps2 = ""
             if ps.count > 15 { ps2 = ps ; ps = "" }
             print(String(format: "%04x: %4@ %15@ %@", ic, instrDetail?.mnemonic.padding(toLength: 5, withPad: " ", startingAt: 0) ?? "???", (ps.isEmpty ? "" : ps).padding(toLength: 15, withPad: " ", startingAt: 0), instrDetail?.comment ?? "???"))
