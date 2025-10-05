@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Debug pdisasm",
+            "program": "${workspaceFolder:pdisasm}/.build/debug/pdisasm",
+            "preLaunchTask": "swift: Build Debug pdisasm"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Release pdisasm",
+            "program": "${workspaceFolder:pdisasm}/.build/release/pdisasm",
+            "preLaunchTask": "swift: Build Release pdisasm"
+        }
+    ]
+}

@@ -1,6 +1,168 @@
 import Foundation
 
+extension Data {
+    
+    /// Returns 512-byte blocks from `Data`.
+    /// - Parameters:
+    ///   - blockNum: the starting block number.
+    ///   - length: the number of blocks to return.
+    /// - Returns: A `Data` object of `length` blocks, starting at block `blockNum`.
+    func getCodeBlock(at blockNum:Int, length:Int) -> Data {
+        return self.subdata(in: Int(blockNum)*512..<(Int(blockNum)*512)+Int(length))
+    }
+    
+    /// Read and decode a 'BIG' value from `Data`. Also returns the number of bytes used to store the value.
+    /// - Parameters:
+    ///   - index: the offset where the BIG value starts.
+    /// - Returns: a tuple containing the decoded value and byte length.
+    func readBig(at index: Int) -> (Int, Int) {
+        var retval: Int = 0
+        var indexInc = 0
+        if self[index] <= 127 {
+            retval = Int(self[index])
+            indexInc = 1
+        } else {
+            retval = Int(self[index] - 128) << 8 | Int(self[index+1])
+            indexInc = 2
+        }
+        return (retval, indexInc)
+    }
+    
+    /// Get a word from `Data`.
+    ///  - Parameters:
+    ///    - index: the offset where the word value starts.
+    ///  - Returns: the word stored at index.
+    func readWord(at index: Int) -> Int {
+        return Int(self[index]) | Int(self[index+1]) << 8
+    }
+    
+    /// Get the absolute location referenced in a self-referenced pointer in `Data`.
+    ///   - Parameters:
+    ///     - at: the offset of the self-referenced pointer
+    ///   - Returns: the absolute pointer corresponding to the self-referenced pointer.
+    func getSelfRefPointer(at index: Int) -> Int {
+        let ptrLocation = index
+        return ptrLocation - readWord(at: ptrLocation)
+    }
+}
 
+struct CodeData {
+    var data: Data
+    var ipc: Int
+    var header: Int
+    
+    init(data: Data) {
+        self.data = data
+        self.ipc = 0
+        self.header = 0
+    }
+    
+    init(data: Data, ipc: Int, header: Int) {
+        self.data = data
+        self.ipc = ipc
+        self.header = header
+    }
+    
+    /// Read a byte from `CodeData` at `ipc`, updating `ipc`.
+    /// - Returns: The byte value.
+    mutating func readByte() -> Int {
+        guard ipc < data.count else { fatalError("Data access out of bounds")}
+        let retval = Int(data[self.ipc])
+        self.ipc += 1
+        return retval
+    }
+    
+    /// Read and decode a 'BIG' value from `CodeData`, at `ipc`, `updating `ipc`.
+    /// - Returns: The decoded value.
+    mutating func readBig() -> Int {
+        guard ipc < data.count else { fatalError("Data access out of bounds")}
+        let firstByte = data[ipc]
+        ipc += 1
+        if firstByte <= 127 {
+            return Int(firstByte)
+        } else {
+            guard ipc < data.count - 1 else { fatalError("Data access out of bounds")}
+            let high = Int(firstByte - 0x80)
+            let low = data[ipc]
+            ipc += 1
+            return (high << 8) | Int(low)
+        }
+    }
+ 
+    /// Get a word from  `CodeData` at `ipc`.
+    ///  - Returns: the word stored at index.
+    mutating func readWord() -> Int {
+        guard ipc < data.count - 1 else { fatalError("Data access out of bounds")}
+        let word = Int(data[ipc]) | Int(data[ipc+1] << 8)
+        self.ipc = self.ipc + 2
+        return word
+    }
+    /// Get a word from  `CodeData` at `index`.
+    ///  - Parameters:
+    ///   - at: if `offset` is set, use this location instead of `ipc` and don't update `ipc` after.
+    ///  - Returns: the word stored at index.
+    mutating func readWord(at position: Int) -> Int {
+        guard position < data.count - 1 else {
+            fatalError("Reading word out of bounds at position $position)")
+        }
+        let word = Int(data[position]) | Int(data[position+1] << 8)
+        return word
+    }
+    
+    mutating func readAddress() -> Int {
+        guard ipc < data.count else { fatalError("Data access out of bounds")}
+        var dest: Int = 0
+        let offset = Int(data[ipc])
+        if offset > 0x7f {
+            let jte = header + offset - 256
+            dest = jte - self.data.readWord(at: jte)// find entry in jump table
+        } else {
+            dest = ipc + offset + 2
+        }
+        ipc += 1
+        return dest
+    }
+    
+    mutating func readString() -> String {
+        let count = Int(data[ipc])
+        ipc += 1
+        guard ipc + count < data.count else {
+            fatalError("Data access out of bounds")
+        }
+
+        let byteArray = Array(data[ipc..<ipc + count])
+        ipc += count
+
+        return String(bytes: byteArray, encoding: .ascii) ?? ""
+    }
+    
+    mutating func readByteArray() -> [Int] {
+        return []
+    }
+    /// Read word-aligned array of `count` words
+    mutating func readWordArray(count: Int) -> [Int] {
+        guard ipc + count * 2 < data.count else { fatalError("Data access out of bounds")}
+        return []
+    }
+}
+
+enum ParamType {
+    case Byte
+    case Big
+    case Word
+    case Address
+    case String
+    case ByteArray
+    case WordArray
+    case Constant
+    case DataLength
+    case ComparisonDataType
+    case CaseMinimum
+    case CaseMaximum
+    case CSPOpCode
+    case Segment
+    case Offset
+}
 
 struct Name {
     var segName:String
@@ -16,7 +178,8 @@ let names:[Int:Name] = [
             16:"FREADCHAR", 17:"FWRITECHAR", 18:"FREADSTRING",
             19:"FWRITESTRING", 20:"FWRITEBYTES", 21:"FREADLN", 22:"FWRITELN",
             23:"SCONCAT", 24:"SINSERT", 25:"SCOPY", 26:"SDELETE", 27:"SPOS",
-            28:"FBLOCKIO", 29: "FGOTOXY"//, 30:"VOLSEARCH", 31:"WRITEDIR",
+            28:"FBLOCKIO", 29: "FGOTOXY",
+//          30:"VOLSEARCH", 31:"WRITEDIR",
 //            32:"DIRSEARCH", 33:"SCANTITLE", 34:"DELENTRY", 35:"INSENTRY",
 //            36:"HOMECURSOR", 37:"CLEARSCREEN", 38:"CLEARLINE", 39:"PROMPT",
 //            40:"SPACEWAIT", 41:"GETCHAR", 42:"FETCHDIR", 43:"PARSECMD",
@@ -34,28 +197,33 @@ let names:[Int:Name] = [
     3:Name(
         segName: "PRINTERR",
         procNames: [1:"PRINTERROR"]),
-    4:Name(
-        segName: "INITIALI",
-        procNames:[
-            1:"INITIALIZE", 2:"INITSYSCOM", 3:"INIT_FILLER",
-            4:"SETPREFIXEDCRTCTL", 5:"SETPREFIXEDCRTINFO", 6:"INITUNITABLE",
+//    4:Name(
+//        segName: "INITIALI",
+//        procNames:[
+//            1:"INITIALIZE",
+//            2:"INITSYSCOM", 3:"INIT_FILLER",
+//            4:"SETPREFIXEDCRTCTL", 5:"SETPREFIXEDCRTINFO", 6:"INITUNITABLE",
 //            7:"INIT_ENTRY", 8:"INITHEAP", 9:"INITWORKFILE", 10:"TRY_OPEN",
 //            11:"INITFILES"
-        ]),
+//        ]),
 //    5:Name(
 //        segName: "GETCMD",
 //        procNames: [
-//            1:"GETCMD", 2:"RUNWORKFILE", 3:"SYS_ASSOCIATE", 4:"YESORNO",
+//            1:"GETCMD",
+//            2:"RUNWORKFILE", 3:"SYS_ASSOCIATE", 4:"YESORNO",
 //            5:"GETSEGNUM", 6:"MISSINGFILE", 7:"FUNC7", 8:"PROC8",9:"PROC9",
 //            10:"LOADUSERSEGS", 11:"FINDSEGSOFKIND", 12:"LOADINTRINSICS",
 //            13:"ASSOCIATE", 14:"STARTCOMPILE", 15:"DELETELEADINGSPACES",
 //            16:"FINISHCOMPILE", 17:"EXECERROR", 18: "PROC18", 19:"EXECUTE",
-//            20:"SWAPPING", 21:"MAKEEXEC"]),
+//            20:"SWAPPING", 21:"MAKEEXEC"
+//        ]),
 //    6:Name(
 //        segName: "FILEPROC",
 //        procNames: [
-//            1:"PROC1", 2:"RESETER", 3:"FRESET", 4:"FOPEN", 5:"ENTERTEMP",
-//            6:"PROC6", 7:"FCLOSE", 8:"PARSECMD"]),
+//            1:"FILEPROC",
+//            2:"RESETER", 3:"FRESET", 4:"FOPEN", 5:"ENTERTEMP",
+//            6:"PROC6", 7:"FCLOSE", 8:"PARSECMD"
+//        ]),
 ]
 let cspNames: [Int:String] = [
     0:"IOC", 1:"NEW", 2:"MOVL", 3:"MOVR", 4:"EXIT", 5:"UNITREAD", 6:"UNITWRITE",
@@ -94,27 +262,18 @@ do {
     let intrinsSegs = binaryData.subdata(in: 288..<296)
     let comment = binaryData.subdata(in: 433..<512)
     
-    func getBlocks(from:Int, to:Int) -> Data {
-        return binaryData.subdata(in: from*512..<to*512)
-    }
-    
-    // retrieves a Data object of length blocks from binaryData starting at block blockNum
-    func getCodeBlock(at blockNum:UInt16, length:UInt16) -> Data {
-        return binaryData.subdata(in: Int(blockNum)*512..<(Int(blockNum)*512)+Int(length))
-    }
-    
-    enum SegmentKind: UInt8 {
+    enum SegmentKind: Int {
         case linked,hostseg,segproc,unitseg,seprtseg,unlinked_intrins,linked_intrins,dataseg
     }
     struct Segment: CustomStringConvertible {
-        var codeaddr: UInt16
-        var codeleng: UInt16
+        var codeaddr: Int
+        var codeleng: Int
         var name: String = ""
         var segkind:SegmentKind = .dataseg
-        var textaddr: UInt16 = 0
-        var segNum: UInt8 = 0
-        var mType: UInt8 = 0
-        var version: UInt8 = 0
+        var textaddr: Int = 0
+        var segNum: Int = 0
+        var mType: Int = 0
+        var version: Int = 0
         var description: String {
             return "| \(segNum) | \(name) | \(String(format:"%04X",codeaddr)) | \(codeleng) | \(segkind) | \(String(format:"%04X",textaddr)) | \(mType) | \(version) |"
         }
@@ -173,27 +332,6 @@ do {
         var procedures: [Procedure]
     }
     
-    // read and decode a 'BIG' value from Data at index, returning a tuple
-    // containing the decoded value and the # of bytes that contained the value
-    // (needed so that the IPC can be incremented correctly)
-    func readBig(data: Data, index: Int) -> (Int, Int) {
-        var retval: Int = 0
-        var indexInc = 0
-        if data[index] <= 127 {
-            retval = Int(data[index])
-            indexInc = 1
-        } else {
-            retval = Int(data[index] - 128) << 8 | Int(data[index+1])
-            indexInc = 2
-        }
-        return (retval, indexInc)
-    }
-    
-    // return a word from Data at index
-    func readWord(data: Data, index: Int) -> Int {
-        return Int(data[index]) | Int(data[index+1]) << 8
-    }
-    
     func decodeComparator(data: Data, index:Int)->(String, Int) {
         
         switch data[index] {
@@ -202,10 +340,10 @@ do {
         case 6: return ("BOOL          Boolean ",1)
         case 8: return ("SET           Set ",1)
         case 10:
-            let (val, inc) = readBig(data: data, index: index+1)
+            let (val, inc) = data.readBig(at: index+1)
             return ("BYTE          Byte array (\(val) long) ", inc+1)
         case 12:
-            let (val, inc) = readBig(data: data, index: index+1)
+            let (val, inc) = data.readBig(at: index+1)
             return ("WORD          Word array (\(val) long) ", inc+1)
         default : return ("",1)
         }
@@ -214,66 +352,60 @@ do {
     // decode Segment Dictionary
     // first, decode the per-segment parts
     for i in 0...15 {
-        let codeaddr = UInt16(diskInfo[i*4+1]) << 8 | UInt16(diskInfo[i*4])
-        let codeleng = UInt16(diskInfo[i*4+3]) << 8 | UInt16(diskInfo[i*4+2])
+        let codeaddr = diskInfo.readWord(at: i*4)
+        let codeleng = diskInfo.readWord(at: i*4+2)
         var name = ""
         for j in 0...7 {
             name.append(String(UnicodeScalar(Int(segName[i*8+j]))!))
         }
         name = name.trimmingCharacters(in: [" "])
-        let kind = SegmentKind(rawValue: segKind[i*2+1] << 8 | segKind[i*2])
-        var segNum = UInt8(segInfo[i*2])
-        if segNum == 0 { segNum = UInt8(i) } // early versions didn't have a segnum in the seg dictionary
-        let mType = UInt8((segInfo[i*2+1] & 0x0F))
-        let version = UInt8((segInfo[i*2+1] & 0xE0)>>5)
-        let text = UInt16(textAddr[i*2+1]) << 8 | UInt16(textAddr[i*2])
+        let kind = SegmentKind(rawValue: segKind.readWord(at: i*2))
+        var segNum = Int(segInfo[i*2])
+        if segNum == 0 { segNum = i } // early versions didn't have a segnum in the seg dictionary
+        let mType = Int(segInfo[i*2+1] & 0x0F)
+        let version = Int((segInfo[i*2+1] & 0xE0)>>5)
+        let text = textAddr.readWord(at: i*2)
         if codeleng > 0 {
             segTable[i] = Segment(codeaddr: codeaddr, codeleng: codeleng, name: name, segkind: kind ?? .dataseg, textaddr: text, segNum: segNum, mType: mType, version: version)
         }
     }
     
     // then decode the per-dictionary parts - the intrinsic set...
-   
-    var intrinsicSet: Set<UInt8> = []
-    var i = intrinsSegs.count - 1
-    repeat {
-        var j = 0
-        var t = intrinsSegs[i]
-        repeat {
-            if (t & 1) == 1 {
-                intrinsicSet.insert(UInt8(i*8+j))
+    var intrinsicSet = Set<UInt8>()
+    for (i, value) in intrinsSegs.enumerated().reversed() {
+        for j in 0..<8 {
+            if (value >> j) & 1 == 1 {
+                intrinsicSet.insert(UInt8(i * 8 + j))
             }
-            t = t >> 1
-            j += 1
-        } while (j < 8)
-        i -= 1
-    } while i >= 0
-    
-    // ... and the comment string.
-    var commentStr: String = ""
-    for i in 0..<comment.count {
-        if comment[i] > 0 {
-            commentStr += String(UnicodeScalar(Int(comment[i]))!)
         }
     }
+    
+    // ... and the comment string.
+    let commentStr = comment
+        .filter { $0 > 0 }
+        .compactMap { UnicodeScalar($0) }
+        .map(String.init)
+        .joined()
+
     // ... and put it all together into a segDict object.
     let segDict = segDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
     
     var allGlobalLocs: Set<Int> = []
 
     var allCodeSegs: [Int:CodeSegment] = [:]
+    
     // for each segment (sorted by segment number), extract the code block from the file
     // if it's the PASCALSYSTEM segment, load the hidden half of the segment too.
     
     for segment in segDict.segTable.sorted(by: {$0.key < $1.key}) {
         let seg = segment.value
         var offset = 0
-        let code = getCodeBlock(at: seg.codeaddr, length: seg.codeleng)
+        let code = binaryData.getCodeBlock(at: seg.codeaddr, length: seg.codeleng)
         var extraCode: Data = Data()
         if seg.segNum == 0  || seg.segNum == 15 {
             if seg.name == "PASCALSY" {
                 if let extraSeg = segDict.segTable[15] {
-                    extraCode = getCodeBlock(at: extraSeg.codeaddr, length: extraSeg.codeleng)
+                    extraCode = binaryData.getCodeBlock(at: extraSeg.codeaddr, length: extraSeg.codeleng)
                     // all procedures are listed in the segment dictionary at the end of
                     // the primary (block 1) segment. The last byte is the number of
                     // procedures in PASCALSYS altogether.
@@ -282,7 +414,7 @@ do {
                     // subtracting 2 * pascalProcCount gets us to the entry for the last procedure
                     let lastProcHdrLoc = code.endIndex - 2 - pascalProcCount * 2
                     // now we get the relative address from that location
-                    let lastProcRelativeAddr = readWord(data: code, index: lastProcHdrLoc)
+                    let lastProcRelativeAddr = code.readWord(at: lastProcHdrLoc)
                     // and subtract the header location from the relative address
                     let lastProcAbsAddr = lastProcRelativeAddr - lastProcHdrLoc
                     // that address + the 0'th procedure entry location is what we will
@@ -310,10 +442,7 @@ do {
         procDict.procedureCount = Int(code[code.endIndex - 1])
                 
         for i in 1...procDict.procedureCount {
-            let procPtr = code.endIndex - i * 2 - 2
-            let relAddr = Int(code[procPtr + 1]) << 8 | Int(code[procPtr])
-            let addr = procPtr - relAddr // the actual address in the file where the proc header is
-            procDict.procedurePointers.append(addr)
+            procDict.procedurePointers.append(code.getSelfRefPointer(at: code.endIndex - i * 2 - 2))
         }
         codeSeg.procedureDictionary = procDict
         var segGlobalLocs: Set<Int> = []
@@ -332,14 +461,10 @@ do {
             proc.procedureNumber = Int(inCode[addr])
             proc.lexicalLevel = Int(inCode[Int(addr) + 1])
             if proc.lexicalLevel > 127 { proc.lexicalLevel = proc.lexicalLevel - 256 }
-            let entryPtr = addr - 2
-            proc.enterIC = entryPtr - (Int(inCode[entryPtr + 1]) << 8 | Int(inCode[entryPtr]))
-            let exitPtr = addr - 4
-            proc.exitIC = exitPtr - (Int(inCode[exitPtr + 1]) << 8 | Int(inCode[exitPtr]))
-            let parmPtr = addr - 6
-            proc.parameterSize = (Int(inCode[parmPtr + 1]) << 8 | Int(inCode[parmPtr])) >> 1
-            let dataPtr = addr - 8
-            proc.dataSize = (Int(inCode[dataPtr + 1]) << 8 | Int(inCode[dataPtr])) >> 1
+            proc.enterIC = inCode.getSelfRefPointer(at: addr - 2)
+            proc.exitIC = inCode.getSelfRefPointer(at: addr - 4)
+            proc.parameterSize = inCode.readWord(at:addr - 6) >> 1
+            proc.dataSize = inCode.readWord(at:addr - 8) >> 1
             var procType: String = "";
             var isFunc: Bool = false
             var ic = proc.enterIC
@@ -349,8 +474,8 @@ do {
             var procGlobalLocs: Set<Int> = []
             var baseLocs: Set<Int> = []
             var localLocs: Set<Int> = []
-            
             while ic < addr && !done {
+                
                 switch inCode[ic] {
                 case 0x00..<0x80:
                     proc.instructions[ic] = String(format:"SLDC %02x          Short load constant %d", inCode[ic], inCode[ic])
@@ -443,7 +568,7 @@ do {
                     proc.instructions[ic] = "UNI              Set union (TOS OR TOS-1)"
                     ic+=1; break;
                 case 0x9D:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     proc.instructions[ic] = String(format:"LDE  %02x %04x      Load extended word (word offset %d in data seg %d)",inCode[ic+1],val, val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
@@ -461,7 +586,7 @@ do {
                     let offset = Int(inCode[ic+1])
                     if offset > 0x7f {
                         let jte = addr + offset - 256
-                        dest = jte - readWord(data: inCode, index: jte)// find entry in jump table
+                        dest = jte - inCode.readWord(at: jte)// find entry in jump table
                     } else {
                         dest = ic + offset + 2
                     }
@@ -469,19 +594,19 @@ do {
                     proc.instructions[ic] = String(format:"FJP  $%04x       Jump if TOS false", dest)
                     ic+=2; break;
                 case 0xA2:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"INC  %04x        Inc field ptr (TOS+%d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA3:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"IND  %04x        Static index and load word (TOS+%d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA4:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"IXA  %04x        Index array (TOS-1 + TOS * %d)", val, val)
                     ic+=(1+inc); break;
                 case 0xA5:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"LAO  %04x        Load global BASE%d", val, val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
@@ -498,16 +623,16 @@ do {
                     ic+=2 + Int(inCode[ic+1])
                     break;
                 case 0xA7:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     proc.instructions[ic] = String(format:"LAE  %02x %04x      Load extended address (address offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
                 case 0xA8:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"MOV  %04x        Move %d words (TOS to TOS-1)", val, val)
                     ic+=(1+inc); break;
                 case 0xA9:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"LDO  %04x        Load global word BASE%d", val,val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
@@ -515,22 +640,22 @@ do {
                     proc.instructions[ic] = String(format:"SAS  %02x          String assign (TOS to TOS-1, %d chars)", inCode[ic+1], inCode[ic+1])
                     ic+=2; break;
                 case 0xAB:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"SRO  %04x        Store global word BASE%d", val, val)
                     baseLocs.insert(val)
                     ic+=(1+inc); break;
                 case 0xAC:
                     ic += 1
                     if ic % 2 != 0 { ic += 1 } // word align
-                    let first = readWord(data: inCode, index: ic)
+                    let first = inCode.readWord(at: ic)
                     ic += 2
-                    let last = readWord(data: inCode, index: ic)
+                    let last = inCode.readWord(at: ic)
                     ic += 2
                     var dest: Int = 0
                     let offset = Int(inCode[ic+1])
                     if offset > 0x7f {
                         let jte = addr + offset - 256
-                        dest = jte - readWord(data: inCode, index: jte)// find entry in jump table
+                        dest = jte - inCode.readWord(at: jte)// find entry in jump table
                     } else {
                         dest = ic + offset + 2
                     }
@@ -542,7 +667,7 @@ do {
                         if c1 == 0 {
                             s += String(repeating: " ", count: 8)
                         }
-                        s += String(format:"   %04x -> %04x", c, ic - readWord(data:inCode, index: ic))
+                        s += String(format:"   %04x -> %04x", c, ic - inCode.readWord(at: ic))
                         ic += 2
                         c1 += 1
                         if c1 == 4 {
@@ -579,7 +704,7 @@ do {
                     proc.instructions[ic] = "GRT" + comp + "TOS-1 > TOS"
                     ic+=inc+1; break;
                 case 0xB2:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
                     if refLexLevel < 0 {
@@ -598,7 +723,7 @@ do {
                     ic += 2
                     if ic % 2 != 0 { ic += 1 } // word aligned data
                     for i in 0..<count {
-                        s += String(format:"%04x", readWord(data: inCode,index: ic+i*2))
+                        s += String(format:"%04x", inCode.readWord(at: ic+i*2))
                     }
                     proc.instructions[ic] = s
                     ic += count*2; break;
@@ -611,7 +736,7 @@ do {
                     proc.instructions[ic] = "LES" + comp + "TOS-1 < TOS"
                     ic+=inc+1; break;
                 case 0xB6:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)_\(val)"
                     if refLexLevel < 0 {
@@ -628,7 +753,7 @@ do {
                     proc.instructions[ic] = "NEQ" + comp + "TOS-1 <> TOS"
                     ic+=inc+1; break;
                 case 0xB8:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     let refLexLevel = proc.lexicalLevel - Int(inCode[ic+1])
                     var label = refLexLevel < 0 ? "G\(val)" : "L\(refLexLevel)\(val)"
                     if refLexLevel < 0 {
@@ -645,7 +770,7 @@ do {
                     let offset = Int(inCode[ic+1])
                     if offset > 0x7f {
                         let jte = addr + offset - 256
-                        dest = jte - readWord(data: inCode, index: jte)// find entry in jump table
+                        dest = jte - inCode.readWord(at: jte)// find entry in jump table
                     } else {
                         dest = ic + offset + 2
                     }
@@ -695,13 +820,13 @@ do {
                     proc.instructions[ic] = "GRTI             Integer TOS-1 > TOS"
                     ic+=1; break;
                 case 0xC6:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"LLA  %04x        Load local address MP%d",val, val)
                     localLocs.insert(val)
                     ic+=(1+inc)
                     break;
                 case 0xC7:
-                    let val = readWord(data: inCode, index: ic+1)
+                    let val = inCode.readWord(at: ic+1)
                     proc.instructions[ic] = String(format:"LDCI %04x        Load word %d",val,val)
                     ic+=3; break;
                 case 0xC8:
@@ -711,7 +836,7 @@ do {
                     proc.instructions[ic] = "LESI             Integer TOS-1 < TOS"
                     ic+=1; break;
                 case 0xCA:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"LDL  %04x        Load local word MP%d",val,val)
                     localLocs.insert(val)
                     ic+=(1+inc)
@@ -720,7 +845,7 @@ do {
                     proc.instructions[ic] = "NEQI             Integer TOS-1 <> TOS"
                     ic+=1; break;
                 case 0xCC:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"STL  %04x        Store TOS into MP%d",val,val)
                     localLocs.insert(val)
                     ic+=(1+inc)
@@ -753,7 +878,7 @@ do {
                     proc.instructions[ic] = s
                     ic+=(2+count); break;
                 case 0xD1:
-                    let (val, inc) = readBig(data: inCode, index: ic+2)
+                    let (val, inc) = inCode.readBig(at: ic+2)
                     proc.instructions[ic] = String(format:"STE  %02x %04x      Store extended word (TOS into word offset %d in data seg %d)",inCode[ic+1],val,val,inCode[ic+1])
                     ic+=(2+inc)
                     break;
@@ -767,7 +892,7 @@ do {
                     proc.instructions[ic] = String(format:"---  %02x", inCode[ic+1])
                     ic+=2; break;
                 case 0xd5:
-                    let (val, inc) = readBig(data: inCode, index: ic+1)
+                    let (val, inc) = inCode.readBig(at: ic+1)
                     proc.instructions[ic] = String(format:"BPT  %04x      Breakpoint",val)
                     ic+=(1+inc)
                     break;
