@@ -7,7 +7,6 @@ This repository contains a Swift-based disassembler for Apple Pascal P-code bina
 ### Core Components
 
 - `pdisasm.swift`: Main entry point and command-line interface using ArgumentParser
-- `ModelTwo.swift`: An experimental model for disassembly logic (not used currently)
 - `Output.swift`: Handles formatting and output of disassembled code
 - `CodeSegment.swift`: Manages code segment parsing and representation
 - `Procedure.swift`: Represents individual procedures and their instructions
