@@ -93,13 +93,13 @@ func outputResults(sourceFilename: String, segDictionary: SegDictionary, globals
                     }
                     print(String(format: "%04x:", address), terminator: " ")
                     if description.hasPrefix("CLP ") || description.hasPrefix("CGP ") {
-                        let c = codeSeg.procedures.first(where: {
-                            $0.procedureNumber
-                                == Int(description.split(separator: ".")[1])
-                        })
-                        print(
-                            "\(description.split(separator: ".")[0]).\(c?.name ?? "unknown3")"
-                        )
+                        if let n = Int(description.split(separator: ".")[1]) {
+                            let c = codeSeg.procedures.first(where: { $0.procedureNumber == n })
+                            print("\(description.split(separator: ".")[0]).\(c?.name ?? "unknown3")")
+                        } else {
+                            print(description)
+                        }
+                        
                     } else if description.hasPrefix("LOD ") || description.hasPrefix("STR ")
                         || description.hasPrefix("LDA ")
                     {

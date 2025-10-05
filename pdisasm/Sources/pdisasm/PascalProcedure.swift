@@ -1018,9 +1018,9 @@ func decodePascalProcedure(
             }
         }
     } else if proc.lexicalLevel >= 1 {
-        for bl in baseLocs.sorted() {
-            proc.variables.append("BASE\(bl)")
-        }
+        // for bl in baseLocs.sorted() {
+        //     proc.variables.append("BASE\(bl)")
+        // }
         // couldn't really have references to intermediate locations if this proc
         // is at level 0 or 1!
         for il in intermediateLocs.sorted() {
