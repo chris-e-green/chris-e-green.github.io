@@ -172,6 +172,8 @@ struct pdisasm: ParsableCommand {
             comment: commentStr
         )
 
+        var allBaseLocs: Set<Int> = []
+        
         var allGlobalLocs: Set<Int> = []
 
         var allCodeSegs: [Int: CodeSegment] = [:]
@@ -251,6 +253,8 @@ struct pdisasm: ParsableCommand {
 
             var segGlobalLocs: Set<Int> = []
 
+            var segBaseLocs: Set<Int> = []
+
             var tempCallers: [Int: Set<Int>] = [:]
 
             if verbose { print("processing P-code segment \(seg.segNum)") }
@@ -258,6 +262,7 @@ struct pdisasm: ParsableCommand {
             for (procIdx, procPtr) in codeSeg.procedureDictionary.procedurePointers.enumerated() {
                 var proc: Procedure = Procedure()
                 var procGlobalLocs: Set<Int> = []
+                var procBaseLocs: Set<Int> = []
                 var inCode: Data
                 var addr = procPtr
                 if addr < 0  // contained in the hidden segment
@@ -276,12 +281,13 @@ struct pdisasm: ParsableCommand {
                     if verbose { print("Found Pascal procedure \(procIdx + 1)") }
                     decodePascalProcedure(
                         currSeg: seg, proc: &proc, knownNames: &names, code: inCode, addr: addr,
-                        callers: &tempCallers, globals: &procGlobalLocs)
+                        callers: &tempCallers, globals: &procGlobalLocs, baseLocs: &procBaseLocs)
                 }
 
                 codeSeg.procedures.append(proc)
 
                 segGlobalLocs.formUnion(procGlobalLocs)
+                segBaseLocs.formUnion(procBaseLocs)
             }
 
             for c in tempCallers {
@@ -289,6 +295,8 @@ struct pdisasm: ParsableCommand {
             }
 
             allCodeSegs[Int(seg.segNum)] = codeSeg
+
+            allBaseLocs.formUnion(segBaseLocs)
 
             allGlobalLocs.formUnion(segGlobalLocs)
         }

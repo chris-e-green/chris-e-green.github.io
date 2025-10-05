@@ -2,7 +2,7 @@ import Foundation
 
 func decodePascalProcedure(
     currSeg: Segment, proc: inout Procedure, knownNames: inout [Int: Name], code: Data, addr: Int,
-    callers: inout [Int: Set<Int>], globals: inout Set<Int>
+    callers: inout [Int: Set<Int>], globals: inout Set<Int>, baseLocs: inout Set<Int>
 ) {
     func decodeComparator(data: Data, index: Int) -> (String, Int) {
 
@@ -35,7 +35,7 @@ func decodePascalProcedure(
     var done: Bool = false
     proc.entryPoints.insert(proc.enterIC)
     proc.entryPoints.insert(proc.exitIC)
-    var baseLocs: Set<Int> = []
+    // var baseLocs: Set<Int> = []
     var localLocs: Set<Int> = []
     var intermediateLocs: Set<String> = []
 
@@ -983,7 +983,9 @@ func decodePascalProcedure(
     }
 
     proc.header = procType
-
+// TODO: move this handling, as much as feasible, into the Output routine.
+// This most likely requires a rethink of how variable references are stored - perhaps 
+// store them as lex-level/memory address tuples? LL=-1 -> global; LL=0 -> base; LL=1+ -> MP
     if proc.lexicalLevel == 0 {
         var done = (actualParams == 0)
         for ll in baseLocs.sorted() {
