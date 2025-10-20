@@ -1,0 +1,4198 @@
+[
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 1,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 4,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 5,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 6,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 7,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 8,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 9,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 10,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "procNumber" : 11,
+    "isAssembly" : false,
+    "segmentName" : "PASCALCO"
+  },
+  {
+    "segmentName" : "PASCALCO",
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "procNumber" : 12,
+    "parameters" : [
+      {
+        "type" : "UNKNOWN",
+        "name" : "PARAM1"
+      },
+      {
+        "type" : "UNKNOWN",
+        "name" : "PARAM2"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 13,
+    "segmentNumber" : 1,
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "PASCALCO"
+  },
+  {
+    "procNumber" : 14,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 1,
+    "isAssembly" : false
+  },
+  {
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 1,
+    "isFunction" : true,
+    "procNumber" : 15
+  },
+  {
+    "segmentName" : "PASCALCO",
+    "procNumber" : 16,
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 1
+  },
+  {
+    "segmentName" : "PASCALCO",
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 17,
+    "isFunction" : true,
+    "segmentNumber" : 1
+  },
+  {
+    "segmentName" : "PASCALCO",
+    "procNumber" : 18,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : true,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isAssembly" : false,
+    "isFunction" : true,
+    "procNumber" : 19,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "PASCALCO"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALCO",
+    "procNumber" : 20,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 1
+  },
+  {
+    "isFunction" : true,
+    "procNumber" : 21,
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 1,
+    "isAssembly" : false
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 1,
+    "procNumber" : 22,
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false
+  },
+  {
+    "isAssembly" : false,
+    "procNumber" : 23,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 1
+  },
+  {
+    "isAssembly" : false,
+    "procNumber" : 24,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 1
+  },
+  {
+    "isAssembly" : false,
+    "procNumber" : 25,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 1
+  },
+  {
+    "procNumber" : 26,
+    "segmentName" : "PASCALCO",
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "procNumber" : 27,
+    "segmentName" : "PASCALCO",
+    "isAssembly" : false,
+    "segmentNumber" : 1,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "segmentNumber" : 1,
+    "isAssembly" : false,
+    "procNumber" : 28,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "PASCALCO",
+    "isFunction" : false
+  },
+  {
+    "isFunction" : true,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 29,
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 1
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 30,
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 1
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 31,
+    "segmentName" : "PASCALCO",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 1
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "segmentName" : "COMPINIT",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 7
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 2,
+    "segmentName" : "COMPINIT",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 7
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 3,
+    "segmentName" : "COMPINIT",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 7
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 4,
+    "segmentName" : "COMPINIT",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 7
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "segmentName" : "COMPINIT",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 7,
+    "procNumber" : 5,
+    "isAssembly" : false
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 6
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 7
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 8
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 9
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 10
+  },
+  {
+    "segmentName" : "COMPINIT",
+    "segmentNumber" : 7,
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 11
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "DECLARAT",
+    "segmentNumber" : 8,
+    "procNumber" : 1,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false
+  },
+  {
+    "segmentName" : "DECLARAT",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 8,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "isFunction" : false,
+    "procNumber" : 2
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "DECLARAT",
+    "procNumber" : 3,
+    "segmentNumber" : 8,
+    "isAssembly" : false
+  },
+  {
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 8,
+    "procNumber" : 4,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "DECLARAT"
+  },
+  {
+    "segmentName" : "DECLARAT",
+    "isAssembly" : false,
+    "segmentNumber" : 8,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 5,
+    "isFunction" : true,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "segmentNumber" : 8,
+    "isAssembly" : false,
+    "procNumber" : 6,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentName" : "DECLARAT",
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 8,
+    "procNumber" : 7
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentName" : "DECLARAT",
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 8,
+    "procNumber" : 8
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentName" : "DECLARAT",
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 8,
+    "procNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentName" : "DECLARAT",
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 8,
+    "procNumber" : 10
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentName" : "DECLARAT",
+    "segmentNumber" : 8,
+    "procNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "procNumber" : 12,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentNumber" : 8,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "DECLARAT"
+  },
+  {
+    "isFunction" : true,
+    "procNumber" : 13,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 8,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "DECLARAT"
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM7",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM8",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 14,
+    "segmentName" : "DECLARAT",
+    "isFunction" : true,
+    "isAssembly" : false,
+    "segmentNumber" : 8
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "procNumber" : 15,
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentNumber" : 8
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "procNumber" : 16,
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentNumber" : 8
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "procNumber" : 17,
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentNumber" : 8
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "procNumber" : 18,
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "isAssembly" : false,
+    "segmentNumber" : 8
+  },
+  {
+    "segmentName" : "DECLARAT",
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 8,
+    "procNumber" : 19,
+    "isAssembly" : false
+  },
+  {
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 8,
+    "segmentName" : "DECLARAT",
+    "isAssembly" : false,
+    "procNumber" : 20
+  },
+  {
+    "procNumber" : 1,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "segmentName" : "BODYPART",
+    "procNumber" : 2,
+    "isFunction" : false,
+    "isAssembly" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 9
+  },
+  {
+    "segmentName" : "BODYPART",
+    "segmentNumber" : 9,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 3,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false
+  },
+  {
+    "segmentNumber" : 9,
+    "segmentName" : "BODYPART",
+    "isFunction" : false,
+    "procNumber" : 4,
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "BODYPART",
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "procNumber" : 5,
+    "segmentNumber" : 9,
+    "isFunction" : false
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "procNumber" : 6,
+    "isFunction" : false,
+    "segmentName" : "BODYPART"
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "procNumber" : 7,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "procNumber" : 8,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "procNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "procNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "procNumber" : 11,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 12,
+    "segmentNumber" : 9,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isFunction" : false,
+    "procNumber" : 13,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "BODYPART",
+    "segmentNumber" : 9,
+    "isAssembly" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "procNumber" : 14,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 9,
+    "segmentName" : "BODYPART"
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "procNumber" : 15,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 9,
+    "segmentName" : "BODYPART"
+  },
+  {
+    "isAssembly" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "BODYPART",
+    "procNumber" : 16,
+    "isFunction" : false,
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 17,
+    "segmentName" : "BODYPART"
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 18,
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "segmentNumber" : 9
+  },
+  {
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 9,
+    "procNumber" : 19,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false
+  },
+  {
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "procNumber" : 20,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "BODYPART",
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9,
+    "procNumber" : 21,
+    "isFunction" : false,
+    "isAssembly" : false
+  },
+  {
+    "procNumber" : 22,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "BODYPART",
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN"
+  },
+  {
+    "procNumber" : 23,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "isFunction" : false
+  },
+  {
+    "procNumber" : 24,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+
+    ],
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "isFunction" : false
+  },
+  {
+    "procNumber" : 25,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+
+    ],
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "isFunction" : false
+  },
+  {
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "procNumber" : 26
+  },
+  {
+    "segmentNumber" : 9,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "procNumber" : 27
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "procNumber" : 28,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "procNumber" : 29,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "procNumber" : 30,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "procNumber" : 31,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "procNumber" : 32,
+    "segmentNumber" : 9,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false
+  },
+  {
+    "segmentName" : "BODYPART",
+    "procNumber" : 33,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 9
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "procNumber" : 34,
+    "segmentNumber" : 9,
+    "isAssembly" : false,
+    "segmentName" : "BODYPART",
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "isFunction" : false,
+    "procNumber" : 35,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 36,
+    "segmentName" : "BODYPART",
+    "segmentNumber" : 9,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "procNumber" : 37
+  },
+  {
+    "parameters" : [
+
+    ],
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "segmentName" : "BODYPART",
+    "isAssembly" : false,
+    "segmentNumber" : 9,
+    "procNumber" : 38
+  },
+  {
+    "procNumber" : 1,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM6",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 10
+  },
+  {
+    "procNumber" : 2,
+    "parameters" : [
+
+    ],
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 10
+  },
+  {
+    "procNumber" : 3,
+    "parameters" : [
+
+    ],
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "segmentNumber" : 10
+  },
+  {
+    "procNumber" : 4,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ]
+  },
+  {
+    "procNumber" : 5,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 6,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 7,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 8,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 9,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 10,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 11,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 12,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 13,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 14,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 15,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 16,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "procNumber" : 17,
+    "isAssembly" : false,
+    "segmentNumber" : 10,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "ROUTINE",
+    "isFunction" : false,
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false,
+    "segmentName" : "STATEMEN",
+    "procNumber" : 1,
+    "segmentNumber" : 11
+  },
+  {
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 2,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 3,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 4,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 5,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 6,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 7,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 11,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 8,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "STATEMEN"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 12,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "CASESTAT"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 13,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "FORSTATE"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 14,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "BODY1"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 15,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "BODY3"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 15,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 2,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "BODY3"
+  },
+  {
+    "parameters" : [
+
+    ],
+    "segmentNumber" : 16,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 1,
+    "isAssembly" : false,
+    "isFunction" : false,
+    "segmentName" : "WRITELIN"
+  },
+  {
+    "segmentName" : "WRITELIN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "isFunction" : false,
+    "procNumber" : 2,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 16
+  },
+  {
+    "segmentName" : "WRITELIN",
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "isFunction" : false,
+    "procNumber" : 3,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 16
+  },
+  {
+    "segmentName" : "WRITELIN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "procNumber" : 4,
+    "segmentNumber" : 16
+  },
+  {
+    "segmentName" : "UNITPART",
+    "segmentNumber" : 17,
+    "procNumber" : 1,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "isAssembly" : false
+  },
+  {
+    "segmentName" : "UNITPART",
+    "segmentNumber" : 17,
+    "procNumber" : 2,
+    "parameters" : [
+
+    ],
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "isAssembly" : false
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 17,
+    "segmentName" : "UNITPART",
+    "procNumber" : 3,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM4",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM5",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isFunction" : false
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "segmentNumber" : 17,
+    "segmentName" : "UNITPART",
+    "procNumber" : 4,
+    "parameters" : [
+
+    ],
+    "isFunction" : false
+  },
+  {
+    "isFunction" : true,
+    "isAssembly" : false,
+    "procNumber" : 1,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM3",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentName" : "COMPOPTI",
+    "segmentNumber" : 18
+  },
+  {
+    "isFunction" : false,
+    "isAssembly" : false,
+    "procNumber" : 2,
+    "returnType" : "UNKNOWN",
+    "parameters" : [
+
+    ],
+    "segmentName" : "COMPOPTI",
+    "segmentNumber" : 18
+  },
+  {
+    "isAssembly" : false,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "procNumber" : 3,
+    "segmentNumber" : 18,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "COMPOPTI"
+  },
+  {
+    "isAssembly" : false,
+    "parameters" : [
+
+    ],
+    "procNumber" : 4,
+    "segmentNumber" : 18,
+    "isFunction" : false,
+    "returnType" : "UNKNOWN",
+    "segmentName" : "COMPOPTI"
+  },
+  {
+    "returnType" : "UNKNOWN",
+    "isAssembly" : false,
+    "procNumber" : 5,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "segmentNumber" : 18,
+    "segmentName" : "COMPOPTI",
+    "isFunction" : false
+  },
+  {
+    "segmentNumber" : 19,
+    "segmentName" : "NUMSTRIN",
+    "procNumber" : 1,
+    "parameters" : [
+      {
+        "name" : "PARAM1",
+        "type" : "UNKNOWN"
+      },
+      {
+        "name" : "PARAM2",
+        "type" : "UNKNOWN"
+      }
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false
+  },
+  {
+    "segmentNumber" : 19,
+    "segmentName" : "NUMSTRIN",
+    "procNumber" : 2,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false
+  },
+  {
+    "segmentNumber" : 19,
+    "segmentName" : "NUMSTRIN",
+    "procNumber" : 3,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false
+  },
+  {
+    "segmentNumber" : 20,
+    "segmentName" : "FINISHUP",
+    "procNumber" : 1,
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false
+  },
+  {
+    "returnType" : "UNITNUM",
+    "segmentNumber" : 0,
+    "parameters" : [
+      {
+        "name" : "FVID",
+        "type" : "VID"
+      },
+      {
+        "name" : "LOOKHARD",
+        "type" : "BOOLEAN"
+      },
+      {
+        "name" : "FDIR",
+        "type" : "DIRP"
+      }
+    ],
+    "procName" : "VOLSEARCH",
+    "segmentName" : "PASCALSY",
+    "isAssembly" : false,
+    "isFunction" : true,
+    "procNumber" : 30
+  },
+  {
+    "segmentNumber" : 0,
+    "procNumber" : 11,
+    "isFunction" : true,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+      {
+        "name" : "F",
+        "type" : "FIB"
+      }
+    ],
+    "isAssembly" : false,
+    "returnType" : "BOOLEAN",
+    "procName" : "FEOLN"
+  },
+  {
+    "segmentNumber" : 0,
+    "procNumber" : 14,
+    "isFunction" : false,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XREADREAL"
+  },
+  {
+    "segmentNumber" : 0,
+    "procNumber" : 53,
+    "isFunction" : false,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ],
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PUTPREFIXED"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 26,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+      {
+        "name" : "DEST",
+        "type" : "STRING"
+      },
+      {
+        "name" : "DELINX",
+        "type" : "INTEGER"
+      },
+      {
+        "name" : "DELLENG",
+        "type" : "INTEGER"
+      }
+    ],
+    "procName" : "SDELETE"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 28,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FBLOCKIO"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 38,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "CLEARLINE"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 50,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "WAITSYSVOL"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 43,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "PARSECMD"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 18,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FREADSTRING"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 49,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "CANTSTRETCH"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 41,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "GETCHAR"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 39,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "PROMPT"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 33,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "SCANTITLE"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 5,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FOPEN"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 9,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "XSEEK"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 48,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "COMMAND"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 32,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "DIRSEARCH"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 22,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FWRITELN"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 17,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FWRITECHAR"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 51,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "PRINTLOCS"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 40,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "SPACEWAIT"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 27,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "SPOS"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 21,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "FREADLN"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 15,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "XWRITEREAL"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 31,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "WRITEDIR"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 52,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "PRINTEXECERR"
+  },
+  {
+    "isAssembly" : false,
+    "segmentName" : "PASCALSY",
+    "procNumber" : 34,
+    "segmentNumber" : 0,
+    "returnType" : "UNKNOWN",
+    "isFunction" : false,
+    "parameters" : [
+
+    ],
+    "procName" : "DELENTRY"
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FINIT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 3,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+      {
+        "name" : "F",
+        "type" : "FIB"
+      },
+      {
+        "name" : "WINDOW",
+        "type" : "WINDOWP"
+      },
+      {
+        "name" : "RECWORDS",
+        "type" : "INTEGER"
+      }
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "EXECERROR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 2,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CLEARSCREEN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 37,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADCHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 16,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FEOF",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 10,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SINSERT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 24,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DOBLOCKIO",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 55,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "INSENTRY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 35,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FCLOSE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 6,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FRESET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 4,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FETCHDIR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 42,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PASCALSYSTEM",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 1,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGOTOXY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 29,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 12,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 7,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCOPY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 25,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEBYTES",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 20,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITESTRING",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 19,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CHECKDEL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 54,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 13,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FPUT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 8,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "HOMECURSOR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 36,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCONCAT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 23,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PROMPT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 39,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FINIT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 3,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PRINTLOCS",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 51,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PASCALSYSTEM",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 1,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITELN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 22,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITECHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 17,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 7,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCOPY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 25,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "EXECERROR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 2,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PARSECMD",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 43,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FCLOSE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 6,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XWRITEREAL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 15,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "GETCHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 41,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SINSERT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 24,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FETCHDIR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 42,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SPACEWAIT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 40,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PUTPREFIXED",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 53,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITESTRING",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 19,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SDELETE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 26,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XREADREAL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 14,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FRESET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 4,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 13,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FEOF",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 10,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADLN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 21,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CLEARSCREEN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 37,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FPUT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 8,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CLEARLINE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 38,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CHECKDEL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 54,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "COMMAND",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 48,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADCHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 16,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FEOLN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 11,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DIRSEARCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 32,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGOTOXY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 29,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "HOMECURSOR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 36,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCANTITLE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 33,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DOBLOCKIO",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 55,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "WAITSYSVOL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 50,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "INSENTRY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 35,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DELENTRY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 34,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PRINTEXECERR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 52,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CANTSTRETCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 49,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XSEEK",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 9,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADSTRING",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 18,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCONCAT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 23,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "VOLSEARCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 30,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEBYTES",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 20,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FBLOCKIO",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 28,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FOPEN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 5,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 12,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SPOS",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 27,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "WRITEDIR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 31,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FBLOCKIO",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 28,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "WAITSYSVOL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 50,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "WRITEDIR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 31,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PARSECMD",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 43,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CANTSTRETCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 49,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CLEARLINE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 38,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 13,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "INSENTRY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 35,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XSEEK",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 9,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PASCALSYSTEM",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 1,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITECHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 17,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XWRITEREAL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 15,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADLN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 21,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PROMPT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 39,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FETCHDIR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 42,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADSTRING",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 18,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "HOMECURSOR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 36,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FCLOSE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 6,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCOPY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 25,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DIRSEARCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 32,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CLEARSCREEN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 37,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FRESET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 4,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITEBYTES",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 20,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "EXECERROR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 2,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SDELETE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 26,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "XREADREAL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 14,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PRINTEXECERR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 52,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FEOLN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 11,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADCHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 16,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "GETCHAR",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 41,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "VOLSEARCH",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 30,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FOPEN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 5,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FINIT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 3,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGOTOXY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 29,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DELENTRY",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 34,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "COMMAND",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 48,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITESTRING",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 19,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCANTITLE",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 33,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SPACEWAIT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 40,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "DOBLOCKIO",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 55,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PRINTLOCS",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 51,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FWRITELN",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 22,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FGET",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 7,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FPUT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 8,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SPOS",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 27,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FEOF",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 10,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "CHECKDEL",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 54,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "PUTPREFIXED",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 53,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SINSERT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 24,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "SCONCAT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 23,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  },
+  {
+    "isAssembly" : false,
+    "returnType" : "UNKNOWN",
+    "procName" : "FREADINT",
+    "segmentNumber" : 0,
+    "isFunction" : false,
+    "procNumber" : 12,
+    "segmentName" : "PASCALSY",
+    "parameters" : [
+
+    ]
+  }
+]

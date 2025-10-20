@@ -1,0 +1,17 @@
+## Segment Table
+
+| slot | segNum | name | codeaddr | codeleng | kind | textAddr | mType | version |
+|-----:|-------:|------|---------:|---------:|------|---------:|-------|--------:|
+
+intrinsics: `[]`
+
+comment: 
+
+## Globals
+
+## Segment Unknown (0)
+
+###  (* P=-99, LL=0, D=0 *)
+
+```
+```

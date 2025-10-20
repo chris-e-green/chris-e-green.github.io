@@ -3,14 +3,14 @@
 ## Segment Table
 | slot | segNum | name | block | length | kind | textAddr | mType | version |
 |-----:|-------:|------|------:|-------:|------|---------:|-------|--------:|
-| 1 | 1 | PASCALCO | 0001 | 5606 | linked | 0000 | 7 | 6 |
+| 1 | 1 | PASCALCOMPILER | 0001 | 5606 | linked | 0000 | 7 | 6 |
 | 2 | 7 | COMPINIT | 000C | 4032 | linked | 0000 | 2 | 6 |
-| 3 | 8 | DECLARAT | 0014 | 7600 | linked | 0000 | 2 | 6 |
+| 3 | 8 | DECLARATIONPART | 0014 | 7600 | linked | 0000 | 2 | 6 |
 | 4 | 9 | BODYPART | 0023 | 7454 | linked | 0000 | 2 | 6 |
 | 5 | 10 | ROUTINE | 0032 | 2892 | linked | 0000 | 2 | 6 |
-| 6 | 11 | STATEMEN | 0038 | 1690 | linked | 0000 | 2 | 6 |
-| 7 | 12 | CASESTAT | 003C | 512 | linked | 0000 | 2 | 6 |
-| 8 | 13 | FORSTATE | 003D | 498 | linked | 0000 | 2 | 6 |
+| 6 | 11 | STATEMENT | 0038 | 1690 | linked | 0000 | 2 | 6 |
+| 7 | 12 | CASESTATEMENT | 003C | 512 | linked | 0000 | 2 | 6 |
+| 8 | 13 | FORSTATEMENT | 003D | 498 | linked | 0000 | 2 | 6 |
 | 9 | 14 | BODY1 | 003E | 326 | linked | 0000 | 2 | 6 |
 | 10 | 15 | BODY3 | 003F | 902 | linked | 0000 | 2 | 6 |
 | 11 | 16 | WRITELINKERINFO | 0041 | 826 | linked | 0000 | 2 | 6 |
@@ -22,223 +22,275 @@
 intrinsics: []
 
 comment: COPYRIGHT 1979,1980,1983-1985 APPLE COMPUTER, INC. ALL RIGHTS RESERVED
+
 ## Globals
 
-G2=INPUT:FIB
-G3=OUTPUT:FIB
-G4=SYSTERM:FIB
-G8=USERINFO.CODEFIBP
-G9=USERINFO.SYMFIB
-G10=USERINFO.ERRNUM
-G11=USERINFO.ERRBLK
-G12=USERIFO.ERRSYM
-G13=USERINFO.STUPID
-G14=USERINFO.SLOWTERM
+|Location|Name|Type|
+|--------|----|----|
+|G2|INPUT|FIB|
+|G3|OUTPUT|FIB|
+|G4|SYSTERM|FIB|
+|G8|USERINFO.CODEFIBP|FIB|
+|G9|USERINFO.SYMFIB|FIB|
+|G10|USERINFO.ERRNUM||
+|G11|USERINFO.ERRBLK||
+|G12|USERIFO.ERRSYM||
+|G13|USERINFO.STUPID||
+|G14|USERINFO.SLOWTERM||
 
-## Segment PASCALCO (1)
+## Segment PASCALCOMPILER (1)
 
-### PROCEDURE PASCALCO.PASCALCO(PARAM1; PARAM2) (* P=1, LL=0, D=1357 *)
+### PROCEDURE PASCALCOMPILER.PASCALCOMPILER(PARAM1; PARAM2) (* P=1, LL=0, D=1357 *)
+```
   BASE1=PARAM2
   BASE2=PARAM1
   BASE35=NOSWAP:BOOLEAN
-  BASE665
-  BASE716
-  BASE756
-  BASE796
-  BASE965
-  BASE1016
-  BASE1056
-  BASE1096
+  BASE665=:FIB
+  BASE716=:FIB
+  BASE756=:FIB
+  BASE796=:FIB
+  BASE965=:WINDOWP
+  BASE1016=:WINDOWP
+  BASE1056=:WINDOWP
+  BASE1096=:WINDOWP
   BASE1357
 BEGIN
+  FINIT(BASE796,BASE1096,-2)
 -> 1184: LAO  031c        Load global BASE796
    1187: LAO  0448        Load global BASE1096
    118a: LDCI 0002        Load word 2
    118d: NGI              Negate integer
    118e: CXP  00 03       Call external procedure PASCALSY.FINIT
+  FINIT(BASE716,BASE1016,-1)
    1191: LAO  02cc        Load global BASE716
    1194: LAO  03f8        Load global BASE1016
    1197: LDCI 0001        Load word 1
    119a: NGI              Negate integer
    119b: CXP  00 03       Call external procedure PASCALSY.FINIT
+  FINIT(BASE756,BASE1056,-1)
    119e: LAO  02f4        Load global BASE756
    11a1: LAO  0420        Load global BASE1056
    11a4: LDCI 0001        Load word 1
    11a7: NGI              Negate integer
    11a8: CXP  00 03       Call external procedure PASCALSY.FINIT
+  FINIT(BASE665,BASE965,-1)
    11ab: LAO  0299        Load global BASE665
    11ae: LAO  03c5        Load global BASE965
    11b1: LDCI 0001        Load word 1
    11b4: NGI              Negate integer
    11b5: CXP  00 03       Call external procedure PASCALSY.FINIT
-   11b8: CXP  07 01       Call external procedure COMPINIT.1
+  COMPINIT.COMPINIT
+   11b8: CXP  07 01       Call external procedure COMPINIT.COMPINIT
+  IF NOT NOSWAP THEN
    11bb: LDO  0023        Load global word BASE35 (NOSWAP)
    11bd: LNOT             Logical NOT (~TOS)
    11be: FJP  $11c4       Jump if TOS false
-   11c0: CLP  1e          Call local procedure PASCALCO.PROC30
+  BEGIN
+    PASCALCOMPILER.PROC30
+   11c0: CLP  1e          Call local procedure PASCALCOMPILER.PROC30
    11c2: UJP  $11c6       Unconditional jump
--> 11c4: CLP  1b          Call local procedure PASCALCO.PROC27
--> 11c6: CXP  14 01       Call external procedure FINISHUP.1
+  END ELSE BEGIN
+    PASCALCOMPILER.PROC27
+-> 11c4: CLP  1b          Call local procedure PASCALCOMPILER.PROC27
+  END
+  FINISHUP.FINISHUP
+-> 11c6: CXP  14 01       Call external procedure FINISHUP.FINISHUP
+  FCLOSE(BASE796)
 -> 11c9: LAO  031c        Load global BASE796
    11cc: SLDC 00          Short load constant 0
    11cd: CXP  00 06       Call external procedure PASCALSY.FCLOSE
+  FCLOSE(BASE716)
    11d0: LAO  02cc        Load global BASE716
    11d3: SLDC 00          Short load constant 0
    11d4: CXP  00 06       Call external procedure PASCALSY.FCLOSE
+  FCLOSE(BASE756)
    11d7: LAO  02f4        Load global BASE756
    11da: SLDC 00          Short load constant 0
    11db: CXP  00 06       Call external procedure PASCALSY.FCLOSE
+  FCLOSE(BASE665)
    11de: LAO  0299        Load global BASE665
    11e1: SLDC 00          Short load constant 0
    11e2: CXP  00 06       Call external procedure PASCALSY.FCLOSE
    11e5: RBP  00          Return from base procedure
 END
+```
 
-### ASMPROC2 (* P=2, LL=0, D=0, Callers: PROC8 *)
+### IDSEARCH (* P=2, LL=0, D=0, Callers: PROC8 *)
+```
+$7e=RETURN_L
+$7f=RETURN_H
+$88-$8F=IDENTIFIER
+$90
+$91
+$92=TOKIDX_L
+$93=TOKIDX_H
+$94=PARAM2_L
+$95=PARAM2_H
+$96=P2PLUSP1_L
+$97=P2PLUSP1_H
 BEGIN
 -> 11f2: 68      PLA
-   11f3: 85 7e   STA $7e	; RETURN_L
+   11f3: 85 7e   STA $7e	      ; RETURN_L
    11f5: 68      PLA
-   11f6: 85 7f   STA $7f	; RETURN_H
+   11f6: 85 7f   STA $7f	      ; RETURN_H
    11f8: 68      PLA
-   11f9: a8      TAY
+   11f9: a8      TAY             ; PARAM1_L
    11fa: 68      PLA
-   11fb: aa      TAX
+   11fb: aa      TAX             ; PARAM1_H
    11fc: 68      PLA
-   11fd: 85 94   STA $94
+   11fd: 85 94   STA $94         ; PARAM2_L
    11ff: 68      PLA
-   1200: 85 95   STA $95
+   1200: 85 95   STA $95         ; PARAM2_H
+
+   ; $96 = word at (PARAM2) + PARAM1
    1202: 98      TYA
-   1203: a0 00   LDY #$00
+   1203: a0 00   LDY #$00        ; Y=0
    1205: 18      CLC
-   1206: 71 94   ADC ($94),Y
-   1208: 85 96   STA $96
+   1206: 71 94   ADC ($94),Y     ; (PARAM2)
+   1208: 85 96   STA $96         ; P2PLUSP1_L
    120a: 8a      TXA
-   120b: c8      INY
-   120c: 71 94   ADC ($94),Y
-   120e: 85 97   STA $97
-   1210: a9 20   LDA #$20
+   120b: c8      INY             ; Y=1
+   120c: 71 94   ADC ($94),Y     ; (PARAM2)
+   120e: 85 97   STA $97         ; P2PLUSP1_H
+
+   ; set $88-$8F to spaces
+   1210: a9 20   LDA #$20        ; ' '
    1212: a2 07   LDX #$07
--> 1214: 95 88   STA $88,X
+-> 1214: 95 88   STA $88,X       ; IDENTIFIER
    1216: ca      DEX
    1217: d0 1214 BNE $1214
-   1219: 88      DEY
-   121a: b1 96   LDA ($96),Y
-   121c: c9 61   CMP #$61
+
+; if P2PLUSP1[0] lowercase, set IDENTIFIER[0] = uppercased, otherwise as-is
+   1219: 88      DEY             ; Y=0
+   121a: b1 96   LDA ($96),Y     ; (P2PLUSP1)
+   121c: c9 61   CMP #$61        ; 'a'
    121e: 90 1227 BCC $1227
-   1220: c9 7b   CMP #$7b
+   1220: c9 7b   CMP #$7b        ; '{' ('z'+1)
    1222: b0 1227 BCS $1227
    1224: 38      SEC
    1225: e9 20   SBC #$20
--> 1227: 85 88   STA $88
--> 1229: c8      INY
-   122a: b1 96   LDA ($96),Y
-   122c: c9 7b   CMP #$7b
-   122e: b0 1234 BCS $1234
-   1230: c9 61   CMP #$61
-   1232: b0 124a BCS $124a
--> 1234: c9 30   CMP #$30
-   1236: 90 123c BCC $123c
-   1238: c9 3a   CMP #$3a
-   123a: 90 124c BCC $124c
--> 123c: c9 41   CMP #$41
-   123e: 90 1255 BCC $1255
-   1240: c9 5b   CMP #$5b
-   1242: 90 124c BCC $124c
-   1244: c9 5f   CMP #$5f
-   1246: d0 1255 BNE $1255
+-> 1227: 85 88   STA $88         ; IDENTIFIER[0]
+-> 1229: c8      INY             ; Y=1
+   122a: b1 96   LDA ($96),Y     ; (P2PLUSP1) get P2PLUSP1[1]
+   122c: c9 7b   CMP #$7b        ; '{' ('z'+1)
+   122e: b0 1234 BCS $1234       ; P2PLUS1[1] > 'z'
+   ; it's < 'z'
+   1230: c9 61   CMP #$61        ; 'a'
+   1232: b0 124a BCS $124a       ; if >= 'a'
+   ; it's < 'a'
+-> 1234: c9 30   CMP #$30        ; '0'
+   1236: 90 123c BCC $123c       ; if < '0'
+   ; it's >= '0'
+   1238: c9 3a   CMP #$3a        ; ':' ('9'+1)
+   123a: 90 124c BCC $124c       ; if <= '9'
+   ; it's >= ':'
+-> 123c: c9 41   CMP #$41        ; 'A'
+   123e: 90 1255 BCC $1255       ; if < 'A'
+   ; it's >= 'A'
+   1240: c9 5b   CMP #$5b        ; 'Z'
+   1242: 90 124c BCC $124c       ; if < 'Z'
+   ; it's >= 'Z'
+   1244: c9 5f   CMP #$5f        ; '_'
+   1246: d0 1255 BNE $1255       ; <> '_'
+   ; always to next char
    1248: f0 1229 BEQ $1229
+   ; convert it to uppercase
 -> 124a: e9 20   SBC #$20
--> 124c: e8      INX
+-> 124c: e8      INX             ; inc dest index
    124d: e0 08   CPX #$08
    124f: b0 1229 BCS $1229
-   1251: 95 88   STA $88,X
-   1253: 90 1229 BCC $1229
+   1251: 95 88   STA $88,X       ; store in IDENTIFIER[X]
+   1253: 90 1229 BCC $1229       ; always
+   ; finished uppercasing
 -> 1255: 88      DEY
    1256: 98      TYA
    1257: a0 00   LDY #$00
    1259: 18      CLC
-   125a: 71 94   ADC ($94),Y
-   125c: 91 94   STA ($94),Y
+   125a: 71 94   ADC ($94),Y     ; (PARAM2)
+   125c: 91 94   STA ($94),Y     ; (PARAM2)
    125e: c8      INY
-   125f: b1 94   LDA ($94),Y
-   1261: 69 00   ADC #$02x
-   1263: 91 94   STA ($94),Y
-   1265: a5 88   LDA $88
-   1267: 0a      ASL A
-   1268: a8      TAY
-   1269: b9 006c LDA $006c,Y <- proc relocated
-   126c: 85 92   STA $92
-   126e: b9 006d LDA $006d,Y <- proc relocated
-   1271: 85 93   STA $93
+   125f: b1 94   LDA ($94),Y     ; (PARAM2)
+   1261: 69 00   ADC #$00
+   1263: 91 94   STA ($94),Y     ; (PARAM2)
+   1265: a5 88   LDA $88         ; IDENTIFIER[0]
+   1267: 0a      ASL A           ; doubled
+   1268: a8      TAY             ; Y=2*IDENTIFIER[0] (first letter ascii * 2)
+   1269: b9 006c LDA $006c,Y <- proc relocated (+$11f2=$125e)
+   126c: 85 92   STA $92         ; TOKIDX_L
+   126e: b9 006d LDA $006d,Y <- proc relocated (+$11f2=$125f)
+   1271: 85 93   STA $93         ; TOKIDX_H
    1273: a0 00   LDY #$00
-   1275: b1 92   LDA ($92),Y
+   1275: b1 92   LDA ($92),Y     ; (TOKIDX)
    1277: 85 90   STA $90
--> 1279: a2 00   LDX #$00
-   127b: a0 01   LDY #$01
--> 127d: e8      INX
-   127e: c8      INY
-   127f: b1 92   LDA ($92),Y
-   1281: d5 88   CMP $88,X
+-> 1279: a2 00   LDX #$00        ; X=0
+   127b: a0 01   LDY #$01        ; Y=1
+-> 127d: e8      INX             ; X=1
+   127e: c8      INY             ; Y=2
+   127f: b1 92   LDA ($92),Y     ; (TOKIDX)
+   1281: d5 88   CMP $88,X       ; IDENTIFIER
    1283: f0 1296 BEQ $1296
    1285: c6 90   DEC $90
    1287: f0 12bb BEQ $12bb
-   1289: a5 92   LDA $92
+   1289: a5 92   LDA $92         ; TOKIDX_L
    128b: 18      CLC
-   128c: 69 0a   ADC #$02x
-   128e: 85 92   STA $92
+   128c: 69 0a   ADC #$0a
+   128e: 85 92   STA $92         ; TOKIDX_L
    1290: 90 1294 BCC $1294
-   1292: e6 93   INC $93
+   1292: e6 93   INC $93         ; TOKIDX_H
 -> 1294: d0 1279 BNE $1279
 -> 1296: e0 07   CPX #$07
    1298: d0 127d BNE $127d
    129a: c8      INY
-   129b: b1 92   LDA ($92),Y
+   129b: b1 92   LDA ($92),Y     ; (TOKIDX)
    129d: 85 86   STA $86
    129f: c8      INY
-   12a0: b1 92   LDA ($92),Y
+   12a0: b1 92   LDA ($92),Y     ; (TOKIDX)
    12a2: 85 87   STA $87
    12a4: a0 02   LDY #$02
    12a6: a5 86   LDA $86
-   12a8: 91 94   STA ($94),Y
+   12a8: 91 94   STA ($94),Y     ; (PARAM2)
    12aa: c8      INY
    12ab: a9 00   LDA #$00
-   12ad: 91 94   STA ($94),Y
+   12ad: 91 94   STA ($94),Y     ; (PARAM2)
    12af: c8      INY
    12b0: a5 87   LDA $87
-   12b2: 91 94   STA ($94),Y
+   12b2: 91 94   STA ($94),Y     ; (PARAM2)
    12b4: c8      INY
    12b5: a9 00   LDA #$00
-   12b7: 91 94   STA ($94),Y
+   12b7: 91 94   STA ($94),Y     ; (PARAM2)
    12b9: f0 12d9 BEQ $12d9
 -> 12bb: a9 00   LDA #$00
    12bd: a0 02   LDY #$02
-   12bf: 91 94   STA ($94),Y
+   12bf: 91 94   STA ($94),Y     ; (PARAM2)
    12c1: c8      INY
-   12c2: 91 94   STA ($94),Y
+   12c2: 91 94   STA ($94),Y     ; (PARAM2)
    12c4: c8      INY
    12c5: c8      INY
-   12c6: 91 94   STA ($94),Y
+   12c6: 91 94   STA ($94),Y     ; (PARAM2)
    12c8: 88      DEY
    12c9: a9 15   LDA #$15
-   12cb: 91 94   STA ($94),Y
+   12cb: 91 94   STA ($94),Y     ; (PARAM2)
    12cd: a0 0e   LDY #$0e
    12cf: a2 07   LDX #$07
 -> 12d1: 88      DEY
-   12d2: b5 88   LDA $88,X
-   12d4: 91 94   STA ($94),Y
+   12d2: b5 88   LDA $88,X       ; IDENTIFIER
+   12d4: 91 94   STA ($94),Y     ; (PARAM2)
    12d6: ca      DEX
    12d7: 10 12d1 BPL $12d1
--> 12d9: a5 7f   LDA $7f	; RETURN_H
+-> 12d9: a5 7f   LDA $7f	      ; RETURN_H
    12db: 48      PHA
-   12dc: a5 7e   LDA $7e	; RETURN_L
+   12dc: a5 7e   LDA $7e	      ; RETURN_L
    12de: 48      PHA
    12df: 60      RTS
    12e0:  *0125 *013a *0145 *015a *0179 *0198 *01c1 *0122 |                 
    12f0:  *01cc *0122 *0122 *01f5 *0200 *020b *0216 *0235 |                 
    1300:  *0122 *0254 *0269 *027e *029d *02bc *02c7 *0122 |                 
-   1310:  *0122 *0122 01 40 23 02 41 4e 44 20 20 20 20 20 |     .@#.AND     
-   1320:  27 02 41 52 52 41 59 20 20 20 2c 00 01 42 45 47 | '.ARRAY   ,..BEG
+   1310:  *0122 *0122
+   1314:              01                                  |     .
+   1315:                 40 23 02                         |      @#.
+   1318:                          41 4e 44 20 20 20 20 20 |         AND     
+   1320:  27 02 41 52 52 41 59 20 20 20 2c 00 01          | '.ARRAY   ,..
+   132D:                                         42 45 47 |              BEG
    1330:  49 4e 20 20 20 13 00 02 43 41 53 45 20 20 20 20 | IN   ...CASE    
    1340:  15 00 43 4f 4e 53 54 20 20 20 1c 00 03 44 4f 20 | ..CONST   ...DO 
    1350:  20 20 20 20 20 06 00 44 49 56 20 20 20 20 20 27 |      ..DIV     '
@@ -266,8 +318,10 @@ BEGIN
    14b0:  41 52 20 20 20 20 20 1e 00 02 57 48 49 4c 45 20 | AR     ...WHILE 
    14c0:  20 20 17 00 57 49 54 48 20 20 20 20 19 00       |   ..WITH    ..
 END
+```
 
 ### ASMFUNC3 (* P=3, LL=0, D=0, Callers: PROC7, PROC9, PROC10 *)
+```
 BEGIN
  $84=RETURN_L
  $85=RETURN_H
@@ -311,7 +365,7 @@ BEGIN
    154c: f0 157a BEQ $157a
 -> 154e: 86 80   STX $80	; PARAM3_L
    1550: 85 81   STA $81	; PARAM3_H
-   1552: 4c 001c JMP $001c <- proc relocated
+   1552: 4c 001c JMP $001c <- proc relocated ($152e)
 -> 1555: a0 0a   LDY #$0a
    1557: b1 80   LDA ($80),Y	; (PARAM3)
    1559: aa      TAX
@@ -323,15 +377,15 @@ BEGIN
    1563: f0 1573 BEQ $1573
 -> 1565: 86 80   STX $80	; PARAM3_L
    1567: 85 81   STA $81	; PARAM3_H
-   1569: 4c 001c JMP $001c <- proc relocated
+   1569: 4c 001c JMP $001c <- proc relocated ($152e)
 -> 156c: a9 00   LDA #$00	; push word #$0000
    156e: 48      PHA
    156f: 48      PHA
-   1570: 4c 006e JMP $006e <- proc relocated
+   1570: 4c 006e JMP $006e <- proc relocated ($1580)
 -> 1573: a9 ff   LDA #$ff	; push word #$ffff
    1575: 48      PHA
    1576: 48      PHA
-   1577: 4c 006e JMP $006e <- proc relocated
+   1577: 4c 006e JMP $006e <- proc relocated ($1580)
 -> 157a: a9 00   LDA #$00	; push word #$0001
    157c: 48      PHA
    157d: a9 01   LDA #$01
@@ -348,76 +402,97 @@ BEGIN
    1590: 48      PHA
    1591: 60      RTS
 END
+```
 
-### PROCEDURE PASCALCO.ERROR(PARAM1) (* P=4, LL=1, D=93, Callers: PROC14, PROC8, PROC20, PROC24, PROC26, PROC10, PROC12, PROC7, PROC5 *)
-  BASE1
-  BASE14
+### PROCEDURE PASCALCOMPILER.ERROR(ERRORNUM:INTEGER) (* P=4, LL=1, D=93, Callers: PROC14, PROC8, PROC20, PROC24, PROC26, PROC10, PROC12, PROC7, PROC5 *)
+```
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
   BASE44=LIST:BOOLEAN
   BASE50=NOISY:BOOLEAN
-  BASE93=SYMBLK
-  BASE95=SCREENDOTS
-  BASE98=LINESTART
-  BASE796
+  BASE93=SYMBLK:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE98=LINESTART:CURSRANGE
+  BASE796=:FIB
   BASE1356
-  MP1=PARAM1
-  MP2
-  MP3
-  MP4
-  MP93
+  MP1=ERRORNUM:INTEGER
+  MP2=CH:CHAR
+  MP3=ERRSTART:INTEGER
+  MP4=A:PACKED ARRAY [0..179] OF CHAR
 BEGIN
+  IF USERINFO.ERRSYM <> SYMCURSOR OR USERINFO.ERRBLK <> SYMBLK THEN
 -> 0000: LOD  02 000c     Load word at G12 (USERINFO.ERRSYM)
-   0003: SLDO 0e          Short load global BASE14
+   0003: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0004: NEQI             Integer TOS-1 <> TOS
    0005: LOD  02 000b     Load word at G11 (USERINFO.ERRBLK)
    0008: LDO  005d        Load global word BASE93 (SYMBLK)
    000a: NEQI             Integer TOS-1 <> TOS
    000b: LOR              Logical OR (TOS | TOS-1)
    000c: FJP  $0178       Jump if TOS false
+  BEGIN
+    USERINFO.ERRBLK := SYMBLK
    000e: LDO  005d        Load global word BASE93 (SYMBLK)
    0010: STR  02 000b     Store TOS to G11 (USERINFO.ERRBLK)
-   0013: SLDO 0e          Short load global BASE14
+    USERINFO.ERRSYM := SYMCURSOR
+   0013: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0014: STR  02 000c     Store TOS to G12 (USERINFO.ERRSYM)
-   0017: SLDL 01          Short load local MP1
+    USERINFO.ERRNUM := ERRORNUM
+   0017: SLDL 01          Short load local MP1 (ERRORNUM)
    0018: STR  02 000a     Store TOS to G10 (USERINFO.ERRNUM)
+    IF USERINFO.STUPID THEN
    001b: LOD  02 000d     Load word at G13 (USERINFO.STUPID)
    001e: FJP  $0025       Jump if TOS false
-   0020: SLDC 45          Short load constant 69
-   0021: STL  0002        Store TOS into MP2
+    BEGIN
+   0020: SLDC 45          Short load constant 69 ('E')
+   0021: STL  0002        Store TOS into MP2 (CH)
    0023: UJP  $0127       Unconditional jump
+    END ELSE BEGIN
+      IF NOISY THEN
 -> 0025: LDO  0032        Load global word BASE50 (NOISY)
    0027: FJP  $0031       Jump if TOS false
+      BEGIN
+        PASCALSY.FWRITELN(OUTPUT)
    0029: LOD  02 0003     Load word at G3 (OUTPUT)
    002c: CXP  00 16       Call external procedure PASCALSY.FWRITELN
    002f: UJP  $0044       Unconditional jump
+      END ELSE BEGIN
+        IF LIST AND NOT BASE1356 AND ERRORNUM <= 400 THEN
 -> 0031: LDO  002c        Load global word BASE44 (LIST)
    0033: LDO  054c        Load global word BASE1356
    0036: LNOT             Logical NOT (~TOS)
    0037: LAND             Logical AND (TOS & TOS-1)
-   0038: SLDL 01          Short load local MP1
-   0039: LDCI 0190        Load word 400
+   0038: SLDL 01          Short load local MP1 (ERRORNUM)
+   0039: LDCI 0190        Load word 400 { Illegal character in text }
    003c: LEQI             Integer TOS-1 <= TOS
    003d: LAND             Logical AND (TOS & TOS-1)
    003e: FJP  $0044       Jump if TOS false
+        EXIT(1,4)
    0040: SLDC 01          Short load constant 1
    0041: SLDC 04          Short load constant 4
    0042: CSP  04          Call standard procedure EXIT
+      END
+      IF LINESTART = 0 THEN
 -> 0044: LDO  0062        Load global word BASE98 (LINESTART)
    0046: SLDC 00          Short load constant 0
    0047: EQUI             Integer TOS-1 = TOS
    0048: FJP  $0057       Jump if TOS false
+      BEGIN
+        PASCALSY.FWRITEBYTES(OUTPUT,SYMBUFP,SYMCURSOR,1024)
    004a: LOD  02 0003     Load word at G3 (OUTPUT)
-   004d: SLDO 01          Short load global BASE1
-   004e: SLDO 0e          Short load global BASE14
+   004d: SLDO 01          Short load global BASE1 (SYMBUFP)
+   004e: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    004f: LDCI 0400        Load word 1024
    0052: CXP  00 14       Call external procedure PASCALSY.FWRITEBYTES
    0055: UJP  $0085       Unconditional jump
+      END ELSE BEGIN
+        ERRSTART := SCAN(-(LINESTART - 1), 0, 13, SYMBUFP, LINESTART - 2, 0) + LINESTART - 1
 -> 0057: LDO  0062        Load global word BASE98 (LINESTART)
    0059: SLDC 01          Short load constant 1
    005a: SBI              Subtract integers (TOS-1 - TOS)
    005b: NGI              Negate integer
    005c: SLDC 00          Short load constant 0
    005d: SLDC 0d          Short load constant 13
-   005e: SLDO 01          Short load global BASE1
+   005e: SLDO 01          Short load global BASE1 (SYMBUFP)
    005f: LDO  0062        Load global word BASE98 (LINESTART)
    0061: SLDC 02          Short load constant 2
    0062: SBI              Subtract integers (TOS-1 - TOS)
@@ -427,139 +502,175 @@ BEGIN
    0068: ADI              Add integers (TOS + TOS-1)
    0069: SLDC 01          Short load constant 1
    006a: SBI              Subtract integers (TOS-1 - TOS)
-   006b: STL  0003        Store TOS into MP3
-   006d: SLDO 01          Short load global BASE1
-   006e: SLDL 03          Short load local MP3
-   006f: LLA  0004        Load local address MP4
+   006b: STL  0003        Store TOS into MP3 (ERRSTART)
+        MOVL(SYMBUFP,ERRSTART,A,0,SYMCURSOR - ERRSTART)
+   006d: SLDO 01          Short load global BASE1 (SYMBUFP)
+   006e: SLDL 03          Short load local MP3 (ERRSTART)
+   006f: LLA  0004        Load local address MP4 (A)
    0071: SLDC 00          Short load constant 0
-   0072: SLDO 0e          Short load global BASE14
-   0073: SLDL 03          Short load local MP3
+   0072: SLDO 0e          Short load global BASE14 (SYMCURSOR)
+   0073: SLDL 03          Short load local MP3 (ERRSTART)
    0074: SBI              Subtract integers (TOS-1 - TOS)
    0075: CSP  02          Call standard procedure MOVL
+        PASCALSY.FWRITEBYTES(OUTPUT,A,SYMCURSOR - ERRSTART,180)
    0077: LOD  02 0003     Load word at G3 (OUTPUT)
-   007a: LLA  0004        Load local address MP4
-   007c: SLDO 0e          Short load global BASE14
-   007d: SLDL 03          Short load local MP3
+   007a: LLA  0004        Load local address MP4 (A)
+   007c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
+   007d: SLDL 03          Short load local MP3 (ERRSTART)
    007e: SBI              Subtract integers (TOS-1 - TOS)
    007f: LDCI 00b4        Load word 180
    0082: CXP  00 14       Call external procedure PASCALSY.FWRITEBYTES
+      END
+      PASCALSY.FWRITESTRING(OUTPUT,' <<<<',0)
 -> 0085: LOD  02 0003     Load word at G3 (OUTPUT)
    0088: NOP              No operation
    0089: LSA  05          Load string address: ' <<<<'
    0090: SLDC 00          Short load constant 0
    0091: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
+      PASCALSY.FWRITELN(OUTPUT)
    0094: LOD  02 0003     Load word at G3 (OUTPUT)
    0097: CXP  00 16       Call external procedure PASCALSY.FWRITELN
+      PASCALSY.FWRITESTRING(OUTPUT,'Line ',0)
    009a: LOD  02 0003     Load word at G3 (OUTPUT)
    009d: LSA  05          Load string address: 'Line '
    00a4: NOP              No operation
    00a5: SLDC 00          Short load constant 0
    00a6: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
+      PASCALSY.FWRITEINT(OUTPUT,SCREENDOTS,0)
    00a9: LOD  02 0003     Load word at G3 (OUTPUT)
    00ac: LDO  005f        Load global word BASE95 (SCREENDOTS)
    00ae: SLDC 00          Short load constant 0
    00af: CXP  00 0d       Call external procedure PASCALSY.FWRITEINT
+      PASCALSY.FWRITESTRING(OUTPUT,', error ',0)
    00b2: LOD  02 0003     Load word at G3 (OUTPUT)
    00b5: LSA  08          Load string address: ', error '
    00bf: NOP              No operation
    00c0: SLDC 00          Short load constant 0
    00c1: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
+      PASCALSY.FWRITEINT(OUTPUT,ERRORNUM,0)
    00c4: LOD  02 0003     Load word at G3 (OUTPUT)
-   00c7: SLDL 01          Short load local MP1
+   00c7: SLDL 01          Short load local MP1 (ERRORNUM)
    00c8: SLDC 00          Short load constant 0
    00c9: CXP  00 0d       Call external procedure PASCALSY.FWRITEINT
+      PASCALSY.FWRITECHAR(OUTPUT,':',0)
    00cc: LOD  02 0003     Load word at G3 (OUTPUT)
-   00cf: SLDC 3a          Short load constant 58
+   00cf: SLDC 3a          Short load constant 58 (':')
    00d0: SLDC 00          Short load constant 0
    00d1: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+      PASCALSY.FWRITESTRING(OUTPUT,' <sp>(continue), <esc>(terminate), E(dit',0)
    00d4: LOD  02 0003     Load word at G3 (OUTPUT)
    00d7: LSA  28          Load string address: ' <sp>(continue), <esc>(terminate), E(dit'
    0101: NOP              No operation
    0102: SLDC 00          Short load constant 0
    0103: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
+      PASCALSY.FWRITECHAR(OUTPUT,7,0)
    0106: LOD  02 0003     Load word at G3 (OUTPUT)
-   0109: SLDC 07          Short load constant 7
+   0109: SLDC 07          Short load constant 7 (bel)
    010a: SLDC 00          Short load constant 0
    010b: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+      REPEAT
+        PASCALSY.FREADCHAR(SYSTERM,CH)
 -> 010e: LOD  02 0004     Load word at G4 (SYSTERM)
-   0111: LLA  0002        Load local address MP2
+   0111: LLA  0002        Load local address MP2 (CH)
    0113: CXP  00 10       Call external procedure PASCALSY.FREADCHAR
-   0116: SLDL 02          Short load local MP2
-   0117: SLDC 20          Short load constant 32
+      UNTIL (CH = ' ') OR (CH = 'E') OR (CH = 'e') OR (CH = 27)
+   0116: SLDL 02          Short load local MP2 (CH)
+   0117: SLDC 20          Short load constant 32 (' ')
    0118: EQUI             Integer TOS-1 = TOS
-   0119: SLDL 02          Short load local MP2
-   011a: SLDC 45          Short load constant 69
+   0119: SLDL 02          Short load local MP2 (CH)
+   011a: SLDC 45          Short load constant 69 ('E')
    011b: EQUI             Integer TOS-1 = TOS
    011c: LOR              Logical OR (TOS | TOS-1)
-   011d: SLDL 02          Short load local MP2
-   011e: SLDC 65          Short load constant 101
+   011d: SLDL 02          Short load local MP2 (CH)
+   011e: SLDC 65          Short load constant 101 ('e')
    011f: EQUI             Integer TOS-1 = TOS
    0120: LOR              Logical OR (TOS | TOS-1)
-   0121: SLDL 02          Short load local MP2
-   0122: SLDC 1b          Short load constant 27
+   0121: SLDL 02          Short load local MP2 (CH)
+   0122: SLDC 1b          Short load constant 27 (esc)
    0123: EQUI             Integer TOS-1 = TOS
    0124: LOR              Logical OR (TOS | TOS-1)
    0125: FJP  $010e       Jump if TOS false
--> 0127: SLDL 02          Short load local MP2
-   0128: SLDC 45          Short load constant 69
+    END
+    IF (CH = 'E') OR (CH = 'e') THEN
+-> 0127: SLDL 02          Short load local MP2 (CH)
+   0128: SLDC 45          Short load constant 69 ('E')
    0129: EQUI             Integer TOS-1 = TOS
-   012a: SLDL 02          Short load local MP2
-   012b: SLDC 65          Short load constant 101
+   012a: SLDL 02          Short load local MP2 (CH)
+   012b: SLDC 65          Short load constant 101 ('e')
    012c: EQUI             Integer TOS-1 = TOS
    012d: LOR              Logical OR (TOS | TOS-1)
    012e: FJP  $013b       Jump if TOS false
+    BEGIN
+      USERINFO.ERRBLK := SYMBLK - 2
    0130: LDO  005d        Load global word BASE93 (SYMBLK)
    0132: SLDC 02          Short load constant 2
    0133: SBI              Subtract integers (TOS-1 - TOS)
    0134: STR  02 000b     Store TOS to G11 (USERINFO.ERRBLK)
+      EXIT(1,1)
    0137: SLDC 01          Short load constant 1
    0138: SLDC 01          Short load constant 1
    0139: CSP  04          Call standard procedure EXIT
--> 013b: SLDL 01          Short load local MP1
-   013c: LDCI 0190        Load word 400
+    END
+    IF (ERRORNUM > 400) OR (CH = 27) THEN
+-> 013b: SLDL 01          Short load local MP1 (ERRORNUM)
+   013c: LDCI 0190        Load word 400 { Illegal character in text }
    013f: GRTI             Integer TOS-1 > TOS
-   0140: SLDL 02          Short load local MP2
+   0140: SLDL 02          Short load local MP2 (CH)
    0141: SLDC 1b          Short load constant 27
    0142: EQUI             Integer TOS-1 = TOS
    0143: LOR              Logical OR (TOS | TOS-1)
    0144: FJP  $0155       Jump if TOS false
+    BEGIN
+      USERINFO.ERRBLK := 0
    0146: SLDC 00          Short load constant 0
    0147: STR  02 000b     Store TOS to G11 (USERINFO.ERRBLK)
+      FCLOSE(BASE796,1)
    014a: LAO  031c        Load global BASE796
    014d: SLDC 01          Short load constant 1
    014e: CXP  00 06       Call external procedure PASCALSY.FCLOSE
+      EXIT(1,1)
    0151: SLDC 01          Short load constant 1
    0152: SLDC 01          Short load constant 1
    0153: CSP  04          Call standard procedure EXIT
+    END
+    PASCALSY.FWRITELN(OUTPUT)
 -> 0155: LOD  02 0003     Load word at G3 (OUTPUT)
    0158: CXP  00 16       Call external procedure PASCALSY.FWRITELN
+    IF NOISY THEN
    015b: LDO  0032        Load global word BASE50 (NOISY)
    015d: FJP  $0178       Jump if TOS false
+    BEGIN
+      PASCALSY.FWRITECHAR(OUTPUT,'<',0)
    015f: LOD  02 0003     Load word at G3 (OUTPUT)
-   0162: SLDC 3c          Short load constant 60
+   0162: SLDC 3c          Short load constant 60 ('<')
    0163: SLDC 00          Short load constant 0
    0164: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+      PASCALSY.FWRITEINT(OUTPUT,SCREENDOTS,4)
    0167: LOD  02 0003     Load word at G3 (OUTPUT)
    016a: LDO  005f        Load global word BASE95 (SCREENDOTS)
    016c: SLDC 04          Short load constant 4
    016d: CXP  00 0d       Call external procedure PASCALSY.FWRITEINT
+      PASCALSY.FWRITECHAR(OUTPUT,'>',0)
    0170: LOD  02 0003     Load word at G3 (OUTPUT)
-   0173: SLDC 3e          Short load constant 62
+   0173: SLDC 3e          Short load constant 62 ('>')
    0174: SLDC 00          Short load constant 0
    0175: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+    END
+  END
 -> 0178: RNP  00          Return from nonbase procedure
 END
+```
 
-### PROCEDURE PASCALCO.PROC5 (* P=5, LL=1, D=1, Callers: PROC14 *)
-  BASE1
+### PROCEDURE PASCALCOMPILER.PROC5 (* P=5, LL=1, D=1, Callers: PROC14 *)
+  BASE1=SYMBUFP:^SYMBUFARRAY
   BASE2
-  BASE14
+  BASE14=SYMCURSOR:CURSRANGE
   BASE32
   BASE33
   BASE37
   BASE38
-  BASE93=SYMBLK
-  BASE98=LINESTART
+  BASE93=SYMBLK:INTEGER
+  BASE98=LINESTART:CURSRANGE
   BASE708
   BASE709
   BASE710
@@ -568,12 +679,12 @@ END
   BASE713
   BASE714
   BASE715
-  BASE716
-  BASE756
+  BASE716=:FIB
+  BASE756=:FIB
   MP1
 BEGIN
 -> 018a: SLDC 00          Short load constant 0
-   018b: SRO  000e        Store global word BASE14
+   018b: SRO  000e        Store global word BASE14 (SYMCURSOR)
    018d: SLDC 00          Short load constant 0
    018e: SRO  0062        Store global word BASE98 (LINESTART)
    0190: LDO  0021        Load global word BASE33
@@ -583,14 +694,14 @@ BEGIN
    0198: LNOT             Logical NOT (~TOS)
    0199: LAND             Logical AND (TOS & TOS-1)
    019a: FJP  $01ae       Jump if TOS false
-   019c: SLDO 01          Short load global BASE1
+   019c: SLDO 01          Short load global BASE1 (SYMBUFP)
    019d: LDO  02c4        Load global word BASE708
    01a0: SLDO 02          Short load global BASE2
    01a1: SLDC 00          Short load constant 0
    01a2: LDCI 0400        Load word 1024
    01a5: CSP  02          Call standard procedure MOVL
    01a7: SLDC 01          Short load constant 1
-   01a8: CGP  18          Call global procedure PASCALCO.PROC24
+   01a8: CGP  18          Call global procedure PASCALCOMPILER.PROC24
    01aa: SLDC 00          Short load constant 0
    01ab: SRO  02c4        Store global word BASE708
 -> 01ae: LDO  0025        Load global word BASE37
@@ -600,7 +711,7 @@ BEGIN
    01b6: EQUI             Integer TOS-1 = TOS
    01b7: FJP  $01d0       Jump if TOS false
    01b9: LOD  02 0008     Load word at G8 (USERINFO.CODEFIBP)
-   01bc: SLDO 01          Short load global BASE1
+   01bc: SLDO 01          Short load global BASE1 (SYMBUFP)
    01bd: SLDC 00          Short load constant 0
    01be: SLDC 02          Short load constant 2
    01bf: LDO  005d        Load global word BASE93 (SYMBLK)
@@ -615,7 +726,7 @@ BEGIN
    01cc: SRO  0025        Store global word BASE37
 -> 01ce: UJP  $01e5       Unconditional jump
 -> 01d0: LAO  02cc        Load global BASE716
-   01d3: SLDO 01          Short load global BASE1
+   01d3: SLDO 01          Short load global BASE1 (SYMBUFP)
    01d4: SLDC 00          Short load constant 0
    01d5: SLDC 02          Short load constant 2
    01d6: LDO  005d        Load global word BASE93 (SYMBLK)
@@ -634,7 +745,7 @@ BEGIN
 -> 01eb: LDO  02c5        Load global word BASE709
    01ee: SRO  005d        Store global word BASE93 (SYMBLK)
    01f0: LDO  02c8        Load global word BASE712
-   01f3: SRO  000e        Store global word BASE14
+   01f3: SRO  000e        Store global word BASE14 (SYMCURSOR)
    01f5: LDO  02c7        Load global word BASE711
    01f8: SRO  0062        Store global word BASE98 (LINESTART)
 -> 01fa: LDO  0025        Load global word BASE37
@@ -643,7 +754,7 @@ BEGIN
    01ff: LDO  0026        Load global word BASE38
    0201: FJP  $0239       Jump if TOS false
    0203: LAO  02f4        Load global BASE756
-   0206: SLDO 01          Short load global BASE1
+   0206: SLDO 01          Short load global BASE1 (SYMBUFP)
    0207: SLDC 00          Short load constant 0
    0208: SLDC 02          Short load constant 2
    0209: LDO  005d        Load global word BASE93 (SYMBLK)
@@ -658,8 +769,9 @@ BEGIN
    0217: SLDC 00          Short load constant 0
    0218: NEQI             Integer TOS-1 <> TOS
    0219: FJP  $0220       Jump if TOS false
+  PASCALCOMPILER.ERROR(403) { Error in reading include file }
    021b: LDCI 0193        Load word 403
-   021e: CGP  04          Call global procedure PASCALCO.ERROR
+   021e: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0220: LAO  02f4        Load global BASE756
    0223: SLDC 00          Short load constant 0
    0224: CXP  00 06       Call external procedure PASCALSY.FCLOSE
@@ -668,7 +780,7 @@ BEGIN
    022a: LDO  02c6        Load global word BASE710
    022d: SRO  005d        Store global word BASE93 (SYMBLK)
    022f: LDO  02ca        Load global word BASE714
-   0232: SRO  000e        Store global word BASE14
+   0232: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0234: LDO  02c9        Load global word BASE713
    0237: SRO  0062        Store global word BASE98 (LINESTART)
 -> 0239: LDO  0026        Load global word BASE38
@@ -677,7 +789,7 @@ BEGIN
    023e: LNOT             Logical NOT (~TOS)
    023f: FJP  $0258       Jump if TOS false
    0241: LOD  02 0009     Load word at G9 (USERINFO.SYMFIB)
-   0244: SLDO 01          Short load global BASE1
+   0244: SLDO 01          Short load global BASE1 (SYMBUFP)
    0245: SLDC 00          Short load constant 0
    0246: SLDC 02          Short load constant 2
    0247: LDO  005d        Load global word BASE93 (SYMBLK)
@@ -688,20 +800,21 @@ BEGIN
    024f: SLDC 02          Short load constant 2
    0250: NEQI             Integer TOS-1 <> TOS
    0251: FJP  $0258       Jump if TOS false
+  PASCALCOMPILER.ERROR(401) { Unexpected end of input }
    0253: LDCI 0191        Load word 401
-   0256: CGP  04          Call global procedure PASCALCO.ERROR
--> 0258: SLDO 0e          Short load global BASE14
+   0256: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+-> 0258: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0259: SLDC 00          Short load constant 0
    025a: EQUI             Integer TOS-1 = TOS
    025b: FJP  $0267       Jump if TOS false
-   025d: SLDO 01          Short load global BASE1
+   025d: SLDO 01          Short load global BASE1 (SYMBUFP)
    025e: SLDC 00          Short load constant 0
    025f: LDB              Load byte at byte ptr TOS-1 + TOS
    0260: SLDC 10          Short load constant 16
    0261: EQUI             Integer TOS-1 = TOS
    0262: FJP  $0267       Jump if TOS false
    0264: SLDC 02          Short load constant 2
-   0265: SRO  000e        Store global word BASE14
+   0265: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0267: LDO  005d        Load global word BASE93 (SYMBLK)
    0269: SLDC 02          Short load constant 2
    026a: ADI              Add integers (TOS + TOS-1)
@@ -709,19 +822,19 @@ BEGIN
 -> 026d: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC6 (* P=6, LL=1, D=53, Callers: PROC14 *)
-  BASE1
-  BASE13=SEG
-  BASE14
+### PROCEDURE PASCALCOMPILER.PRINTLINE (* P=6, LL=1, D=53, Callers: PROC14 *)
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE13=SEG:SEGRANGE
+  BASE14=SYMCURSOR:CURSRANGE
   BASE39
   BASE47
   BASE82
-  BASE93=SYMBLK
-  BASE95=SCREENDOTS
-  BASE96=LINEINFO
-  BASE98=LINESTART
+  BASE93=SYMBLK:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE96=LINEINFO:INTEGER
+  BASE98=LINESTART:CURSRANGE
   BASE100
-  BASE796
+  BASE796=:FIB
   MP1
   MP2
   MP3
@@ -780,7 +893,7 @@ BEGIN
    02d8: SLDC 00          Short load constant 0
    02d9: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
    02dc: CSP  00          Call standard procedure IOC
-   02de: SLDO 0e          Short load global BASE14
+   02de: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    02df: LDO  0062        Load global word BASE98 (LINESTART)
    02e1: SBI              Subtract integers (TOS-1 - TOS)
    02e2: STL  0003        Store TOS into MP3
@@ -790,7 +903,7 @@ BEGIN
    02e7: FJP  $02ec       Jump if TOS false
    02e9: SLDC 64          Short load constant 100
    02ea: STL  0003        Store TOS into MP3
--> 02ec: SLDO 01          Short load global BASE1
+-> 02ec: SLDO 01          Short load global BASE1 (SYMBUFP)
    02ed: LDO  0062        Load global word BASE98 (LINESTART)
    02ef: LLA  0004        Load local address MP4
    02f1: SLDC 00          Short load constant 0
@@ -864,87 +977,115 @@ BEGIN
 -> 0373: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC7(PARAM1) (* P=7, LL=1, D=4 *)
-  BASE8
-  BASE134
-  MP1=PARAM1
-  MP2
-  MP3
-  MP4
+### PROCEDURE PASCALCOMPILER.ENTERID(FCP:CTP) (* P=7, LL=1, D=4 *)
+```
+  BASE8=TOP:DISPRANGE
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  MP1=FCP:CTP
+  MP2=LCP1:CTP
+  MP3=LCP:CTP
+  MP4=I:INTEGER
 BEGIN
--> 0380: LAO  0086        Load global BASE134
-   0383: SLDO 08          Short load global BASE8
+  LCP := DISPLAY[TOP].FNAME
+-> 0380: LAO  0086        Load global BASE134 (DISPLAY)
+   0383: SLDO 08          Short load global BASE8 (TOP)
    0384: IXA  0004        Index array (TOS-1 + TOS * 4)
-   0386: SIND 00          Short index load *TOS+0
-   0387: STL  0003        Store TOS into MP3
-   0389: SLDL 03          Short load local MP3
+   0386: SIND 00          Short index load *TOS+0 (FNAME)
+   0387: STL  0003        Store TOS into MP3 (LCP)
+  IF LCP = NIL THEN
+   0389: SLDL 03          Short load local MP3 (LCP)
    038a: LDCN             Load constant NIL
    038b: EQUI             Integer TOS-1 = TOS
    038c: FJP  $0398       Jump if TOS false
-   038e: LAO  0086        Load global BASE134
-   0391: SLDO 08          Short load global BASE8
+  BEGIN
+    DISPLAY[TOP].FNAME := FCP
+   038e: LAO  0086        Load global BASE134 (DISPLAY)
+   0391: SLDO 08          Short load global BASE8 (TOP)
    0392: IXA  0004        Index array (TOS-1 + TOS * 4)
-   0394: SLDL 01          Short load local MP1
+   0394: SLDL 01          Short load local MP1 (FCP)
    0395: STO              Store indirect (TOS into TOS-1)
    0396: UJP  $03d3       Unconditional jump
--> 0398: SLDL 03          Short load local MP3
-   0399: LLA  0002        Load local address MP2
-   039b: SLDL 01          Short load local MP1
+  END ELSE BEGIN
+    I := PASCALCOMPILER.TREESEARCH(LCP,LCP1,FCP.NAME)
+-> 0398: SLDL 03          Short load local MP3 (LCP)
+   0399: LLA  0002        Load local address MP2 (LCP1)
+   039b: SLDL 01          Short load local MP1 (FCP)
    039c: SLDC 00          Short load constant 0
    039d: SLDC 00          Short load constant 0
-   039e: CGP  03          Call global procedure PASCALCO.ASMFUNC3
-   03a0: STL  0004        Store TOS into MP4
--> 03a2: SLDL 04          Short load local MP4
+   039e: CGP  03          Call global procedure PASCALCOMPILER.TREESEARCH
+   03a0: STL  0004        Store TOS into MP4 (I)
+    WHILE I = 0 DO
+-> 03a2: SLDL 04          Short load local MP4 (I)
    03a3: SLDC 00          Short load constant 0
    03a4: EQUI             Integer TOS-1 = TOS
    03a5: FJP  $03c2       Jump if TOS false
+    BEGIN
+      PASCALCOMPILER.ERROR(101) { Identifier declared twice }
    03a7: SLDC 65          Short load constant 101
-   03a8: CGP  04          Call global procedure PASCALCO.ERROR
-   03aa: SLDL 02          Short load local MP2
+   03a8: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+      IF LCP1.RLINK = NIL THEN
+   03aa: SLDL 02          Short load local MP2 (LCP1)
    03ab: SIND 04          Short index load *TOS+4
    03ac: LDCN             Load constant NIL
    03ad: EQUI             Integer TOS-1 = TOS
    03ae: FJP  $03b5       Jump if TOS false
+      BEGIN
+        I := 1
    03b0: SLDC 01          Short load constant 1
-   03b1: STL  0004        Store TOS into MP4
+   03b1: STL  0004        Store TOS into MP4 (I)
    03b3: UJP  $03c0       Unconditional jump
--> 03b5: SLDL 02          Short load local MP2
+      END ELSE BEGIN
+        I := PASCALCOMPILER.TREESEARCH(LCP1.RLINK, LCP1,FCP.NAME)
+-> 03b5: SLDL 02          Short load local MP2 (LCP1)
    03b6: SIND 04          Short index load *TOS+4
-   03b7: LLA  0002        Load local address MP2
-   03b9: SLDL 01          Short load local MP1
+   03b7: LLA  0002        Load local address MP2 (LCP1)
+   03b9: SLDL 01          Short load local MP1 (FCP)
    03ba: SLDC 00          Short load constant 0
    03bb: SLDC 00          Short load constant 0
-   03bc: CGP  03          Call global procedure PASCALCO.ASMFUNC3
-   03be: STL  0004        Store TOS into MP4
+   03bc: CGP  03          Call global procedure PASCALCOMPILER.TREESEARCH
+   03be: STL  0004        Store TOS into MP4 (I)
+      END
 -> 03c0: UJP  $03a2       Unconditional jump
--> 03c2: SLDL 04          Short load local MP4
+    END
+    IF I = 1 THEN
+-> 03c2: SLDL 04          Short load local MP4 (I)
    03c3: SLDC 01          Short load constant 1
    03c4: EQUI             Integer TOS-1 = TOS
    03c5: FJP  $03ce       Jump if TOS false
-   03c7: SLDL 02          Short load local MP2
+    BEGIN
+      LCP1.RLINK := FCP
+   03c7: SLDL 02          Short load local MP2 (LCP1)
    03c8: INC  0004        Inc field ptr (TOS+4)
-   03ca: SLDL 01          Short load local MP1
+   03ca: SLDL 01          Short load local MP1 (FCP)
    03cb: STO              Store indirect (TOS into TOS-1)
    03cc: UJP  $03d3       Unconditional jump
--> 03ce: SLDL 02          Short load local MP2
+    END ELSE BEGIN
+      LCP1.LLINK := FCP
+-> 03ce: SLDL 02          Short load local MP2 (LCP1)
    03cf: INC  0005        Inc field ptr (TOS+5)
-   03d1: SLDL 01          Short load local MP1
+   03d1: SLDL 01          Short load local MP1 (FCP)
    03d2: STO              Store indirect (TOS into TOS-1)
--> 03d3: SLDL 01          Short load local MP1
+    END
+  END
+  FCP.LLINK := NIL
+-> 03d3: SLDL 01          Short load local MP1 (FCP)
    03d4: INC  0005        Inc field ptr (TOS+5)
    03d6: LDCN             Load constant NIL
    03d7: STO              Store indirect (TOS into TOS-1)
-   03d8: SLDL 01          Short load local MP1
+  FCP.RLINK := NIL
+   03d8: SLDL 01          Short load local MP1 (FCP)
    03d9: INC  0004        Inc field ptr (TOS+4)
    03db: LDCN             Load constant NIL
    03dc: STO              Store indirect (TOS into TOS-1)
 -> 03dd: RNP  00          Return from nonbase procedure
 END
+```
 
-### PROCEDURE PASCALCO.PROC8 (* P=8, LL=1, D=5, Callers: PROC16, PROC26, PROC20 *)
-  BASE1
-  BASE14
-  BASE15
+### PROCEDURE PASCALCOMPILER.PROC8 (* P=8, LL=1, D=5, Callers: PROC16, PROC26, PROC20 *)
+```
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
   BASE16
   BASE23
   BASE26
@@ -955,26 +1096,34 @@ END
   MP4
   MP5
 BEGIN
+  IF BASE26 THEN
 -> 050a: LDO  001a        Load global word BASE26
    050c: FJP  $0515       Jump if TOS false
+  BEGIN
+    BASE82 := BASE81
    050e: LDO  0051        Load global word BASE81
    0510: SRO  0052        Store global word BASE82
+    BASE26 := FALSE
    0512: SLDC 00          Short load constant 0
    0513: SRO  001a        Store global word BASE26
+  END
+  BASE16 := 15
 -> 0515: SLDC 0f          Short load constant 15
    0516: SRO  0010        Store global word BASE16
--> 0518: SLDC 2f          Short load constant 47
+  BASE15 := 47
+-> 0518: SLDC 2f          Short load constant 47 ('/')
    0519: SRO  000f        Store global word BASE15
-   051b: SLDO 01          Short load global BASE1
-   051c: SLDO 0e          Short load global BASE14
+  SYMBUFP[SYMCURSOR]
+   051b: SLDO 01          Short load global BASE1 (SYMBUFP)
+   051c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    051d: LDB              Load byte at byte ptr TOS-1 + TOS
    051e: UJP  $067d       Unconditional jump
    0520: SLDC 00          Short load constant 0
    0521: LLA  0001        Load local address MP1
-   0523: CXP  13 01       Call external procedure NUMSTRIN.1
+   0523: CXP  13 01       Call external procedure NUMSTRIN.NUMSTRIN
    0526: UJP  $076a       Unconditional jump
-   0528: SLDO 01          Short load global BASE1
-   0529: SLDO 0e          Short load global BASE14
+   0528: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0529: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    052a: LDB              Load byte at byte ptr TOS-1 + TOS
    052b: STL  0005        Store TOS into MP5
    052d: SLDC 00          Short load constant 0
@@ -982,8 +1131,8 @@ BEGIN
    0530: SLDC 00          Short load constant 0
    0531: STL  0003        Store TOS into MP3
 -> 0533: SLDL 05          Short load local MP5
-   0536: LDC  04          Load multiple-word constant
-                            0000 0000 0000 03ff 
+   0534: LDC  04          Load multiple-word constant
+                            0000 0000 0000 03ff [0..9]
    053e: SLDC 04          Short load constant 4
    053f: INN              Set membership (TOS-1 in set TOS)
    0540: SLDL 04          Short load local MP4
@@ -1003,29 +1152,29 @@ BEGIN
    0550: SLDC 01          Short load constant 1
    0551: ADI              Add integers (TOS + TOS-1)
    0552: STL  0004        Store TOS into MP4
-   0554: SLDO 01          Short load global BASE1
-   0555: SLDO 0e          Short load global BASE14
+   0554: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0555: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0556: SLDL 04          Short load local MP4
    0557: ADI              Add integers (TOS + TOS-1)
    0558: LDB              Load byte at byte ptr TOS-1 + TOS
    0559: STL  0005        Store TOS into MP5
    055b: UJP  $0533       Unconditional jump
 -> 055d: SLDL 05          Short load local MP5
-   0560: LDC  05          Load multiple-word constant
-                            0000 0000 4000 03ff 0020 
+   055e: LDC  05          Load multiple-word constant
+                            0000 0000 4000 03ff 0020 [5,16..25,46]
    056a: SLDC 05          Short load constant 5
    056b: INN              Set membership (TOS-1 in set TOS)
    056c: FJP  $0576       Jump if TOS false
    056e: SLDC 01          Short load constant 1
    056f: LLA  0001        Load local address MP1
-   0571: CXP  13 01       Call external procedure NUMSTRIN.1
+   0571: CXP  13 01       Call external procedure NUMSTRIN.NUMSTRIN
    0574: UJP  $0586       Unconditional jump
--> 0576: SLDO 0e          Short load global BASE14
+-> 0576: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0577: SLDL 04          Short load local MP4
    0578: ADI              Add integers (TOS + TOS-1)
    0579: SLDC 01          Short load constant 1
    057a: SBI              Subtract integers (TOS-1 - TOS)
-   057b: SRO  000e        Store global word BASE14
+   057b: SRO  000e        Store global word BASE14 (SYMCURSOR)
    057d: SLDC 23          Short load constant 35
    057e: SRO  000f        Store global word BASE15
    0580: SLDC 0f          Short load constant 15
@@ -1033,32 +1182,32 @@ BEGIN
    0583: SLDL 03          Short load local MP3
    0584: SRO  0017        Store global word BASE23
 -> 0586: UJP  $076a       Unconditional jump
-   0588: LAO  000e        Load global BASE14
-   058a: SLDO 01          Short load global BASE1
-   058b: CGP  02          Call global procedure PASCALCO.ASMPROC2
+   0588: LAO  000e        Load global BASE14 (SYMCURSOR)
+   058a: SLDO 01          Short load global BASE1 (SYMBUFP)
+   058b: CGP  02          Call global procedure PASCALCOMPILER.IDSEARCH
    058d: UJP  $076a       Unconditional jump
    058f: SLDC 7d          Short load constant 125
-   0590: CLP  1c          Call local procedure PASCALCO.PROC28
+   0590: CLP  1c          Call local procedure PASCALCOMPILER.PROC28
    0592: UJP  $0518       Unconditional jump
    0594: UJP  $076a       Unconditional jump
-   0596: SLDO 01          Short load global BASE1
-   0597: SLDO 0e          Short load global BASE14
+   0596: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0597: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0598: SLDC 01          Short load constant 1
    0599: ADI              Add integers (TOS + TOS-1)
    059a: LDB              Load byte at byte ptr TOS-1 + TOS
    059b: SLDC 2a          Short load constant 42
    059c: EQUI             Integer TOS-1 = TOS
    059d: FJP  $05b0       Jump if TOS false
-   059f: SLDO 0e          Short load global BASE14
+   059f: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05a0: SLDC 01          Short load constant 1
    05a1: ADI              Add integers (TOS + TOS-1)
-   05a2: SRO  000e        Store global word BASE14
+   05a2: SRO  000e        Store global word BASE14 (SYMCURSOR)
    05a4: SLDC 2a          Short load constant 42
-   05a5: CLP  1c          Call local procedure PASCALCO.PROC28
-   05a7: SLDO 0e          Short load global BASE14
+   05a5: CLP  1c          Call local procedure PASCALCOMPILER.PROC28
+   05a7: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05a8: SLDC 01          Short load constant 1
    05a9: ADI              Add integers (TOS + TOS-1)
-   05aa: SRO  000e        Store global word BASE14
+   05aa: SRO  000e        Store global word BASE14 (SYMCURSOR)
    05ac: UJP  $0518       Unconditional jump
    05ae: UJP  $05b3       Unconditional jump
 -> 05b0: SLDC 04          Short load constant 4
@@ -1070,42 +1219,42 @@ BEGIN
    05ba: SLDC 01          Short load constant 1
    05bb: SRO  000f        Store global word BASE15
    05bd: UJP  $076a       Unconditional jump
-   05bf: SLDO 0e          Short load global BASE14
+   05bf: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05c0: SLDC 01          Short load constant 1
    05c1: ADI              Add integers (TOS + TOS-1)
-   05c2: SRO  000e        Store global word BASE14
+   05c2: SRO  000e        Store global word BASE14 (SYMCURSOR)
    05c4: UJP  $0518       Unconditional jump
    05c6: UJP  $076a       Unconditional jump
-   05c8: SLDO 01          Short load global BASE1
-   05c9: SLDO 0e          Short load global BASE14
+   05c8: SLDO 01          Short load global BASE1 (SYMBUFP)
+   05c9: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05ca: SLDC 01          Short load constant 1
    05cb: ADI              Add integers (TOS + TOS-1)
    05cc: LDB              Load byte at byte ptr TOS-1 + TOS
    05cd: SLDC 2e          Short load constant 46
    05ce: EQUI             Integer TOS-1 = TOS
    05cf: FJP  $05db       Jump if TOS false
-   05d1: SLDO 0e          Short load global BASE14
+   05d1: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05d2: SLDC 01          Short load constant 1
    05d3: ADI              Add integers (TOS + TOS-1)
-   05d4: SRO  000e        Store global word BASE14
+   05d4: SRO  000e        Store global word BASE14 (SYMCURSOR)
    05d6: SLDC 02          Short load constant 2
    05d7: SRO  000f        Store global word BASE15
    05d9: UJP  $05de       Unconditional jump
 -> 05db: SLDC 12          Short load constant 18
    05dc: SRO  000f        Store global word BASE15
 -> 05de: UJP  $076a       Unconditional jump
-   05e0: SLDO 01          Short load global BASE1
-   05e1: SLDO 0e          Short load global BASE14
+   05e0: SLDO 01          Short load global BASE1 (SYMBUFP)
+   05e1: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05e2: SLDC 01          Short load constant 1
    05e3: ADI              Add integers (TOS + TOS-1)
    05e4: LDB              Load byte at byte ptr TOS-1 + TOS
    05e5: SLDC 3d          Short load constant 61
    05e6: EQUI             Integer TOS-1 = TOS
    05e7: FJP  $05f3       Jump if TOS false
-   05e9: SLDO 0e          Short load global BASE14
+   05e9: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    05ea: SLDC 01          Short load constant 1
    05eb: ADI              Add integers (TOS + TOS-1)
-   05ec: SRO  000e        Store global word BASE14
+   05ec: SRO  000e        Store global word BASE14 (SYMCURSOR)
    05ee: SLDC 0e          Short load constant 14
    05ef: SRO  000f        Store global word BASE15
    05f1: UJP  $05f6       Unconditional jump
@@ -1148,26 +1297,29 @@ BEGIN
    062d: SRO  000f        Store global word BASE15
    062f: SLDC 08          Short load constant 8
    0630: SRO  0010        Store global word BASE16
-   0632: SLDO 01          Short load global BASE1
-   0633: SLDO 0e          Short load global BASE14
+   0632: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0633: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0634: SLDC 01          Short load constant 1
    0635: ADI              Add integers (TOS + TOS-1)
    0636: LDB              Load byte at byte ptr TOS-1 + TOS
    0637: UJP  $064d       Unconditional jump
    0639: SLDC 0c          Short load constant 12
    063a: SRO  0010        Store global word BASE16
-   063c: SLDO 0e          Short load global BASE14
+   063c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    063d: SLDC 01          Short load constant 1
    063e: ADI              Add integers (TOS + TOS-1)
-   063f: SRO  000e        Store global word BASE14
+   063f: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0641: UJP  $0658       Unconditional jump
    0643: SLDC 09          Short load constant 9
    0644: SRO  0010        Store global word BASE16
-   0646: SLDO 0e          Short load global BASE14
+   0646: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0647: SLDC 01          Short load constant 1
    0648: ADI              Add integers (TOS + TOS-1)
-   0649: SRO  000e        Store global word BASE14
+   0649: SRO  000e        Store global word BASE14 (SYMCURSOR)
    064b: UJP  $0658       Unconditional jump
+-> 064d: XJP  003d 003e 0658 Case jump
+           003d -> 0643   003e -> 0639
+           default -> 0658
 -> 0658: UJP  $076a       Unconditional jump
    065a: SLDC 29          Short load constant 41
    065b: SRO  000f        Store global word BASE15
@@ -1176,8 +1328,8 @@ BEGIN
    0660: UJP  $076a       Unconditional jump
    0662: SLDC 29          Short load constant 41
    0663: SRO  000f        Store global word BASE15
-   0665: SLDO 01          Short load global BASE1
-   0666: SLDO 0e          Short load global BASE14
+   0665: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0666: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0667: SLDC 01          Short load constant 1
    0668: ADI              Add integers (TOS + TOS-1)
    0669: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -1186,39 +1338,72 @@ BEGIN
    066c: FJP  $0678       Jump if TOS false
    066e: SLDC 0a          Short load constant 10
    066f: SRO  0010        Store global word BASE16
-   0671: SLDO 0e          Short load global BASE14
+   0671: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0672: SLDC 01          Short load constant 1
    0673: ADI              Add integers (TOS + TOS-1)
-   0674: SRO  000e        Store global word BASE14
+   0674: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0676: UJP  $067b       Unconditional jump
 -> 0678: SLDC 0b          Short load constant 11
    0679: SRO  0010        Store global word BASE16
 -> 067b: UJP  $076a       Unconditional jump
+-> 067d: XJP  0009 007b 076a Case jump
+           0009 -> 05bf   000a -> 0682   000b -> 0682   000c -> 0682
+           000d -> 0682   000e -> 0682   000f -> 0682   0010 -> 0682
+           0011 -> 0682   0012 -> 0682   0013 -> 0682   0014 -> 0682
+           0015 -> 0682   0016 -> 0682   0017 -> 0682   0018 -> 0682
+           0019 -> 0682   001a -> 0682   001b -> 0682   001c -> 0682
+           001d -> 0682   001e -> 0682   001f -> 0682   0020 -> 05bf
+           0021 -> 0682   0022 -> 0682   0023 -> 0682   0024 -> 0682
+           0025 -> 0682   0026 -> 0682   0027 -> 0520   0028 -> 0596
+           0029 -> 05b5   002a -> 060c   002b -> 0614   002c -> 05ba
+           002d -> 061c   002e -> 05c8   002f -> 0624   0030 -> 0528
+           0031 -> 0528   0032 -> 0528   0033 -> 0528   0034 -> 0528
+           0035 -> 0528   0036 -> 0528   0037 -> 0528   0038 -> 0528
+           0039 -> 0528   003a -> 05e0   003b -> 05f8   003c -> 062c
+           003d -> 065a   003e -> 0662   003f -> 0682   0040 -> 0682
+           0041 -> 0588   0042 -> 0588   0043 -> 0588   0044 -> 0588
+           0045 -> 0588   0046 -> 0588   0047 -> 0588   0048 -> 0588
+           0049 -> 0588   004a -> 0588   004b -> 0588   004c -> 0588
+           004d -> 0588   004e -> 0588   004f -> 0588   0050 -> 0588
+           0051 -> 0588   0052 -> 0588   0053 -> 0588   0054 -> 0588
+           0055 -> 0588   0056 -> 0588   0057 -> 0588   0058 -> 0588
+           0059 -> 0588   005a -> 0588   005b -> 0602   005c -> 0682
+           005d -> 0607   005e -> 05fd   005f -> 0682   0060 -> 0682
+           0061 -> 0588   0062 -> 0588   0063 -> 0588   0064 -> 0588
+           0065 -> 0588   0066 -> 0588   0067 -> 0588   0068 -> 0588
+           0069 -> 0588   006a -> 0588   006b -> 0588   006c -> 0588
+           006d -> 0588   006e -> 0588   006f -> 0588   0070 -> 0588
+           0071 -> 0588   0072 -> 0588   0073 -> 0588   0074 -> 0588
+           0075 -> 0588   0076 -> 0588   0077 -> 0588   0078 -> 0588
+           0079 -> 0588   007a -> 0588   007b -> 058f
+       default -> 076a
 -> 076a: SLDO 0f          Short load global BASE15
    076b: SLDC 2f          Short load constant 47
    076c: EQUI             Integer TOS-1 = TOS
    076d: FJP  $0784       Jump if TOS false
-   076f: SLDO 01          Short load global BASE1
-   0770: SLDO 0e          Short load global BASE14
+   076f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0770: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0771: LDB              Load byte at byte ptr TOS-1 + TOS
    0772: SLDC 0d          Short load constant 13
    0773: EQUI             Integer TOS-1 = TOS
    0774: FJP  $077f       Jump if TOS false
-   0776: CGP  0e          Call global procedure PASCALCO.PROC14
+   0776: CGP  0e          Call global procedure PASCALCOMPILER.CHECKEND
    0778: SLDC 01          Short load constant 1
    0779: SRO  001a        Store global word BASE26
    077b: UJP  $0518       Unconditional jump
    077d: UJP  $0784       Unconditional jump
+  PASCALCOMPILER.ERROR(400) { Illegal character in text }
 -> 077f: LDCI 0190        Load word 400
-   0782: CGP  04          Call global procedure PASCALCO.ERROR
--> 0784: SLDO 0e          Short load global BASE14
+   0782: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+-> 0784: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0785: SLDC 01          Short load constant 1
    0786: ADI              Add integers (TOS + TOS-1)
-   0787: SRO  000e        Store global word BASE14
+   0787: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0789: RNP  00          Return from nonbase procedure
 END
+```
 
-### PROCEDURE PASCALCO.PROC9(PARAM1; PARAM2) (* P=9, LL=1, D=2 *)
+### PROCEDURE PASCALCOMPILER.PROC9(PARAM1; PARAM2) (* P=9, LL=1, D=2 *)
   BASE17
   MP1=PARAM2
   MP2=PARAM1
@@ -1232,7 +1417,7 @@ BEGIN
    07a7: LAO  0011        Load global BASE17
    07a9: SLDC 00          Short load constant 0
    07aa: SLDC 00          Short load constant 0
-   07ab: CGP  03          Call global procedure PASCALCO.ASMFUNC3
+   07ab: CGP  03          Call global procedure PASCALCOMPILER.TREESEARCH
    07ad: SLDC 00          Short load constant 0
    07ae: EQUI             Integer TOS-1 = TOS
    07af: FJP  $07b3       Jump if TOS false
@@ -1247,8 +1432,8 @@ BEGIN
 -> 07bb: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC10(PARAM1; PARAM2) (* P=10, LL=1, D=4, Callers: PROC20 *)
-  BASE8
+### PROCEDURE PASCALCOMPILER.PROC10(PARAM1; PARAM2) (* P=10, LL=1, D=4, Callers: PROC20 *)
+  BASE8=TOP:DISPRANGE
   BASE17
   BASE24
   BASE54
@@ -1258,7 +1443,7 @@ END
   BASE76
   BASE77
   BASE78
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1=PARAM2
   MP2=PARAM1
   MP3
@@ -1286,7 +1471,7 @@ BEGIN
    07e6: LAO  0011        Load global BASE17
    07e8: SLDC 00          Short load constant 0
    07e9: SLDC 00          Short load constant 0
-   07ea: CGP  03          Call global procedure PASCALCO.ASMFUNC3
+   07ea: CGP  03          Call global procedure PASCALCOMPILER.TREESEARCH
    07ec: SLDC 00          Short load constant 0
    07ed: EQUI             Integer TOS-1 = TOS
    07ee: FJP  $080a       Jump if TOS false
@@ -1300,8 +1485,9 @@ BEGIN
    07fa: UJP  $0808       Unconditional jump
 -> 07fc: LDO  0036        Load global word BASE54
    07fe: FJP  $0805       Jump if TOS false
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    0800: SLDC 67          Short load constant 103
-   0801: CGP  04          Call global procedure PASCALCO.ERROR
+   0801: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    0803: UJP  $0808       Unconditional jump
 -> 0805: LDCN             Load constant NIL
    0806: STL  0003        Store TOS into MP3
@@ -1315,8 +1501,9 @@ BEGIN
    0813: UJP  $07ce       Unconditional jump
 -> 0815: LDO  0036        Load global word BASE54
    0817: FJP  $085c       Jump if TOS false
+  PASCALCOMPILER.ERROR(104) { Undeclared identifier }
    0819: SLDC 68          Short load constant 104
-   081a: CGP  04          Call global procedure PASCALCO.ERROR
+   081a: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    081c: SLDC 00          Short load constant 0
    081d: SLDL 02          Short load local MP2
    081e: SLDC 01          Short load constant 1
@@ -1365,7 +1552,7 @@ BEGIN
 -> 085f: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC11(PARAM1; PARAM2; PARAM3) (* P=11, LL=1, D=4 *)
+### PROCEDURE PASCALCOMPILER.PROC11(PARAM1; PARAM2; PARAM3) (* P=11, LL=1, D=4 *)
   BASE62
   MP1=PARAM3
   MP2=PARAM2
@@ -1416,16 +1603,19 @@ BEGIN
 -> 08a2: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC12(PARAM1; PARAM2; PARAM3) (* P=12, LL=1, D=3, Callers: PROC13 *)
-  MP1=PARAM3
+### PROCEDURE PASCALCOMPILER.PROC12(PARAM1; PARAM2; ERRORNUM:INTEGER) (* P=12, LL=1, D=3, Callers: PROC13, DECLARATIONPART.PROC19, UNITPART.PROC3 *)
+  MP1=ERRORNUM
   MP2=PARAM2
   MP3=PARAM1
 BEGIN
+  IF MP3.0 < MP2 THEN
 -> 08ae: SLDL 03          Short load local MP3
    08af: SIND 00          Short index load *TOS+0
    08b0: SLDL 02          Short load local MP2
    08b1: LESI             Integer TOS-1 < TOS
    08b2: FJP  $08bc       Jump if TOS false
+  BEGIN
+    MP3.0 := MP3.0 + 1
    08b4: SLDL 03          Short load local MP3
    08b5: SLDL 03          Short load local MP3
    08b6: SIND 00          Short index load *TOS+0
@@ -1433,28 +1623,37 @@ BEGIN
    08b8: ADI              Add integers (TOS + TOS-1)
    08b9: STO              Store indirect (TOS into TOS-1)
    08ba: UJP  $08bf       Unconditional jump
+  END ELSE BEGIN
+    PASCALCOMPILER.ERROR(ERRORNUM)
 -> 08bc: SLDL 01          Short load local MP1
-   08bd: CGP  04          Call global procedure PASCALCO.ERROR
+   08bd: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+  END
 -> 08bf: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC13(PARAM1) (* P=13, LL=1, D=1 *)
-  BASE13=SEG
+### PROCEDURE PASCALCOMPILER.PROC13(PARAM1) (* P=13, LL=1, D=1, Callers: DECLARATIONPART.PROC12, DECLARATIONPART.PROC19, UNITPART.PROC3 *)
+  BASE13=SEG:SEGRANGE
   BASE21
   BASE88
   BASE589
   MP1=PARAM1
 BEGIN
+  IF MP1 THEN
 -> 08cc: SLDL 01          Short load local MP1
    08cd: FJP  $08d7       Jump if TOS false
+  BEGIN
+    PASCALCOMPILER.PROC12(BASE88,63,354) { Too many segments for seg dictionary }
    08cf: LAO  0058        Load global BASE88
    08d1: SLDC 3f          Short load constant 63
    08d2: LDCI 0162        Load word 354
-   08d5: CGP  0c          Call global procedure PASCALCO.PROC12
+   08d5: CGP  0c          Call global procedure PASCALCOMPILER.PROC12
+  END
+  PASCALCOMPILER.PROC12(BASE21,15,354) { Too many segments for seg dictionary }
 -> 08d7: LAO  0015        Load global BASE21
    08d9: SLDC 0f          Short load constant 15
    08da: LDCI 0162        Load word 354
-   08dd: CGP  0c          Call global procedure PASCALCO.PROC12
+   08dd: CGP  0c          Call global procedure PASCALCOMPILER.PROC12
+  BASE589[SEG] := BASE21
    08df: LAO  024d        Load global BASE589
    08e2: SLDO 0d          Short load global BASE13 (SEG)
    08e3: IXP  04 04       Index packed array TOS-1[TOS], 4 elts/word, 4 field width
@@ -1463,35 +1662,41 @@ BEGIN
 -> 08e9: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC14 (* P=14, LL=1, D=0, Callers: PROC8, PROC28 *)
-  BASE1
-  BASE9=IC
+### PROCEDURE PASCALCOMPILER.CHECKEND (* P=14, LL=1, D=0, Callers: PROC8, PROC28 *)
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE9=IC:ADDRRANGE
   BASE10
-  BASE14
+  BASE14=SYMCURSOR:CURSRANGE
   BASE37
   BASE39
   BASE44=LIST:BOOLEAN
   BASE47
   BASE50=NOISY:BOOLEAN
-  BASE94=STARTDOTS
-  BASE95=SCREENDOTS
-  BASE96=LINEINFO
-  BASE98=LINESTART
+  BASE94=STARTDOTS:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE96=LINEINFO:INTEGER
+  BASE98=LINESTART:CURSRANGE
 BEGIN
+  SCREENDOTS := SCREENDOTS + 1
 -> 03ec: LDO  005f        Load global word BASE95 (SCREENDOTS)
    03ee: SLDC 01          Short load constant 1
    03ef: ADI              Add integers (TOS + TOS-1)
    03f0: SRO  005f        Store global word BASE95 (SCREENDOTS)
-   03f2: SLDO 0e          Short load global BASE14
+  SYMCURSOR := SYMCURSOR + 1
+   03f2: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    03f3: SLDC 01          Short load constant 1
    03f4: ADI              Add integers (TOS + TOS-1)
-   03f5: SRO  000e        Store global word BASE14
+   03f5: SRO  000e        Store global word BASE14 (SYMCURSOR)
+  IF NOISY THEN
    03f7: LDO  0032        Load global word BASE50 (NOISY)
    03f9: FJP  $042d       Jump if TOS false
+  BEGIN
+    PASCALSY.FWRITECHAR(OUTPUT,'.',0)
    03fb: LOD  02 0003     Load word at G3 (OUTPUT)
-   03fe: SLDC 2e          Short load constant 46
+   03fe: SLDC 2e          Short load constant 46 ('.')
    03ff: SLDC 00          Short load constant 0
    0400: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+    IF (SCREENDOTS - STARTDOTS) % 50 = 0 THEN
    0403: LDO  005f        Load global word BASE95 (SCREENDOTS)
    0405: LDO  005e        Load global word BASE94 (STARTDOTS)
    0407: SBI              Subtract integers (TOS-1 - TOS)
@@ -1500,27 +1705,34 @@ BEGIN
    040a: SLDC 00          Short load constant 0
    040b: EQUI             Integer TOS-1 = TOS
    040c: FJP  $042d       Jump if TOS false
+    BEGIN
+      PASCALSY.FWRITELN(OUTPUT)
    040e: LOD  02 0003     Load word at G3 (OUTPUT)
    0411: CXP  00 16       Call external procedure PASCALSY.FWRITELN
+     PASCALSY.FWRITECHAR(OUTPUT,'<',0)
    0414: LOD  02 0003     Load word at G3 (OUTPUT)
-   0417: SLDC 3c          Short load constant 60
+   0417: SLDC 3c          Short load constant 60 ('<')
    0418: SLDC 00          Short load constant 0
    0419: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+     PASCALSY.FWRITEINT(OUTPUT,SCREENDOTS,4)
    041c: LOD  02 0003     Load word at G3 (OUTPUT)
    041f: LDO  005f        Load global word BASE95 (SCREENDOTS)
    0421: SLDC 04          Short load constant 4
    0422: CXP  00 0d       Call external procedure PASCALSY.FWRITEINT
+     PASCALSY.FWRITECHAR(OUTPUT,'>',0)
    0425: LOD  02 0003     Load word at G3 (OUTPUT)
-   0428: SLDC 3e          Short load constant 62
+   0428: SLDC 3e          Short load constant 62 ('>')
    0429: SLDC 00          Short load constant 0
    042a: CXP  00 11       Call external procedure PASCALSY.FWRITECHAR
+    END
+  END
 -> 042d: LDO  002c        Load global word BASE44 (LIST)
    042f: FJP  $0433       Jump if TOS false
-   0431: CGP  06          Call global procedure PASCALCO.PROC6
+   0431: CGP  06          Call global procedure PASCALCOMPILER.PRINTLINE
 -> 0433: SLDC 00          Short load constant 0
    0434: SRO  002f        Store global word BASE47
-   0436: SLDO 01          Short load global BASE1
-   0437: SLDO 0e          Short load global BASE14
+   0436: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0437: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0438: LDB              Load byte at byte ptr TOS-1 + TOS
    0439: SLDC 00          Short load constant 0
    043a: EQUI             Integer TOS-1 = TOS
@@ -1529,68 +1741,69 @@ BEGIN
    043f: LNOT             Logical NOT (~TOS)
    0440: FJP  $045e       Jump if TOS false
    0442: LDCI 0400        Load word 1024
-   0445: SLDO 0e          Short load global BASE14
+   0445: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0446: SBI              Subtract integers (TOS-1 - TOS)
    0447: SLDC 01          Short load constant 1
    0448: SLDC 00          Short load constant 0
-   0449: SLDO 01          Short load global BASE1
-   044a: SLDO 0e          Short load global BASE14
+   0449: SLDO 01          Short load global BASE1 (SYMBUFP)
+   044a: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    044b: SLDC 00          Short load constant 0
    044c: CSP  0b          Call standard procedure SCAN
-   044e: SLDO 0e          Short load global BASE14
+   044e: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    044f: ADI              Add integers (TOS + TOS-1)
-   0450: SRO  000e        Store global word BASE14
-   0452: SLDO 0e          Short load global BASE14
+   0450: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   0452: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0453: LDCI 0400        Load word 1024
    0456: NEQI             Integer TOS-1 <> TOS
    0457: FJP  $045e       Jump if TOS false
+  PASCALCOMPILER.ERROR(400) { Illegal character in text }
    0459: LDCI 0190        Load word 400
-   045c: CGP  04          Call global procedure PASCALCO.ERROR
--> 045e: CGP  05          Call global procedure PASCALCO.PROC5
+   045c: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+-> 045e: CGP  05          Call global procedure PASCALCOMPILER.PROC5
    0460: UJP  $0465       Unconditional jump
--> 0462: SLDO 0e          Short load global BASE14
+-> 0462: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0463: SRO  0062        Store global word BASE98 (LINESTART)
--> 0465: SLDO 01          Short load global BASE1
-   0466: SLDO 0e          Short load global BASE14
+-> 0465: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0466: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0467: LDB              Load byte at byte ptr TOS-1 + TOS
    0468: SLDC 0c          Short load constant 12
    0469: EQUI             Integer TOS-1 = TOS
    046a: FJP  $0471       Jump if TOS false
-   046c: SLDO 0e          Short load global BASE14
+   046c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    046d: SLDC 01          Short load constant 1
    046e: ADI              Add integers (TOS + TOS-1)
-   046f: SRO  000e        Store global word BASE14
--> 0471: SLDO 01          Short load global BASE1
-   0472: SLDO 0e          Short load global BASE14
+   046f: SRO  000e        Store global word BASE14 (SYMCURSOR)
+-> 0471: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0472: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0473: LDB              Load byte at byte ptr TOS-1 + TOS
    0474: SLDC 10          Short load constant 16
    0475: EQUI             Integer TOS-1 = TOS
    0476: FJP  $047f       Jump if TOS false
-   0478: SLDO 0e          Short load global BASE14
+   0478: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0479: SLDC 02          Short load constant 2
    047a: ADI              Add integers (TOS + TOS-1)
-   047b: SRO  000e        Store global word BASE14
+   047b: SRO  000e        Store global word BASE14 (SYMCURSOR)
    047d: UJP  $0497       Unconditional jump
--> 047f: SLDO 0e          Short load global BASE14
+-> 047f: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0480: SLDC 50          Short load constant 80
    0481: SLDC 01          Short load constant 1
    0482: SLDC 09          Short load constant 9
-   0483: SLDO 01          Short load global BASE1
-   0484: SLDO 0e          Short load global BASE14
+   0483: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0484: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0485: SLDC 00          Short load constant 0
    0486: CSP  0b          Call standard procedure SCAN
    0488: ADI              Add integers (TOS + TOS-1)
-   0489: SRO  000e        Store global word BASE14
-   048b: SLDO 0e          Short load global BASE14
+   0489: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   048b: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    048c: SLDC 50          Short load constant 80
    048d: SLDC 01          Short load constant 1
    048e: SLDC 20          Short load constant 32
-   048f: SLDO 01          Short load global BASE1
-   0490: SLDO 0e          Short load global BASE14
+   048f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0490: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0491: SLDC 00          Short load constant 0
    0492: CSP  0b          Call standard procedure SCAN
    0494: ADI              Add integers (TOS + TOS-1)
-   0495: SRO  000e        Store global word BASE14
+   0495: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0497: LDO  0027        Load global word BASE39
    0499: FJP  $04a0       Jump if TOS false
    049b: SLDO 0a          Short load global BASE10
@@ -1601,9 +1814,9 @@ BEGIN
 -> 04a3: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC15(PARAM1): RETVAL (* P=15, LL=1, D=7 *)
+### FUNCTION PASCALCOMPILER.FUNC15(PARAM1): RETVAL (* P=15, LL=1, D=7 *)
   BASE30
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   MP1=RETVAL1
   MP2=RETVAL2
   MP3=PARAM1
@@ -1660,8 +1873,8 @@ BEGIN
 -> 0d2d: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC16(PARAM1; PARAM2; PARAM3; PARAM4) (* P=16, LL=1, D=4, Callers: PROC26, PROC20 *)
-  BASE15
+### PROCEDURE PASCALCOMPILER.PROC16(PARAM1; PARAM2; PARAM3; PARAM4) (* P=16, LL=1, D=4, Callers: PROC26, PROC20 *)
+  BASE15=SY:SYMBOL
   MP1=PARAM4
   MP2=PARAM3
   MP3=PARAM2
@@ -1674,12 +1887,12 @@ BEGIN
    08fc: INN              Set membership (TOS-1 in set TOS)
    08fd: LNOT             Logical NOT (~TOS)
    08fe: FJP  $0904       Jump if TOS false
-   0900: CGP  08          Call global procedure PASCALCO.PROC8
+   0900: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0902: UJP  $08f6       Unconditional jump
 -> 0904: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC17(PARAM1): RETVAL (* P=17, LL=1, D=5, Callers: FUNC18 *)
+### FUNCTION PASCALCOMPILER.FUNC17(PARAM1): RETVAL (* P=17, LL=1, D=5, Callers: FUNC18 *)
   BASE62
   MP1=RETVAL1
   MP2=RETVAL2
@@ -1708,7 +1921,7 @@ BEGIN
 -> 092a: RNP  01          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC18(PARAM1): RETVAL (* P=18, LL=1, D=5, Callers: FUNC21 *)
+### FUNCTION PASCALCOMPILER.FUNC18(PARAM1): RETVAL (* P=18, LL=1, D=5, Callers: FUNC21 *)
   MP1=RETVAL1
   MP2=RETVAL2
   MP3=PARAM1
@@ -1719,7 +1932,7 @@ BEGIN
    0939: SLDL 03          Short load local MP3
    093a: SLDC 00          Short load constant 0
    093b: SLDC 00          Short load constant 0
-   093c: CGP  11          Call global procedure PASCALCO.PROC17
+   093c: CGP  11          Call global procedure PASCALCOMPILER.PROC17
    093e: FJP  $0944       Jump if TOS false
    0940: SLDL 03          Short load local MP3
    0941: SIND 07          Short index load *TOS+7
@@ -1727,7 +1940,7 @@ BEGIN
 -> 0944: RNP  01          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC19(PARAM1): RETVAL (* P=19, LL=1, D=5, Callers: PROC20 *)
+### FUNCTION PASCALCOMPILER.FUNC19(PARAM1): RETVAL (* P=19, LL=1, D=5, Callers: PROC20 *)
   MP1=RETVAL1
   MP2=RETVAL2
   MP3=PARAM1
@@ -1744,17 +1957,17 @@ BEGIN
 -> 0959: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC20(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=20, LL=1, D=12 *)
+### PROCEDURE PASCALCOMPILER.PROC20(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=20, LL=1, D=12 *)
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE16
-  BASE22
+  BASE22=LGTH:INTEGER
   BASE23
   BASE55
   BASE62
   BASE63
   BASE64
-  BASE129=CONSTBEGSYS
+  BASE129=CONSTBEGSYS:SETOFSYS
   MP1=PARAM6
   MP2=PARAM5
   MP3=PARAM4
@@ -1780,8 +1993,9 @@ BEGIN
    0973: INN              Set membership (TOS-1 in set TOS)
    0974: LNOT             Logical NOT (~TOS)
    0975: FJP  $098a       Jump if TOS false
+  PASCALCOMPILER.ERROR(50) { Error in constant }
    0977: SLDC 32          Short load constant 50
-   0978: CGP  04          Call global procedure PASCALCO.ERROR
+   0978: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    097a: LLA  0003        Load local address MP3
    097c: LDM  04          Load 4 words from (TOS)
    097e: SLDC 04          Short load constant 4
@@ -1790,7 +2004,7 @@ BEGIN
    0984: SLDC 04          Short load constant 4
    0985: UNI              Set union (TOS OR TOS-1)
    0986: ADJ  04          Adjust set to 4 words
-   0988: CGP  10          Call global procedure PASCALCO.PROC16
+   0988: CGP  10          Call global procedure PASCALCOMPILER.PROC16
 -> 098a: SLDO 0f          Short load global BASE15
    098b: LAO  0081        Load global BASE129 (CONSTBEGSYS)
    098e: LDM  04          Load 4 words from (TOS)
@@ -1833,7 +2047,7 @@ BEGIN
 -> 09ca: SLDL 01          Short load local MP1
    09cb: LAO  0017        Load global BASE23
    09cd: MOV  0001        Move 1 words (TOS to TOS-1)
-   09cf: CGP  08          Call global procedure PASCALCO.PROC8
+   09cf: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    09d1: UJP  $0b24       Unconditional jump
 -> 09d3: SLDC 00          Short load constant 0
    09d4: STL  0009        Store TOS into MP9
@@ -1841,7 +2055,7 @@ BEGIN
    09d7: SLDC 28          Short load constant 40
    09d8: EQUI             Integer TOS-1 = TOS
    09d9: SLDO 10          Short load global BASE16
-   09da: SLDC 60          Short load constant 96
+   09da: SLDC 60          Short load constant 96 [5,6]
    09db: SLDC 01          Short load constant 1
    09dc: INN              Set membership (TOS-1 in set TOS)
    09dd: LAND             Logical AND (TOS & TOS-1)
@@ -1855,7 +2069,7 @@ BEGIN
    09e8: UJP  $09ed       Unconditional jump
 -> 09ea: SLDC 02          Short load constant 2
    09eb: STL  0009        Store TOS into MP9
--> 09ed: CGP  08          Call global procedure PASCALCO.PROC8
+-> 09ed: CGP  08          Call global procedure PASCALCOMPILER.PROC8
 -> 09ef: SLDO 0f          Short load global BASE15
    09f0: SLDC 00          Short load constant 0
    09f1: EQUI             Integer TOS-1 = TOS
@@ -1864,7 +2078,7 @@ BEGIN
    09f5: SLDC 01          Short load constant 1
    09f6: ADJ  01          Adjust set to 1 words
    09f8: LLA  0008        Load local address MP8
-   09fa: CGP  0a          Call global procedure PASCALCO.PROC10
+   09fa: CGP  0a          Call global procedure PASCALCOMPILER.PROC10
    09fc: SLDL 08          Short load local MP8
    09fd: STL  000c        Store TOS into MP12
    09ff: SLDL 0c          Short load local MP12
@@ -1922,7 +2136,7 @@ BEGIN
    0a44: LDO  003f        Load global word BASE63
    0a46: SLDC 00          Short load constant 0
    0a47: SLDC 00          Short load constant 0
-   0a48: CGP  15          Call global procedure PASCALCO.FUNC21
+   0a48: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0a4a: FJP  $0a87       Jump if TOS false
    0a4c: SLDL 09          Short load local MP9
    0a4d: SLDC 02          Short load constant 2
@@ -1968,9 +2182,10 @@ BEGIN
    0a83: SLDL 0a          Short load local MP10
    0a84: STO              Store indirect (TOS into TOS-1)
 -> 0a85: UJP  $0a8a       Unconditional jump
+  PASCALCOMPILER.ERROR(105) { sign not allowed }
 -> 0a87: SLDC 69          Short load constant 105
-   0a88: CGP  04          Call global procedure PASCALCO.ERROR
--> 0a8a: CGP  08          Call global procedure PASCALCO.PROC8
+   0a88: CGP  04          Call global procedure PASCALCOMPILER.ERROR
+-> 0a8a: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0a8c: UJP  $0b24       Unconditional jump
 -> 0a8e: SLDO 0f          Short load global BASE15
    0a8f: SLDC 23          Short load constant 35
@@ -1988,7 +2203,7 @@ BEGIN
    0aa0: SLDL 01          Short load local MP1
    0aa1: LAO  0017        Load global BASE23
    0aa3: MOV  0001        Move 1 words (TOS to TOS-1)
-   0aa5: CGP  08          Call global procedure PASCALCO.PROC8
+   0aa5: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0aa7: UJP  $0b24       Unconditional jump
 -> 0aa9: SLDO 0f          Short load global BASE15
    0aaa: SLDC 24          Short load constant 36
@@ -2010,7 +2225,7 @@ BEGIN
    0ac4: SLDL 01          Short load local MP1
    0ac5: LAO  0017        Load global BASE23
    0ac7: MOV  0001        Move 1 words (TOS to TOS-1)
-   0ac9: CGP  08          Call global procedure PASCALCO.PROC8
+   0ac9: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0acb: UJP  $0b24       Unconditional jump
 -> 0acd: SLDO 0f          Short load global BASE15
    0ace: SLDC 30          Short load constant 48
@@ -2056,7 +2271,7 @@ BEGIN
    0b06: LDO  0016        Load global word BASE22
    0b08: SLDC 00          Short load constant 0
    0b09: SLDC 00          Short load constant 0
-   0b0a: CGP  13          Call global procedure PASCALCO.PROC19
+   0b0a: CGP  13          Call global procedure PASCALCOMPILER.PROC19
    0b0c: STO              Store indirect (TOS into TOS-1)
    0b0d: SLDL 07          Short load local MP7
    0b0e: INC  0001        Inc field ptr (TOS+1)
@@ -2065,13 +2280,14 @@ BEGIN
    0b12: SLDL 01          Short load local MP1
    0b13: LAO  0017        Load global BASE23
    0b15: MOV  0001        Move 1 words (TOS to TOS-1)
-   0b17: CGP  08          Call global procedure PASCALCO.PROC8
+   0b17: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0b19: UJP  $0b24       Unconditional jump
+  PASCALCOMPILER.ERROR(106) { Number expected }
 -> 0b1b: SLDC 6a          Short load constant 106
-   0b1c: CGP  04          Call global procedure PASCALCO.ERROR
+   0b1c: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    0b1e: LLA  0003        Load local address MP3
    0b20: LDM  04          Load 4 words from (TOS)
-   0b22: CGP  10          Call global procedure PASCALCO.PROC16
+   0b22: CGP  10          Call global procedure PASCALCOMPILER.PROC16
 -> 0b24: SLDO 0f          Short load global BASE15
    0b25: LLA  0003        Load local address MP3
    0b27: LDM  04          Load 4 words from (TOS)
@@ -2079,18 +2295,19 @@ BEGIN
    0b2a: INN              Set membership (TOS-1 in set TOS)
    0b2b: LNOT             Logical NOT (~TOS)
    0b2c: FJP  $0b37       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    0b2e: SLDC 06          Short load constant 6
-   0b2f: CGP  04          Call global procedure PASCALCO.ERROR
+   0b2f: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    0b31: LLA  0003        Load local address MP3
    0b33: LDM  04          Load 4 words from (TOS)
-   0b35: CGP  10          Call global procedure PASCALCO.PROC16
+   0b35: CGP  10          Call global procedure PASCALCOMPILER.PROC16
 -> 0b37: SLDL 02          Short load local MP2
    0b38: SLDL 07          Short load local MP7
    0b39: STO              Store indirect (TOS into TOS-1)
 -> 0b3a: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC21(PARAM1; PARAM2): RETVAL (* P=21, LL=1, D=12, Callers: PROC20 *)
+### FUNCTION PASCALCOMPILER.FUNC21(PARAM1; PARAM2): RETVAL (* P=21, LL=1, D=12, Callers: PROC20 *)
   BASE57
   BASE58
   BASE79:GLOBTESTP
@@ -2142,7 +2359,7 @@ BEGIN
    0b7d: SIND 02          Short index load *TOS+2
    0b7e: SLDC 00          Short load constant 0
    0b7f: SLDC 00          Short load constant 0
-   0b80: CGP  15          Call global procedure PASCALCO.FUNC21
+   0b80: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0b82: STL  0001        Store TOS into MP1
    0b84: UJP  $0cac       Unconditional jump
    0b86: SLDC 00          Short load constant 0
@@ -2204,7 +2421,7 @@ BEGIN
    0bd1: SIND 02          Short index load *TOS+2
    0bd2: SLDC 00          Short load constant 0
    0bd3: SLDC 00          Short load constant 0
-   0bd4: CGP  15          Call global procedure PASCALCO.FUNC21
+   0bd4: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0bd6: STL  0007        Store TOS into MP7
 -> 0bd8: SLDL 07          Short load local MP7
    0bd9: STL  0001        Store TOS into MP1
@@ -2220,7 +2437,7 @@ BEGIN
    0be8: SIND 02          Short index load *TOS+2
    0be9: SLDC 00          Short load constant 0
    0bea: SLDC 00          Short load constant 0
-   0beb: CGP  15          Call global procedure PASCALCO.FUNC21
+   0beb: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0bed: STL  0001        Store TOS into MP1
    0bef: UJP  $0cac       Unconditional jump
    0bf1: SLDL 04          Short load local MP4
@@ -2229,7 +2446,7 @@ BEGIN
    0bf4: SIND 03          Short index load *TOS+3
    0bf5: SLDC 00          Short load constant 0
    0bf6: SLDC 00          Short load constant 0
-   0bf7: CGP  15          Call global procedure PASCALCO.FUNC21
+   0bf7: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0bf9: SLDL 04          Short load local MP4
    0bfa: SIND 04          Short index load *TOS+4
    0bfb: SLDL 03          Short load local MP3
@@ -2265,7 +2482,7 @@ BEGIN
    0c1f: SLDL 04          Short load local MP4
    0c20: SLDC 00          Short load constant 0
    0c21: SLDC 00          Short load constant 0
-   0c22: CGP  12          Call global procedure PASCALCO.PROC18
+   0c22: CGP  12          Call global procedure PASCALCOMPILER.PROC18
    0c24: LNOT             Logical NOT (~TOS)
    0c25: SLDL 04          Short load local MP4
    0c26: LDO  0039        Load global word BASE57
@@ -2317,7 +2534,7 @@ BEGIN
    0c60: SIND 06          Short index load *TOS+6
    0c61: SLDC 00          Short load constant 0
    0c62: SLDC 00          Short load constant 0
-   0c63: CGP  15          Call global procedure PASCALCO.FUNC21
+   0c63: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0c65: STL  0007        Store TOS into MP7
    0c67: SLDL 06          Short load local MP6
    0c68: SIND 07          Short index load *TOS+7
@@ -2353,9 +2570,13 @@ BEGIN
    0c8b: SIND 02          Short index load *TOS+2
    0c8c: SLDC 00          Short load constant 0
    0c8d: SLDC 00          Short load constant 0
-   0c8e: CGP  15          Call global procedure PASCALCO.FUNC21
+   0c8e: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0c90: STL  0001        Store TOS into MP1
    0c92: UJP  $0cac       Unconditional jump
+-> 0c94: XJP  0000 0007 0cac Case jump
+           0000 -> 0b75   0001 -> 0b7a   0002 -> 0b86   0003 -> 0be0
+           0004 -> 0be5   0005 -> 0bf1   0006 -> 0c47   0007 -> 0c88
+       default -> 0cac
 -> 0cac: UJP  $0cd3       Unconditional jump
 -> 0cae: SLDL 04          Short load local MP4
    0caf: SIND 01          Short index load *TOS+1
@@ -2367,7 +2588,7 @@ BEGIN
    0cb6: SLDL 03          Short load local MP3
    0cb7: SLDC 00          Short load constant 0
    0cb8: SLDC 00          Short load constant 0
-   0cb9: CGP  15          Call global procedure PASCALCO.FUNC21
+   0cb9: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0cbb: STL  0001        Store TOS into MP1
    0cbd: UJP  $0cd3       Unconditional jump
 -> 0cbf: SLDL 03          Short load local MP3
@@ -2380,7 +2601,7 @@ BEGIN
    0cc7: SIND 02          Short index load *TOS+2
    0cc8: SLDC 00          Short load constant 0
    0cc9: SLDC 00          Short load constant 0
-   0cca: CGP  15          Call global procedure PASCALCO.FUNC21
+   0cca: CGP  15          Call global procedure PASCALCOMPILER.FUNC21
    0ccc: STL  0001        Store TOS into MP1
    0cce: UJP  $0cd3       Unconditional jump
 -> 0cd0: SLDC 00          Short load constant 0
@@ -2388,9 +2609,9 @@ BEGIN
 -> 0cd3: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC22(PARAM1) (* P=22, LL=1, D=1, Callers: PROC23, PROC25 *)
+### PROCEDURE PASCALCOMPILER.PROC22(PARAM1) (* P=22, LL=1, D=1, Callers: PROC23, PROC25 *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   MP1=PARAM1
 BEGIN
 -> 0d3a: SLDO 02          Short load global BASE2
@@ -2404,9 +2625,9 @@ BEGIN
 -> 0d43: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC23(PARAM1) (* P=23, LL=1, D=2, Callers: PROC25 *)
+### PROCEDURE PASCALCOMPILER.PROC23(PARAM1) (* P=23, LL=1, D=2, Callers: PROC25 *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE30
   MP1=PARAM1
   MP2
@@ -2414,7 +2635,7 @@ BEGIN
 -> 0d50: SLDO 09          Short load global BASE9 (IC)
    0d51: FJP  $0d56       Jump if TOS false
    0d53: SLDC 00          Short load constant 0
-   0d54: CGP  16          Call global procedure PASCALCO.PROC22
+   0d54: CGP  16          Call global procedure PASCALCOMPILER.PROC22
 -> 0d56: LLA  0001        Load local address MP1
    0d58: SLDC 00          Short load constant 0
    0d59: SLDO 02          Short load global BASE2
@@ -2448,9 +2669,9 @@ BEGIN
 -> 0d7a: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC24(PARAM1) (* P=24, LL=1, D=4, Callers: PROC5, PROC25 *)
+### PROCEDURE PASCALCOMPILER.PROC24(PARAM1) (* P=24, LL=1, D=4, Callers: PROC5, PROC25 *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE1097
   BASE1098
   BASE1099
@@ -2509,8 +2730,9 @@ BEGIN
    0dd8: SLDC 01          Short load constant 1
    0dd9: NEQI             Integer TOS-1 <> TOS
    0dda: FJP  $0de1       Jump if TOS false
+  PASCALCOMPILER.ERROR(402) { Error in writing code file, not enough room }
    0ddc: LDCI 0192        Load word 402
-   0ddf: CGP  04          Call global procedure PASCALCO.ERROR
+   0ddf: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0de1: LDO  0449        Load global word BASE1097
    0de4: SLDC 01          Short load constant 1
    0de5: ADI              Add integers (TOS + TOS-1)
@@ -2528,14 +2750,14 @@ BEGIN
 -> 0df7: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC25 (* P=25, LL=1, D=2, Callers: PROC26 *)
-  BASE9=IC
-  BASE13=SEG
+### PROCEDURE PASCALCOMPILER.PROC25 (* P=25, LL=1, D=2, Callers: PROC26 *)
+  BASE9=IC:ADDRRANGE
+  BASE13=SEG:SEGRANGE
   BASE49
   BASE89
   BASE99=NEXTPROC
   BASE190
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   MP1
   MP2
@@ -2560,7 +2782,7 @@ BEGIN
    0e1f: EQUI             Integer TOS-1 = TOS
    0e20: FJP  $0e27       Jump if TOS false
    0e22: SLDC 00          Short load constant 0
-   0e23: CGP  17          Call global procedure PASCALCO.PROC23
+   0e23: CGP  17          Call global procedure PASCALCOMPILER.PROC23
    0e25: UJP  $0e35       Unconditional jump
 -> 0e27: LDO  0059        Load global word BASE89
    0e29: SLDO 09          Short load global BASE9 (IC)
@@ -2570,18 +2792,18 @@ BEGIN
    0e2f: IXA  0001        Index array (TOS-1 + TOS * 1)
    0e31: SIND 00          Short index load *TOS+0
    0e32: SBI              Subtract integers (TOS-1 - TOS)
-   0e33: CGP  17          Call global procedure PASCALCO.PROC23
+   0e33: CGP  17          Call global procedure PASCALCOMPILER.PROC23
 -> 0e35: SLDL 01          Short load local MP1
    0e36: SLDC 01          Short load constant 1
    0e37: SBI              Subtract integers (TOS-1 - TOS)
    0e38: STL  0001        Store TOS into MP1
    0e3a: UJP  $0e12       Unconditional jump
 -> 0e3c: SLDO 0d          Short load global BASE13 (SEG)
-   0e3d: CGP  16          Call global procedure PASCALCO.PROC22
+   0e3d: CGP  16          Call global procedure PASCALCOMPILER.PROC22
    0e3f: LDO  0063        Load global word BASE99 (NEXTPROC)
    0e41: SLDC 01          Short load constant 1
    0e42: SBI              Subtract integers (TOS-1 - TOS)
-   0e43: CGP  16          Call global procedure PASCALCO.PROC22
+   0e43: CGP  16          Call global procedure PASCALCOMPILER.PROC22
    0e45: LAO  01bd        Load global BASE445 (SEGTABLE)
    0e48: LAO  024d        Load global BASE589
    0e4b: SLDO 0d          Short load global BASE13 (SEG)
@@ -2593,7 +2815,7 @@ BEGIN
    0e55: ADI              Add integers (TOS + TOS-1)
    0e56: STO              Store indirect (TOS into TOS-1)
    0e57: SLDC 01          Short load constant 1
-   0e58: CGP  18          Call global procedure PASCALCO.PROC24
+   0e58: CGP  18          Call global procedure PASCALCOMPILER.PROC24
    0e5a: SLDC 00          Short load constant 0
    0e5b: SRO  0059        Store global word BASE89
    0e5d: SLDC 00          Short load constant 0
@@ -2601,12 +2823,12 @@ BEGIN
 -> 0e60: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC26(PARAM1; PARAM2; PARAM3; PARAM4) (* P=26, LL=1, D=6, Callers: PROC27 *)
-  BASE8
-  BASE9=IC
+### PROCEDURE PASCALCOMPILER.PROC26(PARAM1; PARAM2; PARAM3; PARAM4) (* P=26, LL=1, D=6, Callers: PROC27 *)
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
   BASE10
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE28
   BASE31
   BASE33
@@ -2620,12 +2842,12 @@ END
   BASE81
   BASE84
   BASE86
-  BASE96=LINEINFO
+  BASE96=LINEINFO:INTEGER
   BASE99=NEXTPROC
   BASE100
   BASE117=BLOCKBEGSYS
-  BASE134
-  BASE445=SEGTABLE
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   BASE1355
   MP1=PARAM4
@@ -2649,12 +2871,12 @@ BEGIN
    0ee9: LLA  0001        Load local address MP1
    0eeb: LDM  04          Load 4 words from (TOS)
    0eed: SLDC 04          Short load constant 4
-   0ef0: LDC  04          Load multiple-word constant
-                            0200 0000 0000 001c 
+   0eee: LDC  04          Load multiple-word constant
+                            0200 0000 0000 001c [2..4,57]
    0ef8: SLDC 04          Short load constant 4
    0ef9: UNI              Set union (TOS OR TOS-1)
    0efa: ADJ  04          Adjust set to 4 words
-   0efc: CXP  11 01       Call external procedure UNITPART.1
+   0efc: CXP  11 01       Call external procedure UNITPART.UNITPART
    0eff: SLDO 0f          Short load global BASE15
    0f00: SLDC 12          Short load constant 18
    0f01: EQUI             Integer TOS-1 = TOS
@@ -2663,8 +2885,9 @@ BEGIN
    0f05: SLDC 1a          Short load constant 26
    0f06: CSP  04          Call standard procedure EXIT
 -> 0f08: UJP  $0f0f       Unconditional jump
+  PASCALCOMPILER.ERROR(408) { (*$S+*) needed to compile units }
 -> 0f0a: LDCI 0198        Load word 408
-   0f0d: CGP  04          Call global procedure PASCALCO.ERROR
+   0f0d: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0f0f: LDO  0021        Load global word BASE33
    0f11: LNOT             Logical NOT (~TOS)
    0f12: SRO  001f        Store global word BASE31
@@ -2694,10 +2917,11 @@ BEGIN
    0f38: SIND 00          Short index load *TOS+0
    0f39: SLDC 00          Short load constant 0
    0f3a: SLDC 00          Short load constant 0
-   0f3b: CLP  1d          Call local procedure PASCALCO.FUNC29
+   0f3b: CLP  1d          Call local procedure PASCALCOMPILER.FUNC29
    0f3d: FJP  $0f42       Jump if TOS false
+  PASCALCOMPILER.ERROR(117) { Unsatisified forward reference }
    0f3f: SLDC 75          Short load constant 117
-   0f40: CGP  04          Call global procedure PASCALCO.ERROR
+   0f40: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0f42: LDO  0021        Load global word BASE33
    0f44: FJP  $0f60       Jump if TOS false
    0f46: LDO  0054        Load global word BASE84
@@ -2707,8 +2931,8 @@ BEGIN
    0f4d: EQUI             Integer TOS-1 = TOS
    0f4e: FJP  $0f60       Jump if TOS false
    0f50: SLDO 0f          Short load global BASE15
-   0f54: LDC  02          Load multiple-word constant
-                            0200 0008 
+   0f51: LDC  02          Load multiple-word constant
+                            0200 0008 [3,25]
    0f58: SLDC 02          Short load constant 2
    0f59: INN              Set membership (TOS-1 in set TOS)
    0f5a: FJP  $0f60       Jump if TOS false
@@ -2721,21 +2945,22 @@ BEGIN
    0f64: SLDC 13          Short load constant 19
    0f65: EQUI             Integer TOS-1 = TOS
    0f66: FJP  $0f6c       Jump if TOS false
-   0f68: CGP  08          Call global procedure PASCALCO.PROC8
+   0f68: CGP  08          Call global procedure PASCALCOMPILER.PROC8
    0f6a: UJP  $0f6f       Unconditional jump
+  PASCALCOMPILER.ERROR(17) { 'BEGIN' expected }
 -> 0f6c: SLDC 11          Short load constant 17
-   0f6d: CGP  04          Call global procedure PASCALCO.ERROR
+   0f6d: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0f6f: LLA  0001        Load local address MP1
    0f71: LDM  04          Load 4 words from (TOS)
    0f73: SLDC 04          Short load constant 4
-   0f76: LDC  02          Load multiple-word constant
-                            0000 0020 
+   0f74: LDC  02          Load multiple-word constant
+                            0000 0020 [5]
    0f7a: SLDC 02          Short load constant 2
    0f7b: UNI              Set union (TOS OR TOS-1)
    0f7c: ADJ  04          Adjust set to 4 words
    0f7e: LDO  0054        Load global word BASE84
    0f80: SIND 07          Short index load *TOS+7
-   0f81: CXP  09 01       Call external procedure BODYPART.1
+   0f81: CXP  09 01       Call external procedure BODYPART.BODYPART
    0f84: SLDO 0f          Short load global BASE15
    0f85: LDO  0054        Load global word BASE84
    0f87: SIND 06          Short index load *TOS+6
@@ -2755,11 +2980,16 @@ BEGIN
    0f99: SLDC 03          Short load constant 3
    0f9a: EQUI             Integer TOS-1 = TOS
    0f9b: FJP  $0fa2       Jump if TOS false
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
    0f9d: SLDC 0e          Short load constant 14
-   0f9e: CGP  04          Call global procedure PASCALCO.ERROR
+   0f9e: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    0fa0: UJP  $0fa5       Unconditional jump
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
 -> 0fa2: SLDC 06          Short load constant 6
-   0fa3: CGP  04          Call global procedure PASCALCO.ERROR
+   0fa3: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0fa5: LLA  0001        Load local address MP1
    0fa7: LDM  04          Load 4 words from (TOS)
    0fa9: SLDC 04          Short load constant 4
@@ -2768,7 +2998,7 @@ BEGIN
    0fad: SGS              Build singleton set [TOS]
    0fae: UNI              Set union (TOS OR TOS-1)
    0faf: ADJ  04          Adjust set to 4 words
-   0fb1: CGP  10          Call global procedure PASCALCO.PROC16
+   0fb1: CGP  10          Call global procedure PASCALCOMPILER.PROC16
    0fb3: SLDO 0f          Short load global BASE15
    0fb4: LDO  0054        Load global word BASE84
    0fb6: SIND 06          Short index load *TOS+6
@@ -2796,23 +3026,25 @@ BEGIN
    0fd3: SLDC 03          Short load constant 3
    0fd4: EQUI             Integer TOS-1 = TOS
    0fd5: FJP  $0fdc       Jump if TOS false
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
    0fd7: SLDC 0e          Short load constant 14
-   0fd8: CGP  04          Call global procedure PASCALCO.ERROR
+   0fd8: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    0fda: UJP  $0fdf       Unconditional jump
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
 -> 0fdc: SLDC 06          Short load constant 6
-   0fdd: CGP  04          Call global procedure PASCALCO.ERROR
+   0fdd: CGP  04          Call global procedure PASCALCOMPILER.ERROR
 -> 0fdf: LLA  0001        Load local address MP1
    0fe1: LDM  04          Load 4 words from (TOS)
-   0fe3: CXP  08 01       Call external procedure DECLARAT.1
+   0fe3: CXP  08 01       Call external procedure DECLARATIONPART.DECLARATIONPART
    0fe6: UJP  $1094       Unconditional jump
 -> 0fe8: SLDO 0f          Short load global BASE15
    0fe9: SLDC 03          Short load constant 3
    0fea: EQUI             Integer TOS-1 = TOS
    0feb: FJP  $0fef       Jump if TOS false
-   0fed: CGP  08          Call global procedure PASCALCO.PROC8
+   0fed: CGP  08          Call global procedure PASCALCOMPILER.PROC8
 -> 0fef: SLDO 0f          Short load global BASE15
-   0ff2: LDC  03          Load multiple-word constant
-                            0000 8008 0003 
+   0ff0: LDC  03          Load multiple-word constant
+                            0000 8008 0003 [0,1,19,31]
    0ff8: SLDC 03          Short load constant 3
    0ff9: INN              Set membership (TOS-1 in set TOS)
    0ffa: LNOT             Logical NOT (~TOS)
@@ -2829,14 +3061,15 @@ BEGIN
    1008: LAND             Logical AND (TOS & TOS-1)
    1009: LNOT             Logical NOT (~TOS)
    100a: FJP  $101e       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    100c: SLDC 06          Short load constant 6
-   100d: CGP  04          Call global procedure PASCALCO.ERROR
+   100d: CGP  04          Call global procedure PASCALCOMPILER.ERROR
    100f: LLA  0001        Load local address MP1
    1011: LDM  04          Load 4 words from (TOS)
-   1013: CGP  10          Call global procedure PASCALCO.PROC16
+   1013: CGP  10          Call global procedure PASCALCOMPILER.PROC16
    1015: LLA  0001        Load local address MP1
    1017: LDM  04          Load 4 words from (TOS)
-   1019: CXP  08 01       Call external procedure DECLARAT.1
+   1019: CXP  08 01       Call external procedure DECLARATIONPART.DECLARATIONPART
    101c: UJP  $1020       Unconditional jump
 -> 101e: UJP  $1022       Unconditional jump
 -> 1020: UJP  $1094       Unconditional jump
@@ -2857,7 +3090,7 @@ BEGIN
    1035: FJP  $1062       Jump if TOS false
    1037: LDO  0031        Load global word BASE49
    1039: FJP  $103d       Jump if TOS false
-   103b: CGP  19          Call global procedure PASCALCO.PROC25
+   103b: CGP  19          Call global procedure PASCALCOMPILER.PROC25
 -> 103d: LDO  002d        Load global word BASE45
    103f: LDO  0050        Load global word BASE80
    1041: SLDC 01          Short load constant 1
@@ -2904,15 +3137,15 @@ BEGIN
    1082: IND  000a        Static index and load word (TOS+10)
    1084: SRO  0054        Store global word BASE84
    1086: SLDO 0f          Short load global BASE15
-   108a: LDC  03          Load multiple-word constant
-                            0000 8000 0003 
+   1087: LDC  03          Load multiple-word constant
+                            0000 8000 0003 [0,1,31]
    1090: SLDC 03          Short load constant 3
    1091: INN              Set membership (TOS-1 in set TOS)
    1092: SRO  0056        Store global word BASE86
 -> 1094: UJP  $10d3       Unconditional jump
 -> 1096: LLA  0001        Load local address MP1
    1098: LDM  04          Load 4 words from (TOS)
-   109a: CXP  08 01       Call external procedure DECLARAT.1
+   109a: CXP  08 01       Call external procedure DECLARATIONPART.DECLARATIONPART
    109d: LDO  0050        Load global word BASE80
    109f: SLDC 00          Short load constant 0
    10a0: EQUI             Integer TOS-1 = TOS
@@ -2924,37 +3157,37 @@ BEGIN
    10a8: LLA  0001        Load local address MP1
    10aa: LDM  04          Load 4 words from (TOS)
    10ac: SLDC 04          Short load constant 4
-   10b0: LDC  04          Load multiple-word constant
-                            0200 0000 0000 001c 
+   10ad: LDC  04          Load multiple-word constant
+                            0200 0000 0000 001c [2..4,57]
    10b8: SLDC 04          Short load constant 4
    10b9: UNI              Set union (TOS OR TOS-1)
    10ba: ADJ  04          Adjust set to 4 words
-   10bc: CXP  11 01       Call external procedure UNITPART.1
+   10bc: CXP  11 01       Call external procedure UNITPART.UNITPART
    10bf: SLDO 0f          Short load global BASE15
-   10c2: LDC  03          Load multiple-word constant
-                            0000 8000 0003 
+   10c0: LDC  03          Load multiple-word constant
+                            0000 8000 0003 [0,1,31]
    10c8: SLDC 03          Short load constant 3
    10c9: INN              Set membership (TOS-1 in set TOS)
    10ca: FJP  $10d3       Jump if TOS false
    10cc: LLA  0001        Load local address MP1
    10ce: LDM  04          Load 4 words from (TOS)
-   10d0: CXP  08 01       Call external procedure DECLARAT.1
+   10d0: CXP  08 01       Call external procedure DECLARATIONPART.DECLARATIONPART
 -> 10d3: LDO  0054        Load global word BASE84
    10d5: LDCN             Load constant NIL
    10d6: EQUI             Integer TOS-1 = TOS
    10d7: FJP  $0f17       Jump if TOS false
-   10d9: CGP  19          Call global procedure PASCALCO.PROC25
+   10d9: CGP  19          Call global procedure PASCALCOMPILER.PROC25
 -> 10db: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC27 (* P=27, LL=1, D=0, Callers: PASCALCO, PROC30, PROC31 *)
-  BASE22
-  BASE97
-  BASE105=STATBEGSYS
-  BASE117=BLOCKBEGSYS
+### PROCEDURE PASCALCOMPILER.PROC27 (* P=27, LL=1, D=0, Callers: PASCALCOMPILER, PROC30, PROC31 *)
+  BASE22=LGTH:INTEGER
+  BASE97=LOWTIME:INTEGER
+  BASE105=STATBEGSYS:SETOFSYS
+  BASE117=BLOCKBEGSYS:SETOFSYS
 BEGIN
--> 10f0: LAO  0016        Load global BASE22
-   10f2: LAO  0061        Load global BASE97
+-> 10f0: LAO  0016        Load global BASE22 (LGTH)
+   10f2: LAO  0061        Load global BASE97 (LOWTIME)
    10f4: CSP  09          Call standard procedure TIME
    10f6: LAO  0075        Load global BASE117 (BLOCKBEGSYS)
    10f8: LDM  04          Load 4 words from (TOS)
@@ -2963,27 +3196,27 @@ BEGIN
    10fd: LDM  04          Load 4 words from (TOS)
    10ff: SLDC 04          Short load constant 4
    1100: UNI              Set union (TOS OR TOS-1)
-   1104: LDC  02          Load multiple-word constant
-                            0000 0020 
+   1101: LDC  02          Load multiple-word constant
+                            0000 0020 [5]
    1108: SLDC 02          Short load constant 2
    1109: DIF              Set difference (TOS-1 AND NOT TOS)
    110a: ADJ  04          Adjust set to 4 words
-   110c: CGP  1a          Call global procedure PASCALCO.PROC26
+   110c: CGP  1a          Call global procedure PASCALCOMPILER.PROC26
 -> 110e: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC28(PARAM1) (* P=28, LL=2, D=2, Callers: PROC8 *)
-  BASE1
-  BASE14
+### PROCEDURE PASCALCOMPILER.PROC28(PARAM1) (* P=28, LL=2, D=2, Callers: PROC8 *)
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
   MP1=PARAM1
   MP2
 BEGIN
--> 04b0: SLDO 0e          Short load global BASE14
+-> 04b0: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04b1: SLDC 01          Short load constant 1
    04b2: ADI              Add integers (TOS + TOS-1)
-   04b3: SRO  000e        Store global word BASE14
-   04b5: SLDO 01          Short load global BASE1
-   04b6: SLDO 0e          Short load global BASE14
+   04b3: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   04b5: SLDO 01          Short load global BASE1 (SYMBUFP)
+   04b6: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04b7: LDB              Load byte at byte ptr TOS-1 + TOS
    04b8: SLDC 24          Short load constant 36
    04b9: EQUI             Integer TOS-1 = TOS
@@ -2991,36 +3224,36 @@ BEGIN
    04bc: SLDL 01          Short load local MP1
    04bd: SLDC 00          Short load constant 0
    04be: SLDC 00          Short load constant 0
-   04bf: CXP  12 01       Call external procedure COMPOPTI.1
+   04bf: CXP  12 01       Call external procedure COMPOPTI.COMPOPTI
    04c2: LNOT             Logical NOT (~TOS)
    04c3: FJP  $04c9       Jump if TOS false
    04c5: SLDC 01          Short load constant 1
    04c6: SLDC 1c          Short load constant 28
    04c7: CSP  04          Call standard procedure EXIT
--> 04c9: SLDO 0e          Short load global BASE14
+-> 04c9: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04ca: SLDC 01          Short load constant 1
    04cb: SBI              Subtract integers (TOS-1 - TOS)
-   04cc: SRO  000e        Store global word BASE14
--> 04ce: SLDO 0e          Short load global BASE14
+   04cc: SRO  000e        Store global word BASE14 (SYMCURSOR)
+-> 04ce: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04cf: SLDC 01          Short load constant 1
    04d0: ADI              Add integers (TOS + TOS-1)
-   04d1: SRO  000e        Store global word BASE14
--> 04d3: SLDO 01          Short load global BASE1
-   04d4: SLDO 0e          Short load global BASE14
+   04d1: SRO  000e        Store global word BASE14 (SYMCURSOR)
+-> 04d3: SLDO 01          Short load global BASE1 (SYMBUFP)
+   04d4: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04d5: LDB              Load byte at byte ptr TOS-1 + TOS
    04d6: SLDC 0d          Short load constant 13
    04d7: EQUI             Integer TOS-1 = TOS
    04d8: FJP  $04de       Jump if TOS false
-   04da: CGP  0e          Call global procedure PASCALCO.PROC14
+   04da: CGP  0e          Call global procedure PASCALCOMPILER.CHECKEND
    04dc: UJP  $04d3       Unconditional jump
--> 04de: SLDO 01          Short load global BASE1
-   04df: SLDO 0e          Short load global BASE14
+-> 04de: SLDO 01          Short load global BASE1 (SYMBUFP)
+   04df: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04e0: LDB              Load byte at byte ptr TOS-1 + TOS
    04e1: SLDL 01          Short load local MP1
    04e2: EQUI             Integer TOS-1 = TOS
    04e3: FJP  $04ce       Jump if TOS false
-   04e5: SLDO 01          Short load global BASE1
-   04e6: SLDO 0e          Short load global BASE14
+   04e5: SLDO 01          Short load global BASE1 (SYMBUFP)
+   04e6: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04e7: SLDC 01          Short load constant 1
    04e8: ADI              Add integers (TOS + TOS-1)
    04e9: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -3031,14 +3264,14 @@ BEGIN
    04ee: EQUI             Integer TOS-1 = TOS
    04ef: LOR              Logical OR (TOS | TOS-1)
    04f0: FJP  $04ce       Jump if TOS false
-   04f2: SLDO 0e          Short load global BASE14
+   04f2: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    04f3: SLDC 01          Short load constant 1
    04f4: ADI              Add integers (TOS + TOS-1)
-   04f5: SRO  000e        Store global word BASE14
+   04f5: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 04f7: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCO.FUNC29(PARAM1): RETVAL (* P=29, LL=2, D=6, Callers: PROC26 *)
+### FUNCTION PASCALCOMPILER.FUNC29(PARAM1): RETVAL (* P=29, LL=2, D=6, Callers: PROC26 *)
   MP1=RETVAL1
   MP2=RETVAL2
   MP3=PARAM1
@@ -3055,7 +3288,7 @@ BEGIN
    0e77: STL  0004        Store TOS into MP4
    0e79: SLDL 04          Short load local MP4
    0e7a: IND  0008        Static index and load word (TOS+8)
-   0e7c: SLDC 60          Short load constant 96
+   0e7c: SLDC 60          Short load constant 96 [5,6]
    0e7d: SLDC 01          Short load constant 1
    0e7e: INN              Set membership (TOS-1 in set TOS)
    0e7f: FJP  $0eba       Jump if TOS false
@@ -3093,12 +3326,12 @@ BEGIN
    0ebb: SIND 04          Short index load *TOS+4
    0ebc: SLDC 00          Short load constant 0
    0ebd: SLDC 00          Short load constant 0
-   0ebe: CIP  1d          Call intermediate procedure 29 PASCALCO.29
+   0ebe: CIP  1d          Call intermediate procedure 29 PASCALCOMPILER.29
    0ec0: SLDL 04          Short load local MP4
    0ec1: SIND 05          Short index load *TOS+5
    0ec2: SLDC 00          Short load constant 0
    0ec3: SLDC 00          Short load constant 0
-   0ec4: CIP  1d          Call intermediate procedure 29 PASCALCO.29
+   0ec4: CIP  1d          Call intermediate procedure 29 PASCALCOMPILER.29
    0ec6: LOR              Logical OR (TOS | TOS-1)
    0ec7: FJP  $0ecc       Jump if TOS false
    0ec9: SLDC 01          Short load constant 1
@@ -3106,7 +3339,7 @@ BEGIN
 -> 0ecc: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC30 (* P=30, LL=1, D=0, Callers: PASCALCO *)
+### PROCEDURE PASCALCOMPILER.PROC30 (* P=30, LL=1, D=0, Callers: PASCALCOMPILER *)
   BASE34
 BEGIN
   GOTO 1
@@ -3116,12 +3349,12 @@ BEGIN
 -> 1138: LDO  0022        Load global word BASE34
    113a: FJP  $1140       Jump if TOS false
   BEGIN
-    PASCALCO.PROC27
-   113c: CGP  1b          Call global procedure PASCALCO.PROC27
+    PASCALCOMPILER.PROC27
+   113c: CGP  1b          Call global procedure PASCALCOMPILER.PROC27
    113e: UJP  $1142       Unconditional jump
   END ELSE BEGIN
-    PASCALCO.PROC31
--> 1140: CLP  1f          Call local procedure PASCALCO.PROC31
+    PASCALCOMPILER.PROC31
+-> 1140: CLP  1f          Call local procedure PASCALCOMPILER.PROC31
   END
   UNLOADSEGMENT(15)
 -> 1142: SLDC 0f          Short load constant 15
@@ -3180,13 +3413,13 @@ BEGIN
 -> 1176: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE PASCALCO.PROC31 (* P=31, LL=2, D=0, Callers: PROC30 *)
+### PROCEDURE PASCALCOMPILER.PROC31 (* P=31, LL=2, D=0, Callers: PROC30 *)
 BEGIN
   GOTO 1
 -> 111a: UJP  $1123       Unconditional jump
   2:
-  PASCALCO.PROC27
--> 111c: CGP  1b          Call global procedure PASCALCO.PROC27
+  PASCALCOMPILER.PROC27
+-> 111c: CGP  1b          Call global procedure PASCALCOMPILER.PROC27
   UNLOADSEGMENT(10)
 -> 111e: SLDC 0a          Short load constant 10
    111f: CSP  16          Call standard procedure UNLOADSEGMENT
@@ -3205,17 +3438,17 @@ END
 ## Segment COMPINIT (7)
 
 ### PROCEDURE COMPINIT.COMPINIT (* P=1, LL=1, D=304 *)
-  BASE8
-  BASE9=IC
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
   BASE10
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE17
   BASE21
   BASE28
   BASE44=LIST:BOOLEAN
   BASE50=NOISY:BOOLEAN
-  BASE68
+  BASE68=:CTP
   BASE80
   BASE83
   BASE84
@@ -3224,10 +3457,10 @@ END
   BASE92
   BASE100
   BASE117=BLOCKBEGSYS
-  BASE134
-  BASE445=SEGTABLE
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
-  BASE796
+  BASE796=:FIB
   BASE1356
   BASE1357
   MP259
@@ -3356,8 +3589,8 @@ BEGIN
    0c87: LLA  0103        Load local address MP259
    0c8a: LDL  012f        Load local word MP303
    0c8d: LDB              Load byte at byte ptr TOS-1 + TOS
-   0c90: LDC  08          Load multiple-word constant
-                            0000 0000 0000 0000 0000 0000 fffe 07ff 
+   0c8e: LDC  08          Load multiple-word constant
+                            0000 0000 0000 0000 0000 0000 fffe 07ff [0..10,17..31]
    0ca0: SLDC 08          Short load constant 8
    0ca1: INN              Set membership (TOS-1 in set TOS)
    0ca2: FJP  $0cb4       Jump if TOS false
@@ -3535,10 +3768,10 @@ BEGIN
   BASE92 := MEMAVAIL
    0de8: CSP  28          Call standard procedure MEMAVAIL
    0dea: SRO  005c        Store global word BASE92
-  PASCALCO.PROC5
-   0dec: CXP  01 05       Call external procedure PASCALCO.PROC5
-  PASCALCO.PROC8
-   0def: CXP  01 08       Call external procedure PASCALCO.PROC8
+  PASCALCOMPILER.PROC5
+   0dec: CXP  01 05       Call external procedure PASCALCOMPILER.PROC5
+  PASCALCOMPILER.PROC8
+   0def: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
   COMPINIT.PROC2
    0df2: CLP  02          Call local procedure COMPINIT.PROC2
   COMPINIT.PROC3
@@ -3570,8 +3803,8 @@ BEGIN
    0e0e: LAO  0075        Load global BASE117 (BLOCKBEGSYS)
    0e10: LDM  04          Load 4 words from (TOS)
    0e12: SLDC 04          Short load constant 4
-   0e16: LDC  04          Load multiple-word constant
-                            0000 0000 0000 0004 
+   0e13: LDC  04          Load multiple-word constant
+                            0000 0000 0000 0004 [2]
    0e1e: SLDC 04          Short load constant 4
    0e1f: UNI              Set union (TOS OR TOS-1)
    0e20: ADJ  04          Adjust set to 4 words
@@ -3681,7 +3914,7 @@ BEGIN
    0edb: SLDC 21          Short load constant 33
    0edc: EQUI             Integer TOS-1 = TOS
    0edd: FJP  $0f3e       Jump if TOS false
-   0edf: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0edf: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0ee2: SLDO 0f          Short load global BASE15
    0ee3: SLDC 00          Short load constant 0
    0ee4: EQUI             Integer TOS-1 = TOS
@@ -3699,17 +3932,19 @@ BEGIN
    0efa: LDO  0044        Load global word BASE68
    0efc: LAO  0011        Load global BASE17
    0efe: MOV  0004        Move 4 words (TOS to TOS-1)
+   PASCALCOMPILER.ENTERID(BASE68)
    0f00: LDO  0044        Load global word BASE68
-   0f02: CXP  01 07       Call external procedure PASCALCO.PROC7
+   0f02: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
 -> 0f05: UJP  $0f0b       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0f07: SLDC 02          Short load constant 2
-   0f08: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0f0b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f08: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0f0b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0f0e: SLDO 0f          Short load global BASE15
    0f0f: SLDC 04          Short load constant 4
    0f10: EQUI             Integer TOS-1 = TOS
    0f11: FJP  $0f30       Jump if TOS false
--> 0f13: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0f13: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0f16: SLDO 0f          Short load global BASE15
    0f17: SLDC 28          Short load constant 40
    0f18: SLDC 01          Short load constant 1
@@ -3723,18 +3958,20 @@ BEGIN
    0f23: SLDC 05          Short load constant 5
    0f24: EQUI             Integer TOS-1 = TOS
    0f25: FJP  $0f2c       Jump if TOS false
-   0f27: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f27: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0f2a: UJP  $0f30       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 0f2c: SLDC 04          Short load constant 4
-   0f2d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0f2d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0f30: SLDO 0f          Short load global BASE15
    0f31: SLDC 03          Short load constant 3
    0f32: EQUI             Integer TOS-1 = TOS
    0f33: FJP  $0f3a       Jump if TOS false
-   0f35: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f35: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0f38: UJP  $0f3e       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 0f3a: SLDC 0e          Short load constant 14
-   0f3b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0f3b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0f3e: LAO  0053        Load global BASE83
    0f40: CSP  20          Call standard procedure MARK
    0f42: LAO  0054        Load global BASE84
@@ -3844,7 +4081,7 @@ BEGIN
    003f: ADI              Add integers (TOS + TOS-1)
    0040: SLDC 00          Short load constant 0
    0041: SLDC 00          Short load constant 0
-   0042: CXP  01 13       Call external procedure PASCALCO.FUNC19
+   0042: CXP  01 13       Call external procedure PASCALCOMPILER.FUNC19
    0045: STO              Store indirect (TOS into TOS-1)
    0046: SLDL 02          Short load local MP2
    0047: INC  0001        Inc field ptr (TOS+1)
@@ -4076,10 +4313,10 @@ END
   BASE61
   BASE62
   BASE64
-  BASE69
-  BASE70
+  BASE69=:CTP
+  BASE70=:CTP
   MP1
-  MP2
+  MP2=:CTP
   MP3
   MP4
   MP5
@@ -4102,8 +4339,9 @@ BEGIN
    0196: INC  0008        Inc field ptr (TOS+8)
    0198: SLDC 00          Short load constant 0
    0199: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    019a: SLDL 02          Short load local MP2
-   019b: CXP  01 07       Call external procedure PASCALCO.PROC7
+   019b: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    019e: LLA  0002        Load local address MP2
    01a0: SLDC 09          Short load constant 9
    01a1: CSP  01          Call standard procedure NEW
@@ -4122,8 +4360,9 @@ BEGIN
    01bb: INC  0008        Inc field ptr (TOS+8)
    01bd: SLDC 00          Short load constant 0
    01be: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    01bf: SLDL 02          Short load local MP2
-   01c0: CXP  01 07       Call external procedure PASCALCO.PROC7
+   01c0: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    01c3: LLA  0002        Load local address MP2
    01c5: SLDC 09          Short load constant 9
    01c6: CSP  01          Call standard procedure NEW
@@ -4142,8 +4381,9 @@ BEGIN
    01e0: INC  0008        Inc field ptr (TOS+8)
    01e2: SLDC 00          Short load constant 0
    01e3: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    01e4: SLDL 02          Short load local MP2
-   01e5: CXP  01 07       Call external procedure PASCALCO.PROC7
+   01e5: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    01e8: LLA  0002        Load local address MP2
    01ea: SLDC 09          Short load constant 9
    01eb: CSP  01          Call standard procedure NEW
@@ -4162,8 +4402,9 @@ BEGIN
    0205: INC  0008        Inc field ptr (TOS+8)
    0207: SLDC 00          Short load constant 0
    0208: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0209: SLDL 02          Short load local MP2
-   020a: CXP  01 07       Call external procedure PASCALCO.PROC7
+   020a: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    020d: LLA  0002        Load local address MP2
    020f: SLDC 09          Short load constant 9
    0210: CSP  01          Call standard procedure NEW
@@ -4182,8 +4423,9 @@ BEGIN
    022a: INC  0008        Inc field ptr (TOS+8)
    022c: SLDC 00          Short load constant 0
    022d: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    022e: SLDL 02          Short load local MP2
-   022f: CXP  01 07       Call external procedure PASCALCO.PROC7
+   022f: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    0232: LLA  0002        Load local address MP2
    0234: SLDC 09          Short load constant 9
    0235: CSP  01          Call standard procedure NEW
@@ -4202,8 +4444,9 @@ BEGIN
    024f: INC  0008        Inc field ptr (TOS+8)
    0251: SLDC 00          Short load constant 0
    0252: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0253: SLDL 02          Short load local MP2
-   0254: CXP  01 07       Call external procedure PASCALCO.PROC7
+   0254: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    0257: LLA  0002        Load local address MP2
    0259: SLDC 09          Short load constant 9
    025a: CSP  01          Call standard procedure NEW
@@ -4222,8 +4465,9 @@ BEGIN
    0274: INC  0008        Inc field ptr (TOS+8)
    0276: SLDC 00          Short load constant 0
    0277: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0278: SLDL 02          Short load local MP2
-   0279: CXP  01 07       Call external procedure PASCALCO.PROC7
+   0279: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    027c: LAO  0046        Load global BASE70
    027e: SLDC 0b          Short load constant 11
    027f: CSP  01          Call standard procedure NEW
@@ -4250,8 +4494,9 @@ BEGIN
    02a4: INC  000a        Inc field ptr (TOS+10)
    02a6: SLDC 02          Short load constant 2
    02a7: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(BASE70)
    02a8: LDO  0046        Load global word BASE70
-   02aa: CXP  01 07       Call external procedure PASCALCO.PROC7
+   02aa: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    02ad: LAO  0045        Load global BASE69
    02af: SLDC 0b          Short load constant 11
    02b0: CSP  01          Call standard procedure NEW
@@ -4278,8 +4523,9 @@ BEGIN
    02d5: INC  000a        Inc field ptr (TOS+10)
    02d7: SLDC 03          Short load constant 3
    02d8: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(BASE69)
    02d9: LDO  0045        Load global word BASE69
-   02db: CXP  01 07       Call external procedure PASCALCO.PROC7
+   02db: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    02de: LLA  0002        Load local address MP2
    02e0: SLDC 0b          Short load constant 11
    02e1: CSP  01          Call standard procedure NEW
@@ -4306,8 +4552,9 @@ BEGIN
    0305: INC  000a        Inc field ptr (TOS+10)
    0307: SLDC 04          Short load constant 4
    0308: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0309: SLDL 02          Short load local MP2
-   030a: CXP  01 07       Call external procedure PASCALCO.PROC7
+   030a: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    030d: LDCN             Load constant NIL
    030e: STL  0001        Store TOS into MP1
    0310: SLDC 00          Short load constant 0
@@ -4354,8 +4601,9 @@ BEGIN
    0357: INC  0008        Inc field ptr (TOS+8)
    0359: SLDC 01          Short load constant 1
    035a: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    035b: SLDL 02          Short load local MP2
-   035c: CXP  01 07       Call external procedure PASCALCO.PROC7
+   035c: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    035f: SLDL 02          Short load local MP2
    0360: STL  0001        Store TOS into MP1
    0362: SLDL 03          Short load local MP3
@@ -4393,8 +4641,9 @@ BEGIN
    0396: INC  0008        Inc field ptr (TOS+8)
    0398: SLDC 01          Short load constant 1
    0399: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    039a: SLDL 02          Short load local MP2
-   039b: CXP  01 07       Call external procedure PASCALCO.PROC7
+   039b: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    039e: LLA  0002        Load local address MP2
    03a0: SLDC 0a          Short load constant 10
    03a1: CSP  01          Call standard procedure NEW
@@ -4417,8 +4666,9 @@ BEGIN
    03bf: INC  0009        Inc field ptr (TOS+9)
    03c1: LDCI 7fff        Load word 32767
    03c4: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    03c5: SLDL 02          Short load local MP2
-   03c6: CXP  01 07       Call external procedure PASCALCO.PROC7
+   03c6: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    03c9: LLA  0002        Load local address MP2
    03cb: SLDC 09          Short load constant 9
    03cc: CSP  01          Call standard procedure NEW
@@ -4441,8 +4691,9 @@ BEGIN
    03eb: INC  0008        Inc field ptr (TOS+8)
    03ed: SLDC 00          Short load constant 0
    03ee: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    03ef: SLDL 02          Short load local MP2
-   03f0: CXP  01 07       Call external procedure PASCALCO.PROC7
+   03f0: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    03f3: LLA  0002        Load local address MP2
    03f5: SLDC 09          Short load constant 9
    03f6: CSP  01          Call standard procedure NEW
@@ -4465,8 +4716,9 @@ BEGIN
    0415: INC  0008        Inc field ptr (TOS+8)
    0417: SLDC 00          Short load constant 0
    0418: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0419: SLDL 02          Short load local MP2
-   041a: CXP  01 07       Call external procedure PASCALCO.PROC7
+   041a: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
 -> 041d: RNP  00          Return from nonbase procedure
 END
 
@@ -4765,7 +5017,7 @@ END
   BASE43
   COMPINIT:MP257
   COMPINIT:MP258
-  MP1
+  MP1=:CTP
   MP2
   MP3
   MP4
@@ -4805,15 +5057,15 @@ BEGIN
    0731: LDO  002b        Load global word BASE43
    0733: FJP  $0744       Jump if TOS false
    0735: SLDL 02          Short load local MP2
-   0738: LDC  03          Load multiple-word constant
-                            2484 001e 1d0d 
+   0736: LDC  03          Load multiple-word constant
+                            2484 001e 1d0d [0,2,3,8,10,11,12,17,18,19,20,34,39,42,45]
    073e: SLDC 03          Short load constant 3
    073f: INN              Set membership (TOS-1 in set TOS)
    0740: FJP  $0744       Jump if TOS false
    0742: UJP  $0790       Unconditional jump
 -> 0744: SLDL 02          Short load local MP2
-   0748: LDC  03          Load multiple-word constant
-                            8fe0 0219 02f0 
+   0745: LDC  03          Load multiple-word constant
+                            8fe0 0219 02f0 [4..7,9,16,19,20.25,37..43,47]
    074e: SLDC 03          Short load constant 3
    074f: INN              Set membership (TOS-1 in set TOS)
    0750: STL  0003        Store TOS into MP3
@@ -4858,8 +5110,9 @@ BEGIN
    0788: INC  000a        Inc field ptr (TOS+10)
    078a: SLDL 02          Short load local MP2
    078b: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP1)
    078c: SLDL 01          Short load local MP1
-   078d: CXP  01 07       Call external procedure PASCALCO.PROC7
+   078d: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
 -> 0790: UJP  $071d       Unconditional jump
 -> 0792: RNP  00          Return from nonbase procedure
 END
@@ -4872,7 +5125,7 @@ END
   COMPINIT:MP257
   COMPINIT:MP258
   MP1
-  MP2
+  MP2=:CTP
   MP3
   MP4
   MP5
@@ -4903,7 +5156,7 @@ BEGIN
    0822: ADI              Add integers (TOS + TOS-1)
    0823: STL  0005        Store TOS into MP5
    0825: SLDL 05          Short load local MP5
-   0826: LDCI 1c60        Load word 7264
+   0826: LDCI 1c60        Load word 7264 [5,6,10,11,12]
    0829: SLDC 01          Short load constant 1
    082a: INN              Set membership (TOS-1 in set TOS)
    082b: STL  0006        Store TOS into MP6
@@ -5013,6 +5266,12 @@ BEGIN
    08c9: SLDO 0c          Short load global BASE12
    08ca: STL  0003        Store TOS into MP3
    08cc: UJP  $08f0       Unconditional jump
+-> 08ce: XJP  0001 000d 08f0 Case jump
+           0001 -> 0830   0002 -> 0848   0003 -> 084e   0004 -> 0852
+           0005 -> 086a   0006 -> 08d4   0007 -> 0896   0008 -> 089e
+           0009 -> 08b6   000a -> 08bc   000b -> 08d4   000c -> 08c1
+           000d -> 08c9
+       default -> 08f0
 -> 08f0: SLDL 06          Short load local MP6
    08f1: FJP  $08fa       Jump if TOS false
    08f3: LLA  0002        Load local address MP2
@@ -5075,17 +5334,18 @@ BEGIN
    0940: INC  0007        Inc field ptr (TOS+7)
    0942: SLDL 01          Short load local MP1
    0943: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP2)
    0944: SLDL 02          Short load local MP2
-   0945: CXP  01 07       Call external procedure PASCALCO.PROC7
+   0945: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
 -> 0948: UJP  $0811       Unconditional jump
 -> 094a: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE COMPINIT.INITSCALARS (* P=9, LL=2, D=2, Callers: COMPINIT *)
-  BASE1
+  BASE1=SYMBUFP:^SYMBUFARRAY
   BASE2
   BASE10
-  BASE13=SEG
+  BASE13=SEG:SEGRANGE
   BASE21
   BASE26
   BASE28
@@ -5121,15 +5381,15 @@ END
   BASE88
   BASE89
   BASE90
-  BASE93=SYMBLK
-  BASE94=STARTDOTS
-  BASE95=SCREENDOTS
-  BASE96=LINEINFO
-  BASE98=LINESTART
+  BASE93=SYMBLK:INTEGER
+  BASE94=STARTDOTS:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE96=LINEINFO:INTEGER
+  BASE98=LINESTART:CURSRANGE
   BASE99=NEXTPROC
   BASE100
   BASE186
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE605
   BASE606
   BASE627
@@ -5278,7 +5538,7 @@ BEGIN
    09f8: LDCI 0082        Load word 130
    09fb: CSP  01          Call standard procedure NEW
   NEW(BASE1,512)
-   09fd: LAO  0001        Load global BASE1
+   09fd: LAO  0001        Load global BASE1 (SYMBUFP)
    09ff: LDCI 0200        Load word 512
    0a02: CSP  01          Call standard procedure NEW
   BASE2 := NIL
@@ -5376,8 +5636,8 @@ END
 
 ### PROCEDURE COMPINIT.INITSETS (* P=10, LL=2, D=0, Callers: COMPINIT *)
   BASE101=TYPEDELS
-  BASE105=STATBEGSYS
-  BASE109=FACBEGSYS
+  BASE105=STATBEGSYS:SETOFSYS
+  BASE109=FACBEGSYS:SETOFSYS
   BASE113=SELECTSYS
   BASE117=BLOCKBEGSYS
   BASE121=TYPEBEGSYS
@@ -5387,7 +5647,7 @@ END
 BEGIN
   CONSTBEGSYS := [0,19,20,21,24,44]
 -> 0a74: LAO  0081        Load global BASE129 (CONSTBEGSYS)
-   0a7a: LDC  04          Load multiple-word constant
+   0a77: LDC  04          Load multiple-word constant
                             0001 0000 0138 0001 
    0a82: SLDC 04          Short load constant 4
    0a83: ADJ  04          Adjust set to 4 words
@@ -5404,7 +5664,7 @@ BEGIN
    0a94: STM  04          Store 4 words at TOS to TOS-1
   TYPEBEGSYS := [10,11,12,13,14,17] + SIMPTYPEBEGSYS
    0a96: LAO  0079        Load global BASE121 (TYPEBEGSYS)
-   0a9a: LDC  03          Load multiple-word constant
+   0a98: LDC  03          Load multiple-word constant
                             0000 0002 7c00 
    0aa0: SLDC 03          Short load constant 3
    0aa1: LAO  007d        Load global BASE125 (SIMPTYPEBEGSYS)
@@ -5415,35 +5675,35 @@ BEGIN
    0aa9: STM  04          Store 4 words at TOS to TOS-1
   TYPEDELS := [10,12,13,14]
    0aab: LAO  0065        Load global BASE101 (TYPEDELS)
-   0ab0: LDC  03          Load multiple-word constant
+   0aad: LDC  03          Load multiple-word constant
                             0000 0000 7400 
    0ab6: SLDC 03          Short load constant 3
    0ab7: ADJ  04          Adjust set to 4 words
    0ab9: STM  04          Store 4 words at TOS to TOS-1
   BLOCKBEGSYS := [1,16,17,35,43,44,45,46,47]
    0abb: LAO  0075        Load global BASE117 (BLOCKBEGSYS)
-   0ac0: LDC  04          Load multiple-word constant
+   0abd: LDC  04          Load multiple-word constant
                             0000 f808 0003 0002 
    0ac8: SLDC 04          Short load constant 4
    0ac9: ADJ  04          Adjust set to 4 words
    0acb: STM  04          Store 4 words at TOS to TOS-1
   SELECTSYS := [1,2,31]
    0acd: LAO  0071        Load global BASE113 (SELECTSYS)
-   0ad2: LDC  02          Load multiple-word constant
+   0acf: LDC  02          Load multiple-word constant
                             8000 0006 
    0ad6: SLDC 02          Short load constant 2
    0ad7: ADJ  04          Adjust set to 4 words
    0ad9: STM  04          Store 4 words at TOS to TOS-1
   FACBEGSYS := [0,19,20,21,22,48,52,63]
    0adb: LAO  006d        Load global BASE109 (FACBEGSYS)
-   0ae0: LDC  04          Load multiple-word constant
+   0add: LDC  04          Load multiple-word constant
                             8011 0000 0078 0001 
    0ae8: SLDC 04          Short load constant 4
    0ae9: ADJ  04          Adjust set to 4 words
    0aeb: STM  04          Store 4 words at TOS to TOS-1
   STATBEGSYS := [3,4,5,6,7,8,9,10]
    0aed: LAO  0069        Load global BASE105 (STATBEGSYS)
-   0af2: LDC  02          Load multiple-word constant
+   0aef: LDC  02          Load multiple-word constant
                             0000 07f8 
    0af6: SLDC 02          Short load constant 2
    0af7: ADJ  04          Adjust set to 4 words
@@ -5514,12 +5774,12 @@ BEGIN
 -> 0baa: RNP  00          Return from nonbase procedure
 END
 
-## Segment DECLARAT (8)
+## Segment DECLARATIONPART (8)
 
-### PROCEDURE DECLARAT.DECLARAT(PARAM1; PARAM2; PARAM3; PARAM4) (* P=1, LL=1, D=15, Callers: PROC11 *)
+### PROCEDURE DECLARATIONPART.DECLARATIONPART(PARAM1; PARAM2; PARAM3; PARAM4) (* P=1, LL=1, D=15, Callers: PROC11 *)
   BASE2
-  BASE8
-  BASE15
+  BASE8=TOP:DISPRANGE
+  BASE15=SY:SYMBOL
   BASE27
   BASE32
   BASE33
@@ -5528,7 +5788,7 @@ END
   BASE80
   BASE85
   BASE86
-  BASE105=STATBEGSYS
+  BASE105=STATBEGSYS:SETOFSYS
   BASE117=BLOCKBEGSYS
   MP1=PARAM4
   MP2=PARAM3
@@ -5544,7 +5804,7 @@ BEGIN
    1c3e: LLA  0001        Load local address MP1
    1c40: LDM  04          Load 4 words from (TOS)
    1c42: SLDC 04          Short load constant 4
-   1c43: SLDC 0a          Short load constant 10
+   1c43: SLDC 0a          Short load constant 10 [1,3]
    1c44: SLDC 01          Short load constant 1
    1c45: UNI              Set union (TOS OR TOS-1)
    1c46: ADJ  04          Adjust set to 4 words
@@ -5553,7 +5813,7 @@ BEGIN
    1c4c: LLA  0001        Load local address MP1
    1c4e: LDM  04          Load 4 words from (TOS)
    1c50: SLDC 04          Short load constant 4
-   1c51: SLDC 01          Short load constant 1
+   1c51: SLDC 01          Short load constant 1 [0]
    1c52: SLDC 01          Short load constant 1
    1c53: UNI              Set union (TOS OR TOS-1)
    1c54: ADJ  04          Adjust set to 4 words
@@ -5564,8 +5824,8 @@ BEGIN
    1c5c: SLDC 31          Short load constant 49
    1c5d: EQUI             Integer TOS-1 = TOS
    1c5e: FJP  $1c65       Jump if TOS false
-   1c60: CXP  01 08       Call external procedure PASCALCO.PROC8
-   1c63: CLP  0a          Call local procedure DECLARAT.PROC10
+   1c60: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   1c63: CLP  0a          Call local procedure DECLARATIONPART.PROC10
 -> 1c65: SLDO 02          Short load global BASE2
    1c66: LDCN             Load constant NIL
    1c67: EQUI             Integer TOS-1 = TOS
@@ -5581,38 +5841,39 @@ BEGIN
    1c78: LDO  0020        Load global word BASE32
    1c7a: LAND             Logical AND (TOS & TOS-1)
    1c7b: FJP  $1c97       Jump if TOS false
+  PASCALCOMPILER.ERROR(186) { Labels not allowed in interface section }
    1c7d: LDCI 00ba        Load word 186
-   1c80: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1c80: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1c83: LLA  0001        Load local address MP1
    1c85: LDM  04          Load 4 words from (TOS)
    1c87: SLDC 04          Short load constant 4
-   1c8a: LDC  02          Load multiple-word constant
-                            0000 0800 
+   1c88: LDC  02          Load multiple-word constant
+                            0000 0800 [11]
    1c8e: SLDC 02          Short load constant 2
    1c8f: DIF              Set difference (TOS-1 AND NOT TOS)
    1c90: ADJ  04          Adjust set to 4 words
-   1c92: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1c92: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
    1c95: UJP  $1c9a       Unconditional jump
--> 1c97: CXP  01 08       Call external procedure PASCALCO.PROC8
--> 1c9a: CLP  0f          Call local procedure DECLARAT.PROC15
+-> 1c97: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+-> 1c9a: CLP  0f          Call local procedure DECLARATIONPART.PROC15
 -> 1c9c: SLDO 0f          Short load global BASE15
    1c9d: SLDC 1c          Short load constant 28
    1c9e: EQUI             Integer TOS-1 = TOS
    1c9f: FJP  $1ca6       Jump if TOS false
-   1ca1: CXP  01 08       Call external procedure PASCALCO.PROC8
-   1ca4: CLP  10          Call local procedure DECLARAT.PROC16
+   1ca1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   1ca4: CLP  10          Call local procedure DECLARATIONPART.PROC16
 -> 1ca6: SLDO 0f          Short load global BASE15
    1ca7: SLDC 1d          Short load constant 29
    1ca8: EQUI             Integer TOS-1 = TOS
    1ca9: FJP  $1cb0       Jump if TOS false
-   1cab: CXP  01 08       Call external procedure PASCALCO.PROC8
-   1cae: CLP  11          Call local procedure DECLARAT.PROC17
+   1cab: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   1cae: CLP  11          Call local procedure DECLARATIONPART.PROC17
 -> 1cb0: SLDO 0f          Short load global BASE15
    1cb1: SLDC 1e          Short load constant 30
    1cb2: EQUI             Integer TOS-1 = TOS
    1cb3: FJP  $1cba       Jump if TOS false
-   1cb5: CXP  01 08       Call external procedure PASCALCO.PROC8
-   1cb8: CLP  12          Call local procedure DECLARAT.PROC18
+   1cb5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   1cb8: CLP  12          Call local procedure DECLARATIONPART.PROC18
 -> 1cba: LDO  0050        Load global word BASE80
    1cbc: SLDC 01          Short load constant 1
    1cbd: EQUI             Integer TOS-1 = TOS
@@ -5620,8 +5881,8 @@ BEGIN
    1cc0: SLDO 08          Short load global BASE8
    1cc1: SRO  0055        Store global word BASE85
 -> 1cc3: SLDO 0f          Short load global BASE15
-   1cc6: LDC  03          Load multiple-word constant
-                            0000 8000 0003 
+   1cc4: LDC  03          Load multiple-word constant
+                            0000 8000 0003 [0,1,27]
    1ccc: SLDC 03          Short load constant 3
    1ccd: INN              Set membership (TOS-1 in set TOS)
    1cce: FJP  $1d13       Jump if TOS false
@@ -5636,29 +5897,30 @@ BEGIN
    1cdd: SRO  001b        Store global word BASE27
 -> 1cdf: SLDO 0f          Short load global BASE15
    1ce0: STL  0005        Store TOS into MP5
-   1ce2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1ce2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1ce5: SLDL 05          Short load local MP5
    1ce6: SLDC 21          Short load constant 33
    1ce7: EQUI             Integer TOS-1 = TOS
    1ce8: FJP  $1d00       Jump if TOS false
    1cea: LDO  0021        Load global word BASE33
    1cec: FJP  $1cfa       Jump if TOS false
+  PASCALCOMPILER.ERROR(185) { Segment declaration not allowed in unit }
    1cee: LDCI 00b9        Load word 185
-   1cf1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1cf1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1cf4: SLDC 1f          Short load constant 31
    1cf5: SLDC 00          Short load constant 0
-   1cf6: CLP  13          Call local procedure DECLARAT.PROC19
+   1cf6: CLP  13          Call local procedure DECLARATIONPART.PROC19
    1cf8: UJP  $1cfe       Unconditional jump
 -> 1cfa: SLDL 05          Short load local MP5
    1cfb: SLDC 01          Short load constant 1
-   1cfc: CLP  13          Call local procedure DECLARAT.PROC19
+   1cfc: CLP  13          Call local procedure DECLARATIONPART.PROC19
 -> 1cfe: UJP  $1d04       Unconditional jump
 -> 1d00: SLDL 05          Short load local MP5
    1d01: SLDC 00          Short load constant 0
-   1d02: CLP  13          Call local procedure DECLARAT.PROC19
+   1d02: CLP  13          Call local procedure DECLARATIONPART.PROC19
 -> 1d04: SLDO 0f          Short load global BASE15
-   1d08: LDC  03          Load multiple-word constant
-                            0000 8000 0003 
+   1d05: LDC  03          Load multiple-word constant
+                            0000 8000 0003 [0,1,27]
    1d0e: SLDC 03          Short load constant 3
    1d0f: INN              Set membership (TOS-1 in set TOS)
    1d10: LNOT             Logical NOT (~TOS)
@@ -5671,8 +5933,8 @@ BEGIN
    1d1a: LDO  0021        Load global word BASE33
    1d1c: LOR              Logical OR (TOS | TOS-1)
    1d1d: SLDO 0f          Short load global BASE15
-   1d20: LDC  04          Load multiple-word constant
-                            0200 0000 0000 0010 
+   1d1e: LDC  04          Load multiple-word constant
+                            0200 0000 0000 0010 [4,57]
    1d28: SLDC 04          Short load constant 4
    1d29: INN              Set membership (TOS-1 in set TOS)
    1d2a: LAND             Logical AND (TOS & TOS-1)
@@ -5694,23 +5956,24 @@ BEGIN
    1d3e: LNOT             Logical NOT (~TOS)
    1d3f: LOR              Logical OR (TOS | TOS-1)
    1d40: FJP  $1d5d       Jump if TOS false
+  PASCALCOMPILER.ERROR(18) { Error in declaration part }
    1d42: SLDC 12          Short load constant 18
-   1d43: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1d43: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1d46: LLA  0001        Load local address MP1
    1d48: LDM  04          Load 4 words from (TOS)
    1d4a: SLDC 04          Short load constant 4
-   1d4e: LDC  04          Load multiple-word constant
+   1d4b: LDC  04          Load multiple-word constant
                             0000 0000 0000 000c 
    1d56: SLDC 04          Short load constant 4
    1d57: DIF              Set difference (TOS-1 AND NOT TOS)
    1d58: ADJ  04          Adjust set to 4 words
-   1d5a: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1d5a: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1d5d: SLDO 0f          Short load global BASE15
    1d5e: LAO  0069        Load global BASE105 (STATBEGSYS)
    1d60: LDM  04          Load 4 words from (TOS)
    1d62: SLDC 04          Short load constant 4
-   1d66: LDC  04          Load multiple-word constant
-                            0200 0000 0000 0014 
+   1d63: LDC  04          Load multiple-word constant
+                            0200 0000 0000 0014 [2,4,57]
    1d6e: SLDC 04          Short load constant 4
    1d6f: UNI              Set union (TOS OR TOS-1)
    1d70: INN              Set membership (TOS-1 in set TOS)
@@ -5720,8 +5983,8 @@ BEGIN
 -> 1d76: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC2(PARAM1; PARAM2; PARAM3; PARAM4) (* P=2, LL=2, D=4, Callers: PROC15, PROC20, PROC16, PROC8, PROC3, PROC17, PROC4, PROC19, PROC18 *)
-  BASE15
+### PROCEDURE DECLARATIONPART.PROC2(PARAM1; PARAM2; PARAM3; PARAM4) (* P=2, LL=2, D=4, Callers: PROC15, PROC20, PROC16, PROC8, PROC3, PROC17, PROC4, PROC19, PROC18 *)
+  BASE15=SY:SYMBOL
   MP1=PARAM4
   MP2=PARAM3
   MP3=PARAM2
@@ -5734,19 +5997,20 @@ BEGIN
    0006: INN              Set membership (TOS-1 in set TOS)
    0007: LNOT             Logical NOT (~TOS)
    0008: FJP  $0015       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    000a: SLDC 06          Short load constant 6
-   000b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   000b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    000e: LLA  0001        Load local address MP1
    0010: LDM  04          Load 4 words from (TOS)
-   0012: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0012: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0015: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC3(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=3, LL=2, D=19, Callers: PROC6, PROC18, PROC17 *)
-  BASE8
+### PROCEDURE DECLARATIONPART.PROC3(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=3, LL=2, D=19, Callers: PROC6, PROC18, PROC17 *)
+  BASE8=TOP:DISPRANGE
   BASE11
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE32
   BASE33
   BASE46
@@ -5754,7 +6018,7 @@ END
   BASE101=TYPEDELS
   BASE121=TYPEBEGSYS
   BASE125=SIMPTYPEBEGSYS
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1=PARAM6
   MP2=PARAM5
   MP3=PARAM4
@@ -5783,8 +6047,9 @@ BEGIN
    097f: INN              Set membership (TOS-1 in set TOS)
    0980: LNOT             Logical NOT (~TOS)
    0981: FJP  $0997       Jump if TOS false
+  PASCALCOMPILER.ERROR(10) { Error in type }
    0983: SLDC 0a          Short load constant 10
-   0984: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0984: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0987: LLA  0003        Load local address MP3
    0989: LDM  04          Load 4 words from (TOS)
    098b: SLDC 04          Short load constant 4
@@ -5793,7 +6058,7 @@ BEGIN
    0990: SLDC 04          Short load constant 4
    0991: UNI              Set union (TOS OR TOS-1)
    0992: ADJ  04          Adjust set to 4 words
-   0994: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0994: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0997: SLDO 0f          Short load global BASE15
    0998: LAO  0079        Load global BASE121 (TYPEBEGSYS)
    099a: LDM  04          Load 4 words from (TOS)
@@ -5810,19 +6075,19 @@ BEGIN
    09ab: LDM  04          Load 4 words from (TOS)
    09ad: SLDL 02          Short load local MP2
    09ae: SLDL 01          Short load local MP1
-   09af: CLP  04          Call local procedure DECLARAT.PROC4
+   09af: CLP  04          Call local procedure DECLARATIONPART.PROC4
    09b1: UJP  $0cbf       Unconditional jump
 -> 09b3: SLDO 0f          Short load global BASE15
    09b4: SLDC 11          Short load constant 17
    09b5: EQUI             Integer TOS-1 = TOS
    09b6: FJP  $09bc       Jump if TOS false
-   09b8: CLP  09          Call local procedure DECLARAT.PROC9
+   09b8: CLP  09          Call local procedure DECLARATIONPART.PROC9
    09ba: UJP  $0cbf       Unconditional jump
 -> 09bc: SLDO 0f          Short load global BASE15
    09bd: SLDC 2b          Short load constant 43
    09be: EQUI             Integer TOS-1 = TOS
    09bf: FJP  $09e5       Jump if TOS false
-   09c1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   09c1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    09c4: SLDC 01          Short load constant 1
    09c5: STL  0010        Store TOS into MP16
    09c7: SLDO 0f          Short load global BASE15
@@ -5832,8 +6097,9 @@ BEGIN
    09cd: INN              Set membership (TOS-1 in set TOS)
    09ce: LNOT             Logical NOT (~TOS)
    09cf: FJP  $09e5       Jump if TOS false
+  PASCALCOMPILER.ERROR(10) { Error in type }
    09d1: SLDC 0a          Short load constant 10
-   09d2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   09d2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    09d5: LLA  0003        Load local address MP3
    09d7: LDM  04          Load 4 words from (TOS)
    09d9: SLDC 04          Short load constant 4
@@ -5842,20 +6108,21 @@ BEGIN
    09de: SLDC 04          Short load constant 4
    09df: UNI              Set union (TOS OR TOS-1)
    09e0: ADJ  04          Adjust set to 4 words
-   09e2: CXP  01 10       Call external procedure PASCALCO.PROC16
+   09e2: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 09e5: SLDO 0f          Short load global BASE15
    09e6: SLDC 2c          Short load constant 44
    09e7: EQUI             Integer TOS-1 = TOS
    09e8: FJP  $0b4b       Jump if TOS false
-   09ea: CXP  01 08       Call external procedure PASCALCO.PROC8
+   09ea: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    09ed: SLDO 0f          Short load global BASE15
    09ee: SLDC 0f          Short load constant 15
    09ef: EQUI             Integer TOS-1 = TOS
    09f0: FJP  $09f7       Jump if TOS false
-   09f2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   09f2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    09f5: UJP  $09fb       Unconditional jump
+  PASCALCOMPILER.ERROR(11) { '[' expected }
 -> 09f7: SLDC 0b          Short load constant 11
-   09f8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   09f8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 09fb: LDCN             Load constant NIL
    09fc: STL  0008        Store TOS into MP8
 -> 09fe: SLDL 10          Short load local MP16
@@ -5896,14 +6163,14 @@ BEGIN
    0a34: LLA  0003        Load local address MP3
    0a36: LDM  04          Load 4 words from (TOS)
    0a38: SLDC 04          Short load constant 4
-   0a3c: LDC  02          Load multiple-word constant
-                            0802 0001 
+   0a39: LDC  02          Load multiple-word constant
+                            0802 0001 [0,17,27]
    0a40: SLDC 02          Short load constant 2
    0a41: UNI              Set union (TOS OR TOS-1)
    0a42: ADJ  04          Adjust set to 4 words
    0a44: LLA  0007        Load local address MP7
    0a46: LLA  000d        Load local address MP13
-   0a48: CLP  04          Call local procedure DECLARAT.PROC4
+   0a48: CLP  04          Call local procedure DECLARATIONPART.PROC4
    0a4a: SLDL 08          Short load local MP8
    0a4b: SLDL 0d          Short load local MP13
    0a4c: STO              Store indirect (TOS into TOS-1)
@@ -5920,8 +6187,9 @@ BEGIN
    0a59: LDO  0040        Load global word BASE64
    0a5b: EQUI             Integer TOS-1 = TOS
    0a5c: FJP  $0a67       Jump if TOS false
+  PASCALCOMPILER.ERROR(109) { Type must not be real }
    0a5e: SLDC 6d          Short load constant 109
-   0a5f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0a5f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0a62: LDCN             Load constant NIL
    0a63: STL  0007        Store TOS into MP7
    0a65: UJP  $0a75       Unconditional jump
@@ -5929,8 +6197,9 @@ BEGIN
    0a68: SLDO 0c          Short load global BASE12
    0a69: EQUI             Integer TOS-1 = TOS
    0a6a: FJP  $0a75       Jump if TOS false
+  PASCALCOMPILER.ERROR(149) { Index type must not be integer }
    0a6c: LDCI 0095        Load word 149
-   0a6f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0a6f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0a72: LDCN             Load constant NIL
    0a73: STL  0007        Store TOS into MP7
 -> 0a75: SLDL 09          Short load local MP9
@@ -5938,8 +6207,9 @@ BEGIN
    0a78: SLDL 07          Short load local MP7
    0a79: STO              Store indirect (TOS into TOS-1)
    0a7a: UJP  $0a83       Unconditional jump
+  PASCALCOMPILER.ERROR(113) { Index type must be a scalar or a subrange }
 -> 0a7c: SLDC 71          Short load constant 113
-   0a7d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0a7d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0a80: LDCN             Load constant NIL
    0a81: STL  0007        Store TOS into MP7
 -> 0a83: SLDO 0f          Short load global BASE15
@@ -5949,30 +6219,32 @@ BEGIN
    0a88: SLDO 0b          Short load global BASE11
    0a89: LNOT             Logical NOT (~TOS)
    0a8a: FJP  $0a8f       Jump if TOS false
-   0a8c: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0a8c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0a8f: SLDO 0b          Short load global BASE11
    0a90: FJP  $09fe       Jump if TOS false
    0a92: SLDO 0f          Short load global BASE15
    0a93: SLDC 10          Short load constant 16
    0a94: EQUI             Integer TOS-1 = TOS
    0a95: FJP  $0a9c       Jump if TOS false
-   0a97: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0a97: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0a9a: UJP  $0aa0       Unconditional jump
+  PASCALCOMPILER.ERROR(12) { ']' expected }
 -> 0a9c: SLDC 0c          Short load constant 12
-   0a9d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0a9d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0aa0: SLDO 0f          Short load global BASE15
    0aa1: SLDC 0b          Short load constant 11
    0aa2: EQUI             Integer TOS-1 = TOS
    0aa3: FJP  $0aaa       Jump if TOS false
-   0aa5: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0aa5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0aa8: UJP  $0aae       Unconditional jump
+  PASCALCOMPILER.ERROR(8) { 'OF' expected }
 -> 0aaa: SLDC 08          Short load constant 8
-   0aab: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0aab: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0aae: LLA  0003        Load local address MP3
    0ab0: LDM  04          Load 4 words from (TOS)
    0ab2: LLA  0009        Load local address MP9
    0ab4: LLA  000d        Load local address MP13
-   0ab6: CIP  03          Call intermediate procedure 3 DECLARAT.3
+   0ab6: CIP  03          Call intermediate procedure 3 DECLARATIONPART.3
    0ab8: SLDL 09          Short load local MP9
    0ab9: LDCN             Load constant NIL
    0aba: NEQI             Integer TOS-1 <> TOS
@@ -5982,12 +6254,13 @@ BEGIN
    0abf: SLDC 07          Short load constant 7
    0ac0: EQUI             Integer TOS-1 = TOS
    0ac1: FJP  $0ac7       Jump if TOS false
+  PASCALCOMPILER.ERROR(108) { File not allowed here }
    0ac3: SLDC 6c          Short load constant 108
-   0ac4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ac4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0ac7: SLDL 09          Short load local MP9
    0ac8: SLDC 00          Short load constant 0
    0ac9: SLDC 00          Short load constant 0
-   0aca: CLP  05          Call local procedure DECLARAT.FUNC5
+   0aca: CLP  05          Call local procedure DECLARATIONPART.FUNC5
    0acc: FJP  $0af0       Jump if TOS false
    0ace: LDL  0011        Load local word MP17
    0ad0: LDL  0011        Load local word MP17
@@ -6029,7 +6302,7 @@ BEGIN
    0b07: SIND 02          Short index load *TOS+2
    0b08: LLA  000f        Load local address MP15
    0b0a: LLA  000e        Load local address MP14
-   0b0c: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0b0c: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0b0f: LDL  0013        Load local word MP19
    0b11: SIND 04          Short index load *TOS+4
    0b12: FJP  $0b23       Jump if TOS false
@@ -6056,8 +6329,9 @@ BEGIN
    0b2d: SLDC 00          Short load constant 0
    0b2e: LEQI             Integer TOS-1 <= TOS
    0b2f: FJP  $0b3a       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    0b31: LDCI 018f        Load word 399
-   0b34: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0b34: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0b37: SLDC 01          Short load constant 1
    0b38: STL  000d        Store TOS into MP13
 -> 0b3a: LDL  0013        Load local word MP19
@@ -6076,7 +6350,7 @@ BEGIN
    0b4c: SLDC 2d          Short load constant 45
    0b4d: EQUI             Integer TOS-1 = TOS
    0b4e: FJP  $0bd2       Jump if TOS false
-   0b50: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0b50: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0b53: SLDO 08          Short load global BASE8
    0b54: STL  000a        Store TOS into MP10
    0b56: SLDO 08          Short load global BASE8
@@ -6099,8 +6373,9 @@ BEGIN
    0b70: SLDC 03          Short load constant 3
    0b71: STO              Store indirect (TOS into TOS-1)
    0b72: UJP  $0b7a       Unconditional jump
+    PASCALCOMPILER.ERROR(250) { Too many scopes of nested identifiers }
 -> 0b74: LDCI 00fa        Load word 250
-   0b77: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0b77: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0b7a: SLDC 00          Short load constant 0
    0b7b: STL  000c        Store TOS into MP12
    0b7d: SLDC 00          Short load constant 0
@@ -6108,15 +6383,15 @@ BEGIN
    0b80: LLA  0003        Load local address MP3
    0b82: LDM  04          Load 4 words from (TOS)
    0b84: SLDC 04          Short load constant 4
-   0b85: SLDC 08          Short load constant 8
+   0b85: SLDC 08          Short load constant 8 [3]
    0b86: SLDC 01          Short load constant 1
    0b87: DIF              Set difference (TOS-1 AND NOT TOS)
-   0b88: LDCI 0200        Load word 512
+   0b88: LDCI 0200        Load word 512 [9]
    0b8b: SLDC 01          Short load constant 1
    0b8c: UNI              Set union (TOS OR TOS-1)
    0b8d: ADJ  04          Adjust set to 4 words
    0b8f: LLA  0008        Load local address MP8
-   0b91: CLP  06          Call local procedure DECLARAT.PROC6
+   0b91: CLP  06          Call local procedure DECLARATIONPART.PROC6
    0b93: SLDL 0c          Short load local MP12
    0b94: LDL  0012        Load local word MP18
    0b96: SLDC 00          Short load constant 0
@@ -6152,29 +6427,31 @@ BEGIN
    0bc3: SLDC 09          Short load constant 9
    0bc4: EQUI             Integer TOS-1 = TOS
    0bc5: FJP  $0bcc       Jump if TOS false
-   0bc7: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0bc7: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0bca: UJP  $0bd0       Unconditional jump
+  PASCALCOMPILER.ERROR(13) { 'END' expected }
 -> 0bcc: SLDC 0d          Short load constant 13
-   0bcd: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0bcd: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0bd0: UJP  $0cbc       Unconditional jump
 -> 0bd2: SLDO 0f          Short load global BASE15
    0bd3: SLDC 2a          Short load constant 42
    0bd4: EQUI             Integer TOS-1 = TOS
    0bd5: FJP  $0c60       Jump if TOS false
-   0bd7: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0bd7: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0bda: SLDO 0f          Short load global BASE15
    0bdb: SLDC 0b          Short load constant 11
    0bdc: EQUI             Integer TOS-1 = TOS
    0bdd: FJP  $0be4       Jump if TOS false
-   0bdf: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0bdf: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0be2: UJP  $0be8       Unconditional jump
+  PASCALCOMPILER.ERROR(8) { 'OF' expected }
 -> 0be4: SLDC 08          Short load constant 8
-   0be5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0be5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0be8: LLA  0003        Load local address MP3
    0bea: LDM  04          Load 4 words from (TOS)
    0bec: LLA  0008        Load local address MP8
    0bee: LLA  000d        Load local address MP13
-   0bf0: CLP  04          Call local procedure DECLARAT.PROC4
+   0bf0: CLP  04          Call local procedure DECLARATIONPART.PROC4
    0bf2: SLDL 08          Short load local MP8
    0bf3: LDCN             Load constant NIL
    0bf4: NEQI             Integer TOS-1 <> TOS
@@ -6192,8 +6469,9 @@ BEGIN
    0c02: EQUI             Integer TOS-1 = TOS
    0c03: LOR              Logical OR (TOS | TOS-1)
    0c04: FJP  $0c0f       Jump if TOS false
+  PASCALCOMPILER.ERROR(115) { Base type must be a scalar or a subrange }
    0c06: SLDC 73          Short load constant 115
-   0c07: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0c07: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0c0a: LDCN             Load constant NIL
    0c0b: STL  0008        Store TOS into MP8
    0c0d: UJP  $0c1c       Unconditional jump
@@ -6201,8 +6479,9 @@ BEGIN
    0c10: LDO  0040        Load global word BASE64
    0c12: EQUI             Integer TOS-1 = TOS
    0c13: FJP  $0c1c       Jump if TOS false
+  PASCALCOMPILER.ERROR(114) { Base type must not be real }
    0c15: SLDC 72          Short load constant 114
-   0c16: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0c16: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0c19: LDCN             Load constant NIL
    0c1a: STL  0008        Store TOS into MP8
 -> 0c1c: LLA  0009        Load local address MP9
@@ -6225,7 +6504,7 @@ BEGIN
    0c35: SLDL 08          Short load local MP8
    0c36: LLA  000f        Load local address MP15
    0c38: LLA  000e        Load local address MP14
-   0c3a: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0c3a: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0c3d: LDL  0013        Load local word MP19
    0c3f: SLDL 0e          Short load local MP14
    0c40: SLDC 10          Short load constant 16
@@ -6238,8 +6517,9 @@ BEGIN
    0c48: LDCI 00ff        Load word 255
    0c4b: GRTI             Integer TOS-1 > TOS
    0c4c: FJP  $0c58       Jump if TOS false
+  PASCALCOMPILER.ERROR(169) { Base type of set too large }
    0c4e: LDCI 00a9        Load word 169
-   0c51: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0c51: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0c54: LDL  0013        Load local word MP19
    0c56: SLDC 01          Short load constant 1
    0c57: STO              Store indirect (TOS into TOS-1)
@@ -6259,9 +6539,10 @@ BEGIN
    0c6d: LOR              Logical OR (TOS | TOS-1)
    0c6e: LNOT             Logical NOT (~TOS)
    0c6f: FJP  $0c77       Jump if TOS false
+  PASCALCOMPILER.ERROR(191) { No private files in unit }
    0c71: LDCI 00bf        Load word 191
-   0c74: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0c77: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0c74: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0c77: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0c7a: LLA  0009        Load local address MP9
    0c7c: SLDC 03          Short load constant 3
    0c7d: CSP  01          Call standard procedure NEW
@@ -6279,12 +6560,12 @@ BEGIN
    0c8f: SLDC 0b          Short load constant 11
    0c90: EQUI             Integer TOS-1 = TOS
    0c91: FJP  $0ca2       Jump if TOS false
-   0c93: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0c93: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0c96: LLA  0003        Load local address MP3
    0c98: LDM  04          Load 4 words from (TOS)
    0c9a: LLA  0008        Load local address MP8
    0c9c: LLA  000d        Load local address MP13
-   0c9e: CIP  03          Call intermediate procedure 3 DECLARAT.3
+   0c9e: CIP  03          Call intermediate procedure 3 DECLARATIONPART.3
    0ca0: UJP  $0ca5       Unconditional jump
 -> 0ca2: LDCN             Load constant NIL
    0ca3: STL  0008        Store TOS into MP8
@@ -6311,7 +6592,7 @@ BEGIN
    0cbe: STO              Store indirect (TOS into TOS-1)
 -> 0cbf: LLA  0003        Load local address MP3
    0cc1: LDM  04          Load 4 words from (TOS)
-   0cc3: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   0cc3: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    0cc5: UJP  $0cca       Unconditional jump
 -> 0cc7: SLDL 02          Short load local MP2
    0cc8: LDCN             Load constant NIL
@@ -6333,10 +6614,10 @@ BEGIN
 -> 0cda: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC4(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=4, LL=3, D=19, Callers: PROC3 *)
-  BASE8
+### PROCEDURE DECLARATIONPART.PROC4(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=4, LL=3, D=19, Callers: PROC3 *)
+  BASE8=TOP:DISPRANGE
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE32
   BASE33
@@ -6347,7 +6628,7 @@ END
   BASE63
   BASE64
   BASE125=SIMPTYPEBEGSYS
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1=PARAM6
   MP2=PARAM5
   MP3=PARAM4
@@ -6357,7 +6638,7 @@ END
   MP7
   MP8
   MP9
-  MP10
+  MP10=:CTP
   MP11
   MP12
   MP13
@@ -6372,7 +6653,7 @@ BEGIN
    0027: LLA  0003        Load local address MP3
    0029: LDM  04          Load 4 words from (TOS)
    002b: SLDC 04          Short load constant 4
-   002c: SLDC 22          Short load constant 34
+   002c: SLDC 22          Short load constant 34 [1,5]
    002d: SLDC 01          Short load constant 1
    002e: UNI              Set union (TOS OR TOS-1)
    002f: ADJ  04          Adjust set to 4 words
@@ -6384,8 +6665,9 @@ BEGIN
    0039: INN              Set membership (TOS-1 in set TOS)
    003a: LNOT             Logical NOT (~TOS)
    003b: FJP  $0051       Jump if TOS false
+  PASCALCOMPILER.ERROR(1) { Error in simple type }
    003d: SLDC 01          Short load constant 1
-   003e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   003e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0041: LLA  0003        Load local address MP3
    0043: LDM  04          Load 4 words from (TOS)
    0045: SLDC 04          Short load constant 4
@@ -6394,7 +6676,7 @@ BEGIN
    004a: SLDC 04          Short load constant 4
    004b: UNI              Set union (TOS OR TOS-1)
    004c: ADJ  04          Adjust set to 4 words
-   004e: CXP  01 10       Call external procedure PASCALCO.PROC16
+   004e: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0051: SLDO 0f          Short load global BASE15
    0052: LAO  007d        Load global BASE125 (SIMPTYPEBEGSYS)
    0054: LDM  04          Load 4 words from (TOS)
@@ -6439,7 +6721,7 @@ BEGIN
    008d: STL  0009        Store TOS into MP9
    008f: SLDC 00          Short load constant 0
    0090: STL  000c        Store TOS into MP12
--> 0092: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0092: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0095: SLDO 0f          Short load global BASE15
    0096: SLDC 00          Short load constant 0
    0097: EQUI             Integer TOS-1 = TOS
@@ -6468,21 +6750,23 @@ BEGIN
    00bc: INC  0008        Inc field ptr (TOS+8)
    00be: SLDC 01          Short load constant 1
    00bf: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP10)
    00c0: SLDL 0a          Short load local MP10
-   00c1: CXP  01 07       Call external procedure PASCALCO.PROC7
+   00c1: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    00c4: SLDL 0c          Short load local MP12
    00c5: SLDC 01          Short load constant 1
    00c6: ADI              Add integers (TOS + TOS-1)
    00c7: STL  000c        Store TOS into MP12
    00c9: SLDL 0a          Short load local MP10
    00ca: STL  0009        Store TOS into MP9
-   00cc: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00cc: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00cf: UJP  $00d5       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 00d1: SLDC 02          Short load constant 2
-   00d2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00d2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00d5: LLA  000e        Load local address MP14
    00d7: LDM  04          Load 4 words from (TOS)
-   00d9: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   00d9: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    00db: SLDO 0f          Short load global BASE15
    00dc: SLDC 01          Short load constant 1
    00dd: NEQI             Integer TOS-1 <> TOS
@@ -6497,10 +6781,11 @@ BEGIN
    00e9: SLDC 05          Short load constant 5
    00ea: EQUI             Integer TOS-1 = TOS
    00eb: FJP  $00f2       Jump if TOS false
-   00ed: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00ed: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00f0: UJP  $00f6       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 00f2: SLDC 04          Short load constant 4
-   00f3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00f3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00f6: UJP  $0336       Unconditional jump
 -> 00f8: SLDO 0f          Short load global BASE15
    00f9: SLDC 00          Short load constant 0
@@ -6510,7 +6795,7 @@ BEGIN
    00fe: SLDC 01          Short load constant 1
    00ff: ADJ  01          Adjust set to 1 words
    0101: LLA  000a        Load local address MP10
-   0103: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0103: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    0106: SLDL 0a          Short load local MP10
    0107: IND  0008        Static index and load word (TOS+8)
    0109: SLDC 01          Short load constant 1
@@ -6536,10 +6821,11 @@ BEGIN
    0128: SIND 02          Short index load *TOS+2
    0129: SLDC 00          Short load constant 0
    012a: SLDC 00          Short load constant 0
-   012b: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   012b: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    012e: FJP  $013c       Jump if TOS false
+  PASCALCOMPILER.ERROR(148) { Subrange bounds must be scalar }
    0130: LDCI 0094        Load word 148
-   0133: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0133: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0136: LDL  0012        Load local word MP18
    0138: INC  0002        Inc field ptr (TOS+2)
    013a: LDCN             Load constant NIL
@@ -6552,20 +6838,21 @@ BEGIN
    0146: LDL  0012        Load local word MP18
    0148: SLDC 01          Short load constant 1
    0149: STO              Store indirect (TOS into TOS-1)
-   014a: CXP  01 08       Call external procedure PASCALCO.PROC8
+   014a: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    014d: SLDO 0f          Short load global BASE15
    014e: SLDC 02          Short load constant 2
    014f: EQUI             Integer TOS-1 = TOS
    0150: FJP  $0157       Jump if TOS false
-   0152: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0152: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0155: UJP  $015b       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 0157: SLDC 05          Short load constant 5
-   0158: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0158: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 015b: LLA  0003        Load local address MP3
    015d: LDM  04          Load 4 words from (TOS)
    015f: LLA  0007        Load local address MP7
    0161: LLA  000d        Load local address MP13
-   0163: CXP  01 14       Call external procedure PASCALCO.PROC20
+   0163: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    0166: SLDL 08          Short load local MP8
    0167: INC  0003        Inc field ptr (TOS+3)
    0169: LLA  000d        Load local address MP13
@@ -6575,8 +6862,9 @@ BEGIN
    016f: SLDL 07          Short load local MP7
    0170: NEQI             Integer TOS-1 <> TOS
    0171: FJP  $0177       Jump if TOS false
+  PASCALCOMPILER.ERROR(107) { Incompatible subrange types }
    0173: SLDC 6b          Short load constant 107
-   0174: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0174: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0177: UJP  $028e       Unconditional jump
 -> 0179: SLDL 0a          Short load local MP10
    017a: SIND 06          Short index load *TOS+6
@@ -6585,23 +6873,23 @@ BEGIN
    017e: LDO  0037        Load global word BASE55
    0180: EQUI             Integer TOS-1 = TOS
    0181: FJP  $01f4       Jump if TOS false
-   0183: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0183: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0186: SLDO 0f          Short load global BASE15
    0187: SLDC 0f          Short load constant 15
    0188: EQUI             Integer TOS-1 = TOS
    0189: FJP  $01f2       Jump if TOS false
-   018b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   018b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    018e: LLA  0003        Load local address MP3
    0190: LDM  04          Load 4 words from (TOS)
    0192: SLDC 04          Short load constant 4
-   0196: LDC  02          Load multiple-word constant
-                            0000 0001 
+   0193: LDC  02          Load multiple-word constant
+                            0000 0001 [0]
    019a: SLDC 02          Short load constant 2
    019b: UNI              Set union (TOS OR TOS-1)
    019c: ADJ  04          Adjust set to 4 words
    019e: LLA  0007        Load local address MP7
    01a0: LLA  000d        Load local address MP13
-   01a2: CXP  01 14       Call external procedure PASCALCO.PROC20
+   01a2: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    01a5: SLDL 07          Short load local MP7
    01a6: SLDO 0c          Short load global BASE12
    01a7: EQUI             Integer TOS-1 = TOS
@@ -6614,8 +6902,9 @@ BEGIN
    01b1: GRTI             Integer TOS-1 > TOS
    01b2: LOR              Logical OR (TOS | TOS-1)
    01b3: FJP  $01be       Jump if TOS false
+  PASCALCOMPILER.ERROR(203) { Integer constant exceeds range }
    01b5: LDCI 00cb        Load word 203
-   01b8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01b8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    01bb: SLDC 50          Short load constant 80
    01bc: STL  000d        Store TOS into MP13
 -> 01be: SLDL 0d          Short load local MP13
@@ -6642,27 +6931,29 @@ BEGIN
    01dc: DVI              Divide integers (TOS-1 / TOS)
    01dd: STO              Store indirect (TOS into TOS-1)
 -> 01de: UJP  $01e4       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 01e0: SLDC 0f          Short load constant 15
-   01e1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01e1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01e4: SLDO 0f          Short load global BASE15
    01e5: SLDC 10          Short load constant 16
    01e6: EQUI             Integer TOS-1 = TOS
    01e7: FJP  $01ee       Jump if TOS false
-   01e9: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01e9: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01ec: UJP  $01f2       Unconditional jump
+  PASCALCOMPILER.ERROR(12) { ']' expected }
 -> 01ee: SLDC 0c          Short load constant 12
-   01ef: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01ef: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01f2: UJP  $0285       Unconditional jump
 -> 01f4: SLDL 08          Short load local MP8
    01f5: SLDO 0c          Short load global BASE12
    01f6: EQUI             Integer TOS-1 = TOS
    01f7: FJP  $0259       Jump if TOS false
-   01f9: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01f9: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01fc: SLDO 0f          Short load global BASE15
    01fd: SLDC 0f          Short load constant 15
    01fe: EQUI             Integer TOS-1 = TOS
    01ff: FJP  $0257       Jump if TOS false
-   0201: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0201: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0204: LLA  0008        Load local address MP8
    0206: SLDC 02          Short load constant 2
    0207: CSP  01          Call standard procedure NEW
@@ -6672,14 +6963,14 @@ BEGIN
    020e: LLA  0003        Load local address MP3
    0210: LDM  04          Load 4 words from (TOS)
    0212: SLDC 04          Short load constant 4
-   0216: LDC  02          Load multiple-word constant
-                            0000 0001 
+   0213: LDC  02          Load multiple-word constant
+                            0000 0001 [0]
    021a: SLDC 02          Short load constant 2
    021b: UNI              Set union (TOS OR TOS-1)
    021c: ADJ  04          Adjust set to 4 words
    021e: LLA  0007        Load local address MP7
    0220: LLA  000d        Load local address MP13
-   0222: CXP  01 14       Call external procedure PASCALCO.PROC20
+   0222: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    0225: SLDL 07          Short load local MP7
    0226: SLDO 0c          Short load global BASE12
    0227: EQUI             Integer TOS-1 = TOS
@@ -6692,26 +6983,29 @@ BEGIN
    022f: GRTI             Integer TOS-1 > TOS
    0230: LOR              Logical OR (TOS | TOS-1)
    0231: FJP  $023b       Jump if TOS false
+  PASCALCOMPILER.ERROR(203) { Integer constant exceeds range }
    0233: LDCI 00cb        Load word 203
-   0236: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0236: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0239: UJP  $0243       Unconditional jump
 -> 023b: SLDL 08          Short load local MP8
    023c: SLDL 0d          Short load local MP13
    023d: SLDC 00          Short load constant 0
    023e: SLDC 00          Short load constant 0
-   023f: CXP  01 13       Call external procedure PASCALCO.FUNC19
+   023f: CXP  01 13       Call external procedure PASCALCOMPILER.FUNC19
    0242: STO              Store indirect (TOS into TOS-1)
 -> 0243: UJP  $0249       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 0245: SLDC 0f          Short load constant 15
-   0246: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0246: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0249: SLDO 0f          Short load global BASE15
    024a: SLDC 10          Short load constant 16
    024b: EQUI             Integer TOS-1 = TOS
    024c: FJP  $0253       Jump if TOS false
-   024e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   024e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0251: UJP  $0257       Unconditional jump
+  PASCALCOMPILER.ERROR(12) { ']' expected }
 -> 0253: SLDC 0c          Short load constant 12
-   0254: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0254: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0257: UJP  $0285       Unconditional jump
 -> 0259: SLDL 08          Short load local MP8
    025a: LDO  0039        Load global word BASE57
@@ -6721,8 +7015,9 @@ BEGIN
    0260: EQUI             Integer TOS-1 = TOS
    0261: LOR              Logical OR (TOS | TOS-1)
    0262: FJP  $026a       Jump if TOS false
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    0264: SLDC 67          Short load constant 103
-   0265: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0265: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0268: UJP  $0282       Unconditional jump
 -> 026a: SLDL 08          Short load local MP8
    026b: SIND 01          Short index load *TOS+1
@@ -6736,9 +7031,10 @@ BEGIN
    0278: LOR              Logical OR (TOS | TOS-1)
    0279: LNOT             Logical NOT (~TOS)
    027a: FJP  $0282       Jump if TOS false
+  PASCALCOMPILER.ERROR(191) { No private files in unit }
    027c: LDCI 00bf        Load word 191
-   027f: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0282: CXP  01 08       Call external procedure PASCALCO.PROC8
+   027f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0282: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0285: SLDL 08          Short load local MP8
    0286: LDCN             Load constant NIL
    0287: NEQI             Integer TOS-1 <> TOS
@@ -6758,20 +7054,21 @@ BEGIN
    029a: LLA  0003        Load local address MP3
    029c: LDM  04          Load 4 words from (TOS)
    029e: SLDC 04          Short load constant 4
-   029f: SLDC 04          Short load constant 4
+   029f: SLDC 04          Short load constant 4 [2]
    02a0: SLDC 01          Short load constant 1
    02a1: UNI              Set union (TOS OR TOS-1)
    02a2: ADJ  04          Adjust set to 4 words
    02a4: LLA  0007        Load local address MP7
    02a6: LLA  000d        Load local address MP13
-   02a8: CXP  01 14       Call external procedure PASCALCO.PROC20
+   02a8: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    02ab: SLDL 07          Short load local MP7
    02ac: SLDC 00          Short load constant 0
    02ad: SLDC 00          Short load constant 0
-   02ae: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   02ae: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    02b1: FJP  $02bc       Jump if TOS false
+  PASCALCOMPILER.ERROR(148) { Subrange bounds must be scalar }
    02b3: LDCI 0094        Load word 148
-   02b6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02b6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    02b9: LDCN             Load constant NIL
    02ba: STL  0007        Store TOS into MP7
 -> 02bc: SLDL 08          Short load local MP8
@@ -6791,15 +7088,16 @@ BEGIN
    02d2: SLDC 02          Short load constant 2
    02d3: EQUI             Integer TOS-1 = TOS
    02d4: FJP  $02db       Jump if TOS false
-   02d6: CXP  01 08       Call external procedure PASCALCO.PROC8
+   02d6: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    02d9: UJP  $02df       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 02db: SLDC 05          Short load constant 5
-   02dc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02dc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 02df: LLA  0003        Load local address MP3
    02e1: LDM  04          Load 4 words from (TOS)
    02e3: LLA  0007        Load local address MP7
    02e5: LLA  000d        Load local address MP13
-   02e7: CXP  01 14       Call external procedure PASCALCO.PROC20
+   02e7: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    02ea: SLDL 08          Short load local MP8
    02eb: INC  0003        Inc field ptr (TOS+3)
    02ed: LLA  000d        Load local address MP13
@@ -6809,8 +7107,9 @@ BEGIN
    02f3: SLDL 07          Short load local MP7
    02f4: NEQI             Integer TOS-1 <> TOS
    02f5: FJP  $02fb       Jump if TOS false
+  PASCALCOMPILER.ERROR(107) { Incompatible subrange types }
    02f7: SLDC 6b          Short load constant 107
-   02f8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02f8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 02fb: SLDL 08          Short load local MP8
    02fc: LDCN             Load constant NIL
    02fd: NEQI             Integer TOS-1 <> TOS
@@ -6832,8 +7131,9 @@ BEGIN
    0314: LDO  0040        Load global word BASE64
    0316: EQUI             Integer TOS-1 = TOS
    0317: FJP  $0321       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    0319: LDCI 018f        Load word 399
-   031c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   031c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    031f: UJP  $0336       Unconditional jump
 -> 0321: LDL  0012        Load local word MP18
    0323: SIND 04          Short index load *TOS+4
@@ -6841,8 +7141,9 @@ BEGIN
    0326: SIND 03          Short index load *TOS+3
    0327: GRTI             Integer TOS-1 > TOS
    0328: FJP  $0336       Jump if TOS false
+  PASCALCOMPILER.ERROR(102) { Low bound exceeds high bound }
    032a: SLDC 66          Short load constant 102
-   032b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   032b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    032e: LDL  0012        Load local word MP18
    0330: INC  0003        Inc field ptr (TOS+3)
    0332: LDL  0012        Load local word MP18
@@ -6853,7 +7154,7 @@ BEGIN
    0338: STO              Store indirect (TOS into TOS-1)
    0339: LLA  0003        Load local address MP3
    033b: LDM  04          Load 4 words from (TOS)
-   033d: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   033d: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    033f: UJP  $0344       Unconditional jump
 -> 0341: SLDL 02          Short load local MP2
    0342: LDCN             Load constant NIL
@@ -6861,7 +7162,7 @@ BEGIN
 -> 0344: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION DECLARAT.FUNC5(PARAM1): RETVAL (* P=5, LL=3, D=8, Callers: PROC3, PROC7 *)
+### FUNCTION DECLARATIONPART.FUNC5(PARAM1): RETVAL (* P=5, LL=3, D=8, Callers: PROC3, PROC7 *)
   BASE12
   BASE64
   PROC3:MP16
@@ -6898,7 +7199,7 @@ BEGIN
    037d: SLDL 03          Short load local MP3
    037e: LLA  0005        Load local address MP5
    0380: LLA  0004        Load local address MP4
-   0382: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0382: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0385: SLDL 05          Short load local MP5
    0386: SLDC 00          Short load constant 0
    0387: GEQI             Integer TOS-1 >= TOS
@@ -6933,13 +7234,13 @@ BEGIN
    03b2: SIND 02          Short index load *TOS+2
    03b3: SLDC 00          Short load constant 0
    03b4: SLDC 00          Short load constant 0
-   03b5: CIP  05          Call intermediate procedure 5 DECLARAT.5
+   03b5: CIP  05          Call intermediate procedure 5 DECLARATIONPART.5
    03b7: FJP  $03d3       Jump if TOS false
    03b9: SLDL 06          Short load local MP6
    03ba: SIND 02          Short index load *TOS+2
    03bb: LLA  0005        Load local address MP5
    03bd: LLA  0004        Load local address MP4
-   03bf: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   03bf: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    03c2: SLDL 04          Short load local MP4
    03c3: SLDC 01          Short load constant 1
    03c4: ADI              Add integers (TOS + TOS-1)
@@ -6953,12 +7254,16 @@ BEGIN
    03cf: SLDL 04          Short load local MP4
    03d0: STR  01 0011     Store TOS to PROC3:MP17
 -> 03d3: UJP  $03e6       Unconditional jump
+-> 03d5: XJP  0000 0004 03e6 Case jump
+           0000 -> 0373   0001 -> 0373   0002 -> 03da   0003 -> 03da
+           0004 -> 03b1
+       default -> 03e6
 -> 03e6: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC6(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5) (* P=6, LL=3, D=26, Callers: PROC3, PROC8 *)
+### PROCEDURE DECLARATIONPART.PROC6(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5) (* P=6, LL=3, D=26, Callers: PROC3, PROC8 *)
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   PROC3:MP16
   MP1=PARAM5
@@ -6985,29 +7290,30 @@ BEGIN
    076f: LLA  0002        Load local address MP2
    0771: LDM  04          Load 4 words from (TOS)
    0773: SLDC 04          Short load constant 4
-   0774: SLDC 08          Short load constant 8
+   0774: SLDC 08          Short load constant 8 [3]
    0775: SLDC 01          Short load constant 1
    0776: UNI              Set union (TOS OR TOS-1)
    0777: ADJ  04          Adjust set to 4 words
    0779: STM  04          Store 4 words at TOS to TOS-1
    077b: SLDO 0f          Short load global BASE15
-   077e: LDC  02          Load multiple-word constant
-                            0001 0020 
+   077c: LDC  02          Load multiple-word constant
+                            0001 0020 [5,16]
    0782: SLDC 02          Short load constant 2
    0783: INN              Set membership (TOS-1 in set TOS)
    0784: LNOT             Logical NOT (~TOS)
    0785: FJP  $079d       Jump if TOS false
+  PASCALCOMPILER.ERROR(19) { error in <field-list> }
    0787: SLDC 13          Short load constant 19
-   0788: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0788: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    078b: LLA  0002        Load local address MP2
    078d: LDM  04          Load 4 words from (TOS)
    078f: SLDC 04          Short load constant 4
-   0792: LDC  02          Load multiple-word constant
-                            0001 0020 
+   0790: LDC  02          Load multiple-word constant
+                            0001 0020 [5,16]
    0796: SLDC 02          Short load constant 2
    0797: UNI              Set union (TOS OR TOS-1)
    0798: ADJ  04          Adjust set to 4 words
-   079a: CXP  01 10       Call external procedure PASCALCO.PROC16
+   079a: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 079d: SLDO 0f          Short load global BASE15
    079e: SLDC 00          Short load constant 0
    079f: EQUI             Integer TOS-1 = TOS
@@ -7050,29 +7356,32 @@ BEGIN
    07db: STO              Store indirect (TOS into TOS-1)
    07dc: SLDL 0a          Short load local MP10
    07dd: STL  0008        Store TOS into MP8
+   PASCALCOMPILER.ENTERID(MP10)
    07df: SLDL 0a          Short load local MP10
-   07e0: CXP  01 07       Call external procedure PASCALCO.PROC7
-   07e3: CXP  01 08       Call external procedure PASCALCO.PROC8
+   07e0: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
+   07e3: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    07e6: UJP  $07ec       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 07e8: SLDC 02          Short load constant 2
-   07e9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   07e9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 07ec: SLDO 0f          Short load global BASE15
-   07ed: SLDC 06          Short load constant 6
+   07ed: SLDC 06          Short load constant 6 [1,2]
    07ee: SLDC 01          Short load constant 1
    07ef: INN              Set membership (TOS-1 in set TOS)
    07f0: LNOT             Logical NOT (~TOS)
    07f1: FJP  $0809       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    07f3: SLDC 06          Short load constant 6
-   07f4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   07f4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    07f7: LLA  0002        Load local address MP2
    07f9: LDM  04          Load 4 words from (TOS)
    07fb: SLDC 04          Short load constant 4
-   07fe: LDC  02          Load multiple-word constant
-                            000e 0020 
+   07fc: LDC  02          Load multiple-word constant
+                            000e 0020 [5,17..19]
    0802: SLDC 02          Short load constant 2
    0803: UNI              Set union (TOS OR TOS-1)
    0804: ADJ  04          Adjust set to 4 words
-   0806: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0806: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0809: SLDO 0f          Short load global BASE15
    080a: SLDC 01          Short load constant 1
    080b: NEQI             Integer TOS-1 <> TOS
@@ -7080,28 +7389,29 @@ BEGIN
    080e: SLDO 0b          Short load global BASE11
    080f: LNOT             Logical NOT (~TOS)
    0810: FJP  $0815       Jump if TOS false
-   0812: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0812: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0815: SLDO 0b          Short load global BASE11
    0816: FJP  $07a5       Jump if TOS false
    0818: SLDO 0f          Short load global BASE15
    0819: SLDC 02          Short load constant 2
    081a: EQUI             Integer TOS-1 = TOS
    081b: FJP  $0822       Jump if TOS false
-   081d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   081d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0820: UJP  $0826       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 0822: SLDC 05          Short load constant 5
-   0823: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0823: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0826: LLA  0002        Load local address MP2
    0828: LDM  04          Load 4 words from (TOS)
    082a: SLDC 04          Short load constant 4
-   082e: LDC  02          Load multiple-word constant
-                            0008 0020 
+   082b: LDC  02          Load multiple-word constant
+                            0008 0020 [5,19]
    0832: SLDC 02          Short load constant 2
    0833: UNI              Set union (TOS OR TOS-1)
    0834: ADJ  04          Adjust set to 4 words
    0836: LLA  000f        Load local address MP15
    0838: LLA  0010        Load local address MP16
-   083a: CIP  03          Call intermediate procedure 3 DECLARAT.PROC3
+   083a: CIP  03          Call intermediate procedure 3 DECLARATIONPART.PROC3
    083c: SLDL 0f          Short load local MP15
    083d: LDCN             Load constant NIL
    083e: NEQI             Integer TOS-1 <> TOS
@@ -7111,8 +7421,9 @@ BEGIN
    0843: SLDC 07          Short load constant 7
    0844: EQUI             Integer TOS-1 = TOS
    0845: FJP  $084b       Jump if TOS false
+  PASCALCOMPILER.ERROR(108) { File not allowed here }
    0847: SLDC 6c          Short load constant 108
-   0848: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0848: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 084b: SLDL 08          Short load local MP8
    084c: SLDL 07          Short load local MP7
    084d: NEQI             Integer TOS-1 <> TOS
@@ -7124,7 +7435,7 @@ BEGIN
    0857: SLDL 0f          Short load local MP15
    0858: STO              Store indirect (TOS into TOS-1)
    0859: SLDL 08          Short load local MP8
-   085a: CLP  07          Call local procedure DECLARAT.PROC7
+   085a: CLP  07          Call local procedure DECLARATIONPART.PROC7
    085c: SLDL 08          Short load local MP8
    085d: STL  0006        Store TOS into MP6
    085f: LDL  001a        Load local word MP26
@@ -7137,25 +7448,26 @@ BEGIN
    086a: SLDC 03          Short load constant 3
    086b: EQUI             Integer TOS-1 = TOS
    086c: FJP  $0893       Jump if TOS false
-   086e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   086e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0871: SLDO 0f          Short load global BASE15
-   0874: LDC  02          Load multiple-word constant
-                            0201 0020 
+   0872: LDC  02          Load multiple-word constant
+                            0201 0020 [5,16,25]
    0878: SLDC 02          Short load constant 2
    0879: INN              Set membership (TOS-1 in set TOS)
    087a: LNOT             Logical NOT (~TOS)
    087b: FJP  $0893       Jump if TOS false
+  PASCALCOMPILER.ERROR(19) { error in <field-list> }
    087d: SLDC 13          Short load constant 19
-   087e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   087e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0881: LLA  0002        Load local address MP2
    0883: LDM  04          Load 4 words from (TOS)
    0885: SLDC 04          Short load constant 4
-   0888: LDC  02          Load multiple-word constant
-                            0001 0020 
+   0886: LDC  02          Load multiple-word constant
+                            0001 0020 [5,16]
    088c: SLDC 02          Short load constant 2
    088d: UNI              Set union (TOS OR TOS-1)
    088e: ADJ  04          Adjust set to 4 words
-   0890: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0890: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0893: UJP  $079d       Unconditional jump
 -> 0895: LDCN             Load constant NIL
    0896: STL  0008        Store TOS into MP8
@@ -7181,7 +7493,7 @@ BEGIN
    08b4: SLDC 15          Short load constant 21
    08b5: EQUI             Integer TOS-1 = TOS
    08b6: FJP  $08bc       Jump if TOS false
-   08b8: CLP  08          Call local procedure DECLARAT.PROC8
+   08b8: CLP  08          Call local procedure DECLARATIONPART.PROC8
    08ba: UJP  $08bf       Unconditional jump
 -> 08bc: SLDL 01          Short load local MP1
    08bd: LDCN             Load constant NIL
@@ -7189,7 +7501,7 @@ BEGIN
 -> 08bf: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC7(PARAM1) (* P=7, LL=4, D=3, Callers: PROC8, PROC6 *)
+### PROCEDURE DECLARATIONPART.PROC7(PARAM1) (* P=7, LL=4, D=3, Callers: PROC8, PROC6 *)
   ????????:MP12
   ????????:MP17
   ????????:MP18
@@ -7206,7 +7518,7 @@ BEGIN
    03fb: SIND 06          Short index load *TOS+6
    03fc: SLDC 00          Short load constant 0
    03fd: SLDC 00          Short load constant 0
-   03fe: CIP  05          Call intermediate procedure 5 DECLARAT.FUNC5
+   03fe: CIP  05          Call intermediate procedure 5 DECLARATIONPART.FUNC5
    0400: FJP  $0442       Jump if TOS false
    0402: LOD  02 0011     Load word at ????????:MP17
    0405: LOD  02 0012     Load word at ????????:MP18
@@ -7314,9 +7626,9 @@ BEGIN
 -> 04a9: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC8 (* P=8, LL=4, D=2, Callers: PROC6 *)
+### PROCEDURE DECLARATIONPART.PROC8 (* P=8, LL=4, D=2, Callers: PROC6 *)
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE54
   BASE64
@@ -7361,7 +7673,7 @@ BEGIN
    04d0: LOD  01 0001     Load word at PROC6:MP1
    04d3: LOD  01 000f     Load word at PROC6:MP15
    04d6: STO              Store indirect (TOS into TOS-1)
-   04d7: CXP  01 08       Call external procedure PASCALCO.PROC8
+   04d7: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    04da: SLDO 0f          Short load global BASE15
    04db: SLDC 00          Short load constant 0
    04dc: EQUI             Integer TOS-1 = TOS
@@ -7401,7 +7713,7 @@ BEGIN
    0512: SLDC 01          Short load constant 1
    0513: ADJ  01          Adjust set to 1 words
    0515: LDA  01 0009     Load addr PROC6:MP9
-   0518: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0518: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    051b: SLDC 01          Short load constant 1
    051c: SRO  0036        Store global word BASE54
    051e: LOD  01 0009     Load word at PROC6:MP9
@@ -7413,17 +7725,19 @@ BEGIN
    0528: LOD  01 000a     Load word at PROC6:MP10
    052b: LAO  0011        Load global BASE17
    052d: MOV  0004        Move 4 words (TOS to TOS-1)
+   PASCALCOMPILER.ENTERID(PROC6:MP10)
    052f: LOD  01 000a     Load word at PROC6:MP10
-   0532: CXP  01 07       Call external procedure PASCALCO.PROC7
-   0535: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0532: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
+   0535: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0538: SLDO 0f          Short load global BASE15
    0539: SLDC 02          Short load constant 2
    053a: EQUI             Integer TOS-1 = TOS
    053b: FJP  $0542       Jump if TOS false
-   053d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   053d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0540: UJP  $0546       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 0542: SLDC 05          Short load constant 5
-   0543: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0543: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0546: SLDO 0f          Short load global BASE15
    0547: SLDC 00          Short load constant 0
    0548: EQUI             Integer TOS-1 = TOS
@@ -7432,7 +7746,7 @@ BEGIN
    054c: SLDC 01          Short load constant 1
    054d: ADJ  01          Adjust set to 1 words
    054f: LDA  01 0009     Load addr PROC6:MP9
-   0552: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0552: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    0555: LOD  01 0009     Load word at PROC6:MP9
    0558: SIND 06          Short index load *TOS+6
    0559: STR  01 000e     Store TOS to PROC6:MP14
@@ -7449,10 +7763,11 @@ BEGIN
    056d: LOD  01 000e     Load word at PROC6:MP14
    0570: SLDC 00          Short load constant 0
    0571: SLDC 00          Short load constant 0
-   0572: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0572: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0575: FJP  $057b       Jump if TOS false
+  PASCALCOMPILER.ERROR(109) { Type must not be real }
    0577: SLDC 6d          Short load constant 109
-   0578: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0578: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 057b: LOD  01 000a     Load word at PROC6:MP10
    057e: INC  0006        Inc field ptr (TOS+6)
    0580: LOD  01 000e     Load word at PROC6:MP14
@@ -7464,33 +7779,36 @@ BEGIN
    058d: SLDL 01          Short load local MP1
    058e: FJP  $0595       Jump if TOS false
    0590: LOD  01 000a     Load word at PROC6:MP10
-   0593: CIP  07          Call intermediate procedure 7 DECLARAT.PROC7
+   0593: CIP  07          Call intermediate procedure 7 DECLARATIONPART.PROC7
 -> 0595: UJP  $059b       Unconditional jump
+  PASCALCOMPILER.ERROR(110) { <tagfield> type must be scalar or subrange }
 -> 0597: SLDC 6e          Short load constant 110
-   0598: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 059b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0598: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 059b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    059e: UJP  $05b4       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 05a0: SLDC 02          Short load constant 2
-   05a1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   05a1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    05a4: LDA  01 0002     Load addr PROC6:MP2
    05a7: LDM  04          Load 4 words from (TOS)
    05a9: SLDC 04          Short load constant 4
-   05aa: LDCI 0810        Load word 2064
+   05aa: LDCI 0810        Load word 2064 [4,11]
    05ad: SLDC 01          Short load constant 1
    05ae: UNI              Set union (TOS OR TOS-1)
    05af: ADJ  04          Adjust set to 4 words
-   05b1: CXP  01 10       Call external procedure PASCALCO.PROC16
+   05b1: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 05b4: UJP  $05ca       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 05b6: SLDC 02          Short load constant 2
-   05b7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   05b7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    05ba: LDA  01 0002     Load addr PROC6:MP2
    05bd: LDM  04          Load 4 words from (TOS)
    05bf: SLDC 04          Short load constant 4
-   05c0: LDCI 0810        Load word 2064
+   05c0: LDCI 0810        Load word 2064 [4,11]
    05c3: SLDC 01          Short load constant 1
    05c4: UNI              Set union (TOS OR TOS-1)
    05c5: ADJ  04          Adjust set to 4 words
-   05c7: CXP  01 10       Call external procedure PASCALCO.PROC16
+   05c7: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 05ca: LOD  01 000f     Load word at PROC6:MP15
    05cd: LOD  02 000c     Load word at PROC3:MP12
    05d0: LOD  02 0012     Load word at PROC3:MP18
@@ -7502,10 +7820,11 @@ BEGIN
    05d8: SLDC 0b          Short load constant 11
    05d9: EQUI             Integer TOS-1 = TOS
    05da: FJP  $05e1       Jump if TOS false
-   05dc: CXP  01 08       Call external procedure PASCALCO.PROC8
+   05dc: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    05df: UJP  $05e5       Unconditional jump
+  PASCALCOMPILER.ERROR(8) { 'OF' expected }
 -> 05e1: SLDC 08          Short load constant 8
-   05e2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   05e2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 05e5: LDCN             Load constant NIL
    05e6: STR  01 000e     Store TOS to PROC6:MP14
    05e9: LOD  02 000c     Load word at PROC3:MP12
@@ -7521,13 +7840,13 @@ BEGIN
 -> 0605: LDA  01 0002     Load addr PROC6:MP2
    0608: LDM  04          Load 4 words from (TOS)
    060a: SLDC 04          Short load constant 4
-   060b: SLDC 16          Short load constant 22
+   060b: SLDC 16          Short load constant 22 [1,2,4]
    060c: SLDC 01          Short load constant 1
    060d: UNI              Set union (TOS OR TOS-1)
    060e: ADJ  04          Adjust set to 4 words
    0610: LDA  01 000c     Load addr PROC6:MP12
    0613: LDA  01 0013     Load addr PROC6:MP19
-   0616: CXP  01 14       Call external procedure PASCALCO.PROC20
+   0616: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    0619: LOD  01 000f     Load word at PROC6:MP15
    061c: SIND 02          Short index load *TOS+2
    061d: LDCN             Load constant NIL
@@ -7539,11 +7858,12 @@ BEGIN
    0626: LOD  01 000c     Load word at PROC6:MP12
    0629: SLDC 00          Short load constant 0
    062a: SLDC 00          Short load constant 0
-   062b: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   062b: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    062e: LNOT             Logical NOT (~TOS)
    062f: FJP  $0635       Jump if TOS false
+  PASCALCOMPILER.ERROR(111) { Incompatible with <tagfield> part }
    0631: SLDC 6f          Short load constant 111
-   0632: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0632: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0635: LDA  01 000c     Load addr PROC6:MP12
    0638: SLDC 05          Short load constant 5
    0639: CSP  01          Call standard procedure NEW
@@ -7576,25 +7896,27 @@ BEGIN
    066c: SLDO 0b          Short load global BASE11
    066d: LNOT             Logical NOT (~TOS)
    066e: FJP  $0673       Jump if TOS false
-   0670: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0670: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0673: SLDO 0b          Short load global BASE11
    0674: FJP  $0605       Jump if TOS false
    0676: SLDO 0f          Short load global BASE15
    0677: SLDC 02          Short load constant 2
    0678: EQUI             Integer TOS-1 = TOS
    0679: FJP  $0680       Jump if TOS false
-   067b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   067b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    067e: UJP  $0684       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 0680: SLDC 05          Short load constant 5
-   0681: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0681: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0684: SLDO 0f          Short load global BASE15
    0685: SLDC 04          Short load constant 4
    0686: EQUI             Integer TOS-1 = TOS
    0687: FJP  $068e       Jump if TOS false
-   0689: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0689: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    068c: UJP  $0692       Unconditional jump
+  PASCALCOMPILER.ERROR(9) { '(' expected }
 -> 068e: SLDC 09          Short load constant 9
-   068f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   068f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0692: SLDO 0f          Short load global BASE15
    0693: SLDC 05          Short load constant 5
    0694: EQUI             Integer TOS-1 = TOS
@@ -7605,12 +7927,12 @@ BEGIN
 -> 069d: LDA  01 0002     Load addr PROC6:MP2
    06a0: LDM  04          Load 4 words from (TOS)
    06a2: SLDC 04          Short load constant 4
-   06a3: SLDC 28          Short load constant 40
+   06a3: SLDC 28          Short load constant 40 [3,5]
    06a4: SLDC 01          Short load constant 1
    06a5: UNI              Set union (TOS OR TOS-1)
    06a6: ADJ  04          Adjust set to 4 words
    06a8: LDA  01 000d     Load addr PROC6:MP13
-   06ab: CIP  06          Call intermediate procedure 6 DECLARAT.PROC6
+   06ab: CIP  06          Call intermediate procedure 6 DECLARATIONPART.PROC6
 -> 06ad: LOD  02 000c     Load word at PROC3:MP12
    06b0: LOD  01 0011     Load word at PROC6:MP17
    06b3: GRTI             Integer TOS-1 > TOS
@@ -7655,13 +7977,14 @@ BEGIN
    0708: SLDC 05          Short load constant 5
    0709: EQUI             Integer TOS-1 = TOS
    070a: FJP  $0718       Jump if TOS false
-   070c: CXP  01 08       Call external procedure PASCALCO.PROC8
+   070c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    070f: LDA  01 0014     Load addr PROC6:MP20
    0712: LDM  04          Load 4 words from (TOS)
-   0714: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   0714: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    0716: UJP  $071c       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 0718: SLDC 04          Short load constant 4
-   0719: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0719: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 071c: SLDO 0f          Short load global BASE15
    071d: SLDC 03          Short load constant 3
    071e: NEQI             Integer TOS-1 <> TOS
@@ -7669,7 +7992,7 @@ BEGIN
    0721: SLDO 0b          Short load global BASE11
    0722: LNOT             Logical NOT (~TOS)
    0723: FJP  $0734       Jump if TOS false
-   0725: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0725: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0728: LOD  01 0012     Load word at PROC6:MP18
    072b: STR  02 000c     Store TOS to PROC3:MP12
    072e: LOD  01 0018     Load word at PROC6:MP24
@@ -7691,8 +8014,8 @@ BEGIN
 -> 0750: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC9 (* P=9, LL=3, D=1, Callers: PROC3 *)
-  BASE15
+### PROCEDURE DECLARATIONPART.PROC9 (* P=9, LL=3, D=1, Callers: PROC3 *)
+  BASE15=SY:SYMBOL
   BASE17
   BASE28
   BASE54
@@ -7721,7 +8044,7 @@ BEGIN
    08f1: INC  0001        Inc field ptr (TOS+1)
    08f3: SLDC 02          Short load constant 2
    08f4: STO              Store indirect (TOS into TOS-1)
-   08f5: CXP  01 08       Call external procedure PASCALCO.PROC8
+   08f5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    08f8: SLDO 0f          Short load global BASE15
    08f9: SLDC 00          Short load constant 0
    08fa: EQUI             Integer TOS-1 = TOS
@@ -7732,7 +8055,7 @@ BEGIN
    0901: SLDC 01          Short load constant 1
    0902: ADJ  01          Adjust set to 1 words
    0904: LDA  01 000b     Load addr PROC3:MP11
-   0907: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0907: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    090a: SLDC 01          Short load constant 1
    090b: SRO  0036        Store global word BASE54
    090d: LOD  01 000b     Load word at PROC3:MP11
@@ -7781,18 +8104,20 @@ BEGIN
    0959: SIND 06          Short index load *TOS+6
    095a: STO              Store indirect (TOS into TOS-1)
    095b: UJP  $0961       Unconditional jump
+  PASCALCOMPILER.ERROR(108) { File not allowed here }
 -> 095d: SLDC 6c          Short load constant 108
-   095e: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0961: CXP  01 08       Call external procedure PASCALCO.PROC8
+   095e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0961: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0964: UJP  $096a       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0966: SLDC 02          Short load constant 2
-   0967: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0967: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 096a: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC10 (* P=10, LL=2, D=257, Callers: DECLARAT *)
+### PROCEDURE DECLARATIONPART.PROC10 (* P=10, LL=2, D=257, Callers: DECLARATIONPART *)
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE29
   BASE32
@@ -7807,15 +8132,17 @@ BEGIN
    113c: SLDC 01          Short load constant 1
    113d: GRTI             Integer TOS-1 > TOS
    113e: FJP  $1146       Jump if TOS false
+  PASCALCOMPILER.ERROR(189) { 'Uses' not allowed at this nesting level }
    1140: LDCI 00bd        Load word 189
-   1143: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1143: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1146: LDO  0021        Load global word BASE33
    1148: LDO  0020        Load global word BASE32
    114a: LNOT             Logical NOT (~TOS)
    114b: LAND             Logical AND (TOS & TOS-1)
    114c: FJP  $1154       Jump if TOS false
+  PASCALCOMPILER.ERROR(192) { 'Uses' must be in interface section }
    114e: LDCI 00c0        Load word 192
-   1151: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1151: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1154: LDO  0025        Load global word BASE37
    1156: LNOT             Logical NOT (~TOS)
    1157: FJP  $115c       Jump if TOS false
@@ -7825,8 +8152,9 @@ BEGIN
    115d: SLDC 00          Short load constant 0
    115e: NEQI             Integer TOS-1 <> TOS
    115f: FJP  $1167       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    1161: SLDC 02          Short load constant 2
-   1162: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1162: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1165: UJP  $1192       Unconditional jump
 -> 1167: LDO  0025        Load global word BASE37
    1169: FJP  $118e       Jump if TOS false
@@ -7846,12 +8174,13 @@ BEGIN
    1181: SIND 07          Short index load *TOS+7
    1182: STL  0001        Store TOS into MP1
 -> 1184: UJP  $116f       Unconditional jump
+  PASCALCOMPILER.ERROR(188) { Unit not declared in previous uses declaration }
 -> 1186: LDCI 00bc        Load word 188
-   1189: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1189: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 118c: UJP  $1192       Unconditional jump
 -> 118e: LAO  0011        Load global BASE17
-   1190: CLP  0b          Call local procedure DECLARAT.PROC11
--> 1192: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1190: CLP  0b          Call local procedure DECLARATIONPART.PROC11
+-> 1192: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1195: SLDO 0f          Short load global BASE15
    1196: SLDC 01          Short load constant 1
    1197: NEQI             Integer TOS-1 <> TOS
@@ -7862,21 +8191,23 @@ BEGIN
    119e: SLDC 03          Short load constant 3
    119f: NEQI             Integer TOS-1 <> TOS
    11a0: FJP  $11a8       Jump if TOS false
+  PASCALCOMPILER.ERROR(20) { ',' expected }
    11a2: SLDC 14          Short load constant 20
-   11a3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   11a3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    11a6: UJP  $11a8       Unconditional jump
 -> 11a8: UJP  $11ad       Unconditional jump
--> 11aa: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 11aa: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 11ad: SLDO 0b          Short load global BASE11
    11ae: FJP  $115c       Jump if TOS false
    11b0: SLDO 0f          Short load global BASE15
    11b1: SLDC 03          Short load constant 3
    11b2: EQUI             Integer TOS-1 = TOS
    11b3: FJP  $11ba       Jump if TOS false
-   11b5: CXP  01 08       Call external procedure PASCALCO.PROC8
+   11b5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    11b8: UJP  $11be       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 11ba: SLDC 0e          Short load constant 14
-   11bb: CXP  01 04       Call external procedure PASCALCO.ERROR
+   11bb: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 11be: LDO  0025        Load global word BASE37
    11c0: LNOT             Logical NOT (~TOS)
    11c1: FJP  $11cd       Jump if TOS false
@@ -7889,29 +8220,29 @@ BEGIN
 -> 11cd: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC11(PARAM1) (* P=11, LL=3, D=23, Callers: PROC10 *)
+### PROCEDURE DECLARATIONPART.PROC11(PARAM1) (* P=11, LL=3, D=23, Callers: PROC10 *)
   BASE10
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE17
   BASE41
   BASE45
   BASE50=NOISY:BOOLEAN
   BASE66
   BASE87
-  BASE93=SYMBLK
-  BASE94=STARTDOTS
-  BASE95=SCREENDOTS
+  BASE93=SYMBLK:INTEGER
+  BASE94=STARTDOTS:INTEGER
+  BASE95=SCREENDOTS:INTEGER
   BASE99=NEXTPROC
   BASE186
-  DECLARAT:MP1
+  DECLARATIONPART:MP1
   MP1=PARAM1
   MP2
   MP6
   MP7
   MP9
   MP10
-  MP11
+  MP11=:CTP
   MP14
   MP16
   MP17
@@ -7966,7 +8297,7 @@ BEGIN
    0fe0: SLDO 0a          Short load global BASE10
    0fe1: STL  0011        Store TOS into MP17
    0fe3: LLA  000a        Load local address MP10
-   0fe5: CLP  0c          Call local procedure DECLARAT.PROC12
+   0fe5: CLP  0c          Call local procedure DECLARATIONPART.PROC12
    0fe7: SLDL 0a          Short load local MP10
    0fe8: FJP  $1110       Jump if TOS false
    0fea: LDO  0029        Load global word BASE41
@@ -8004,7 +8335,7 @@ BEGIN
    101e: LDL  0017        Load local word MP23
    1020: INC  000a        Inc field ptr (TOS+10)
    1022: SLDL 07          Short load local MP7
-   1023: SLDC 68          Short load constant 104
+   1023: SLDC 68          Short load constant 104 [3,5,6]
    1024: SLDC 01          Short load constant 1
    1025: INN              Set membership (TOS-1 in set TOS)
    1026: STO              Store indirect (TOS into TOS-1)
@@ -8041,14 +8372,14 @@ BEGIN
    1058: SRO  000a        Store global word BASE10
 -> 105a: LDO  005f        Load global word BASE95 (SCREENDOTS)
    105c: SRO  005e        Store global word BASE94 (STARTDOTS)
-   105e: LDA  02 0001     Load addr DECLARAT:MP1
+   105e: LDA  02 0001     Load addr DECLARATIONPART:MP1
    1061: LDM  04          Load 4 words from (TOS)
    1063: SLDC 04          Short load constant 4
    1064: LDCI 0200        Load word 512
    1067: SLDC 01          Short load constant 1
    1068: UNI              Set union (TOS OR TOS-1)
    1069: ADJ  04          Adjust set to 4 words
-   106b: CGP  01          Call global procedure DECLARAT.DECLARAT
+   106b: CGP  01          Call global procedure DECLARATIONPART.DECLARATIONPART
    106d: LDO  0029        Load global word BASE41
    106f: FJP  $1092       Jump if TOS false
    1071: SLDL 09          Short load local MP9
@@ -8057,8 +8388,9 @@ BEGIN
    1075: SLDC 01          Short load constant 1
    1076: GRTI             Integer TOS-1 > TOS
    1077: FJP  $107f       Jump if TOS false
+    PASCALCOMPILER.ERROR(350) { No data segment allocated }
    1079: LDCI 015e        Load word 350
-   107c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   107c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 107f: UJP  $1092       Unconditional jump
 -> 1081: LAO  00ba        Load global BASE186
    1084: LAO  00ba        Load global BASE186
@@ -8083,9 +8415,10 @@ BEGIN
    10a6: UNI              Set union (TOS OR TOS-1)
    10a7: ADJ  04          Adjust set to 4 words
    10a9: STM  04          Store 4 words at TOS to TOS-1
+   PASCALCOMPILER.ENTERID(MP11)
 -> 10ab: SLDL 0b          Short load local MP11
-   10ac: CXP  01 07       Call external procedure PASCALCO.PROC7
--> 10af: CXP  01 08       Call external procedure PASCALCO.PROC8
+   10ac: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
+-> 10af: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    10b2: SLDO 0f          Short load global BASE15
    10b3: SLDC 00          Short load constant 0
    10b4: EQUI             Integer TOS-1 = TOS
@@ -8100,13 +8433,13 @@ BEGIN
    10cc: LAO  00ba        Load global BASE186
    10cf: LDM  04          Load 4 words from (TOS)
    10d1: SLDC 04          Short load constant 4
-   10d4: LDC  02          Load multiple-word constant
+   10d2: LDC  02          Load multiple-word constant
                             0000 8000 
    10d8: SLDC 02          Short load constant 2
    10d9: UNI              Set union (TOS OR TOS-1)
    10da: ADJ  04          Adjust set to 4 words
    10dc: STM  04          Store 4 words at TOS to TOS-1
-   10de: CXP  01 08       Call external procedure PASCALCO.PROC8
+   10de: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 10e1: LAO  0011        Load global BASE17
    10e3: NOP              No operation
    10e4: LPA  08          Load packed array
@@ -8117,7 +8450,7 @@ BEGIN
    10f6: LAO  00ba        Load global BASE186
    10f9: LDM  04          Load 4 words from (TOS)
    10fb: SLDC 04          Short load constant 4
-   10fe: LDC  02          Load multiple-word constant
+   10fc: LDC  02          Load multiple-word constant
                             0000 4000 
    1102: SLDC 02          Short load constant 2
    1103: UNI              Set union (TOS OR TOS-1)
@@ -8125,7 +8458,7 @@ BEGIN
    1106: STM  04          Store 4 words at TOS to TOS-1
 -> 1108: LDCI 270f        Load word 9999
    110b: SRO  005d        Store global word BASE93 (SYMBLK)
-   110d: CXP  01 05       Call external procedure PASCALCO.PROC5
+   110d: CXP  01 05       Call external procedure PASCALCOMPILER.PROC5
 -> 1110: LDO  0029        Load global word BASE41
    1112: FJP  $1118       Jump if TOS false
    1114: LDL  0011        Load local word MP17
@@ -8146,9 +8479,9 @@ BEGIN
 -> 112c: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC12(PARAM1) (* P=12, LL=4, D=4, Callers: PROC11 *)
-  BASE13=SEG
-  BASE14
+### PROCEDURE DECLARATIONPART.PROC12(PARAM1) (* P=12, LL=4, D=4, Callers: PROC11 *)
+  BASE13=SEG:SEGRANGE
+  BASE14=SYMCURSOR:CURSRANGE
   BASE21
   BASE29
   BASE33
@@ -8158,16 +8491,16 @@ END
   BASE71=MODPTR
   BASE87
   BASE88
-  BASE93=SYMBLK
-  BASE98=LINESTART
+  BASE93=SYMBLK:INTEGER
+  BASE98=LINESTART:CURSRANGE
   BASE99=NEXTPROC
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   BASE709
   BASE711
   BASE712
   BASE715
-  BASE716
+  BASE716=:FIB
   PROC10:MP2
   PROC10:MP34
   PROC10:MP114
@@ -8322,17 +8655,19 @@ BEGIN
    0eab: FJP  $0ec0       Jump if TOS false
    0ead: SLDC 00          Short load constant 0
    0eae: SLDC 00          Short load constant 0
-   0eaf: CLP  0d          Call local procedure DECLARAT.FUNC13
+   0eaf: CLP  0d          Call local procedure DECLARATIONPART.FUNC13
    0eb1: FJP  $0eb5       Jump if TOS false
    0eb3: UJP  $0ebe       Unconditional jump
+  PASCALCOMPILER.ERROR(190) { Unit not in library }
 -> 0eb5: LDCI 00be        Load word 190
-   0eb8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0eb8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0ebb: SLDL 01          Short load local MP1
    0ebc: SLDC 00          Short load constant 0
    0ebd: STO              Store indirect (TOS into TOS-1)
 -> 0ebe: UJP  $0ec6       Unconditional jump
+  PASCALCOMPILER.ERROR(187) { Attempt to open library unsuccessful }
 -> 0ec0: LDCI 00bb        Load word 187
-   0ec3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ec3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0ec6: SLDL 01          Short load local MP1
    0ec7: SIND 00          Short index load *TOS+0
    0ec8: FJP  $0f36       Jump if TOS false
@@ -8356,11 +8691,11 @@ BEGIN
 -> 0ee9: LDO  002a        Load global word BASE42
    0eeb: FJP  $0ef3       Jump if TOS false
    0eed: LDCI 0161        Load word 353
-   0ef0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ef0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0ef3: LDO  0058        Load global word BASE88
    0ef5: SRO  000d        Store global word BASE13 (SEG)
    0ef7: SLDC 01          Short load constant 1
-   0ef8: CXP  01 0d       Call external procedure PASCALCO.PROC13
+   0ef8: CXP  01 0d       Call external procedure PASCALCOMPILER.PROC13
    0efb: LAO  01bd        Load global BASE445 (SEGTABLE)
    0efe: LDO  0015        Load global word BASE21
    0f00: IXA  0009        Index array (TOS-1 + TOS * 9)
@@ -8403,8 +8738,9 @@ BEGIN
    0f39: SLDC 00          Short load constant 0
    0f3a: EQUI             Integer TOS-1 = TOS
    0f3b: FJP  $0f46       Jump if TOS false
+  PASCALCOMPILER.ERROR(195) { Unit not importable }
    0f3d: LDCI 00c3        Load word 195
-   0f40: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0f40: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0f43: SLDL 01          Short load local MP1
    0f44: SLDC 00          Short load constant 0
    0f45: STO              Store indirect (TOS into TOS-1)
@@ -8413,7 +8749,7 @@ BEGIN
    0f48: FJP  $0f68       Jump if TOS false
    0f4a: SLDC 01          Short load constant 1
    0f4b: SRO  0025        Store global word BASE37
-   0f4d: SLDO 0e          Short load global BASE14
+   0f4d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0f4e: SRO  02c8        Store global word BASE712
    0f51: LDO  0062        Load global word BASE98 (LINESTART)
    0f53: SRO  02c7        Store global word BASE711
@@ -8423,12 +8759,12 @@ BEGIN
    0f5a: SRO  02c5        Store global word BASE709
    0f5d: LOD  01 0008     Load word at PROC11:MP8
    0f60: SRO  005d        Store global word BASE93 (SYMBLK)
-   0f62: CXP  01 05       Call external procedure PASCALCO.PROC5
-   0f65: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f62: CXP  01 05       Call external procedure PASCALCOMPILER.PROC5
+   0f65: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0f68: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION DECLARAT.FUNC13: RETVAL (* P=13, LL=5, D=6, Callers: PROC12 *)
+### FUNCTION DECLARATIONPART.FUNC13: RETVAL (* P=13, LL=5, D=6, Callers: PROC12 *)
   BASE41
   BASE87
   ????????:MP130
@@ -8449,7 +8785,7 @@ BEGIN
    0d63: LLA  0004        Load local address MP4
    0d65: SLDC 00          Short load constant 0
    0d66: SLDC 00          Short load constant 0
-   0d67: CLP  0e          Call local procedure DECLARAT.FUNC14
+   0d67: CLP  0e          Call local procedure DECLARATIONPART.FUNC14
    0d69: STR  02 0007     Store TOS to PROC11:MP7
    0d6c: SLDL 04          Short load local MP4
    0d6d: STL  0001        Store TOS into MP1
@@ -8467,7 +8803,7 @@ BEGIN
    0d82: LLA  0004        Load local address MP4
    0d84: SLDC 00          Short load constant 0
    0d85: SLDC 00          Short load constant 0
-   0d86: CLP  0e          Call local procedure DECLARAT.FUNC14
+   0d86: CLP  0e          Call local procedure DECLARATIONPART.FUNC14
    0d88: SLDC 07          Short load constant 7
    0d89: EQUI             Integer TOS-1 = TOS
    0d8a: FJP  $0da2       Jump if TOS false
@@ -8495,14 +8831,14 @@ BEGIN
 -> 0db1: RNP  01          Return from nonbase procedure
 END
 
-### FUNCTION DECLARAT.FUNC14(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6): RETVAL (* P=14, LL=6, D=11, Callers: FUNC13 *)
+### FUNCTION DECLARATIONPART.FUNC14(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6): RETVAL (* P=14, LL=6, D=11, Callers: FUNC13 *)
   ????????:MP34
   ????????:MP98
   ????????:MP2
   MP1=RETVAL1
-  MP2=RETVAL2
   MP3=PARAM6
   MP4=PARAM5
+  MP2=RETVAL2
   MP5=PARAM4
   MP6=PARAM3
   MP8=PARAM1
@@ -8573,13 +8909,13 @@ BEGIN
 -> 0d4e: RNP  01          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC15 (* P=15, LL=2, D=4, Callers: DECLARAT *)
-  BASE8
+### PROCEDURE DECLARATIONPART.PROC15 (* P=15, LL=2, D=4, Callers: DECLARATIONPART *)
+  BASE8=TOP:DISPRANGE
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE23
-  BASE134
-  DECLARAT:MP12
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  DECLARATIONPART:MP12
   MP1
   MP2
   MP3
@@ -8616,8 +8952,9 @@ BEGIN
    1205: UJP  $1210       Unconditional jump
 -> 1207: SLDC 01          Short load constant 1
    1208: STL  0002        Store TOS into MP2
+  PASCALCOMPILER.ERROR(166) { Multideclared label }
    120a: LDCI 00a6        Load word 166
-   120d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   120d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1210: UJP  $11f2       Unconditional jump
 -> 1212: SLDL 02          Short load local MP2
    1213: LNOT             Logical NOT (~TOS)
@@ -8643,13 +8980,14 @@ BEGIN
    122e: INC  0003        Inc field ptr (TOS+3)
    1230: SLDL 01          Short load local MP1
    1231: STO              Store indirect (TOS into TOS-1)
--> 1232: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 1232: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1235: UJP  $123b       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 1237: SLDC 0f          Short load constant 15
-   1238: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 123b: LDA  01 000c     Load addr DECLARAT:MP12
+   1238: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 123b: LDA  01 000c     Load addr DECLARATIONPART:MP12
    123e: LDM  04          Load 4 words from (TOS)
-   1240: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   1240: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    1242: SLDO 0f          Short load global BASE15
    1243: SLDC 01          Short load constant 1
    1244: NEQI             Integer TOS-1 <> TOS
@@ -8657,28 +8995,29 @@ BEGIN
    1247: SLDO 0b          Short load global BASE11
    1248: LNOT             Logical NOT (~TOS)
    1249: FJP  $124e       Jump if TOS false
-   124b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   124b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 124e: SLDO 0b          Short load global BASE11
    124f: FJP  $11de       Jump if TOS false
    1251: SLDO 0f          Short load global BASE15
    1252: SLDC 03          Short load constant 3
    1253: EQUI             Integer TOS-1 = TOS
    1254: FJP  $125b       Jump if TOS false
-   1256: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1256: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1259: UJP  $125f       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 125b: SLDC 0e          Short load constant 14
-   125c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   125c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 125f: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC16 (* P=16, LL=2, D=4, Callers: DECLARAT *)
-  BASE15
+### PROCEDURE DECLARATIONPART.PROC16 (* P=16, LL=2, D=4, Callers: DECLARATIONPART *)
+  BASE15=SY:SYMBOL
   BASE16
   BASE17
   BASE33
-  DECLARAT:MP1
-  DECLARAT:MP8
-  MP1
+  DECLARATIONPART:MP1
+  DECLARATIONPART:MP8
+  MP1=:CTP
   MP2
   MP3
   MP4
@@ -8687,16 +9026,17 @@ BEGIN
    1271: SLDC 00          Short load constant 0
    1272: NEQI             Integer TOS-1 <> TOS
    1273: FJP  $1287       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    1275: SLDC 02          Short load constant 2
-   1276: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1279: LDA  01 0001     Load addr DECLARAT:MP1
+   1276: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1279: LDA  01 0001     Load addr DECLARATIONPART:MP1
    127c: LDM  04          Load 4 words from (TOS)
    127e: SLDC 04          Short load constant 4
    127f: SLDC 01          Short load constant 1
    1280: SLDC 01          Short load constant 1
    1281: UNI              Set union (TOS OR TOS-1)
    1282: ADJ  04          Adjust set to 4 words
-   1284: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1284: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1287: SLDO 0f          Short load global BASE15
    1288: SLDC 00          Short load constant 0
    1289: EQUI             Integer TOS-1 = TOS
@@ -8721,7 +9061,7 @@ BEGIN
    12a4: INC  0008        Inc field ptr (TOS+8)
    12a6: SLDC 01          Short load constant 1
    12a7: STO              Store indirect (TOS into TOS-1)
-   12a8: CXP  01 08       Call external procedure PASCALCO.PROC8
+   12a8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    12ab: SLDO 0f          Short load global BASE15
    12ac: SLDC 29          Short load constant 41
    12ad: EQUI             Integer TOS-1 = TOS
@@ -8730,11 +9070,12 @@ BEGIN
    12b0: EQUI             Integer TOS-1 = TOS
    12b1: LAND             Logical AND (TOS & TOS-1)
    12b2: FJP  $12b9       Jump if TOS false
-   12b4: CXP  01 08       Call external procedure PASCALCO.PROC8
+   12b4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    12b7: UJP  $12bd       Unconditional jump
+  PASCALCOMPILER.ERROR(16) { '=' expected }
 -> 12b9: SLDC 10          Short load constant 16
-   12ba: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 12bd: LDA  01 0001     Load addr DECLARAT:MP1
+   12ba: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 12bd: LDA  01 0001     Load addr DECLARATIONPART:MP1
    12c0: LDM  04          Load 4 words from (TOS)
    12c2: SLDC 04          Short load constant 4
    12c3: SLDC 08          Short load constant 8
@@ -8743,10 +9084,10 @@ BEGIN
    12c6: ADJ  04          Adjust set to 4 words
    12c8: LLA  0002        Load local address MP2
    12ca: LLA  0003        Load local address MP3
-   12cc: CXP  01 14       Call external procedure PASCALCO.PROC20
+   12cc: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
+   PASCALCOMPILER.ENTERID(MP1)
    12cf: SLDL 01          Short load local MP1
-   here
-12d0: CXP  01 07       Call external procedure PASCALCO.PROC7
+   12d1: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    12d3: SLDL 01          Short load local MP1
    12d4: INC  0006        Inc field ptr (TOS+6)
    12d6: SLDL 02          Short load local MP2
@@ -8759,10 +9100,10 @@ BEGIN
    12e0: SLDC 03          Short load constant 3
    12e1: EQUI             Integer TOS-1 = TOS
    12e2: FJP  $12f0       Jump if TOS false
-   12e4: CXP  01 08       Call external procedure PASCALCO.PROC8
-   12e7: LDA  01 0008     Load addr DECLARAT:MP8
+   12e4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   12e7: LDA  01 0008     Load addr DECLARATIONPART:MP8
    12ea: LDM  04          Load 4 words from (TOS)
-   12ec: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   12ec: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    12ee: UJP  $12fd       Unconditional jump
 -> 12f0: SLDO 0f          Short load global BASE15
    12f1: SLDC 09          Short load constant 9
@@ -8771,23 +9112,24 @@ BEGIN
    12f5: LAND             Logical AND (TOS & TOS-1)
    12f6: LNOT             Logical NOT (~TOS)
    12f7: FJP  $12fd       Jump if TOS false
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
    12f9: SLDC 0e          Short load constant 14
-   12fa: CXP  01 04       Call external procedure PASCALCO.ERROR
+   12fa: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 12fd: UJP  $1287       Unconditional jump
 -> 12ff: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC17 (* P=17, LL=2, D=6, Callers: DECLARAT *)
-  BASE15
+### PROCEDURE DECLARATIONPART.PROC17 (* P=17, LL=2, D=6, Callers: DECLARATIONPART *)
+  BASE15=SY:SYMBOL
   BASE16
   BASE17
   BASE33
   BASE67:FWPTR
-  DECLARAT:MP1
-  DECLARAT:MP8
+  DECLARATIONPART:MP1
+  DECLARATIONPART:MP8
   MP1
   MP2
-  MP3
+  MP3=:CTP
   MP4
   MP5
   MP6
@@ -8796,16 +9138,17 @@ BEGIN
    130f: SLDC 00          Short load constant 0
    1310: NEQI             Integer TOS-1 <> TOS
    1311: FJP  $1325       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    1313: SLDC 02          Short load constant 2
-   1314: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1317: LDA  01 0001     Load addr DECLARAT:MP1
+   1314: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1317: LDA  01 0001     Load addr DECLARATIONPART:MP1
    131a: LDM  04          Load 4 words from (TOS)
    131c: SLDC 04          Short load constant 4
    131d: SLDC 01          Short load constant 1
    131e: SLDC 01          Short load constant 1
    131f: UNI              Set union (TOS OR TOS-1)
    1320: ADJ  04          Adjust set to 4 words
-   1322: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1322: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1325: SLDO 0f          Short load global BASE15
    1326: SLDC 00          Short load constant 0
    1327: EQUI             Integer TOS-1 = TOS
@@ -8826,7 +9169,7 @@ BEGIN
    133d: INC  0008        Inc field ptr (TOS+8)
    133f: SLDC 00          Short load constant 0
    1340: STO              Store indirect (TOS into TOS-1)
-   1341: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1341: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1344: SLDO 0f          Short load global BASE15
    1345: SLDC 29          Short load constant 41
    1346: EQUI             Integer TOS-1 = TOS
@@ -8835,11 +9178,12 @@ BEGIN
    1349: EQUI             Integer TOS-1 = TOS
    134a: LAND             Logical AND (TOS & TOS-1)
    134b: FJP  $1352       Jump if TOS false
-   134d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   134d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1350: UJP  $1356       Unconditional jump
+  PASCALCOMPILER.ERROR(16) { '=' expected }
 -> 1352: SLDC 10          Short load constant 16
-   1353: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 1356: LDA  01 0001     Load addr DECLARAT:MP1
+   1353: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 1356: LDA  01 0001     Load addr DECLARATIONPART:MP1
    1359: LDM  04          Load 4 words from (TOS)
    135b: SLDC 04          Short load constant 4
    135c: SLDC 08          Short load constant 8
@@ -8848,9 +9192,10 @@ BEGIN
    135f: ADJ  04          Adjust set to 4 words
    1361: LLA  0004        Load local address MP4
    1363: LLA  0005        Load local address MP5
-   1365: CIP  03          Call intermediate procedure 3 DECLARAT.PROC3
+   1365: CIP  03          Call intermediate procedure 3 DECLARATIONPART.PROC3
+   PASCALCOMPILER.ENTERID(MP3)
    1367: SLDL 03          Short load local MP3
-   1368: CXP  01 07       Call external procedure PASCALCO.PROC7
+   1368: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    136b: SLDL 03          Short load local MP3
    136c: INC  0006        Inc field ptr (TOS+6)
    136e: SLDL 04          Short load local MP4
@@ -8894,10 +9239,10 @@ BEGIN
    13a3: SLDC 03          Short load constant 3
    13a4: EQUI             Integer TOS-1 = TOS
    13a5: FJP  $13b3       Jump if TOS false
-   13a7: CXP  01 08       Call external procedure PASCALCO.PROC8
-   13aa: LDA  01 0008     Load addr DECLARAT:MP8
+   13a7: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   13aa: LDA  01 0008     Load addr DECLARATIONPART:MP8
    13ad: LDM  04          Load 4 words from (TOS)
-   13af: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   13af: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    13b1: UJP  $13c0       Unconditional jump
 -> 13b3: SLDO 0f          Short load global BASE15
    13b4: SLDC 09          Short load constant 9
@@ -8906,25 +9251,27 @@ BEGIN
    13b8: LAND             Logical AND (TOS & TOS-1)
    13b9: LNOT             Logical NOT (~TOS)
    13ba: FJP  $13c0       Jump if TOS false
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
    13bc: SLDC 0e          Short load constant 14
-   13bd: CXP  01 04       Call external procedure PASCALCO.ERROR
+   13bd: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 13c0: UJP  $1325       Unconditional jump
 -> 13c2: LDO  0043        Load global word BASE67 (FWPTR)
    13c4: LDCN             Load constant NIL
    13c5: NEQI             Integer TOS-1 <> TOS
    13c6: FJP  $13cf       Jump if TOS false
+  PASCALCOMPILER.ERROR(117) { Unsatisified forward reference }
    13c8: SLDC 75          Short load constant 117
-   13c9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   13c9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    13cc: LDCN             Load constant NIL
    13cd: SRO  0043        Store global word BASE67 (FWPTR)
 -> 13cf: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC18 (* P=18, LL=2, D=6, Callers: DECLARAT *)
-  BASE8
+### PROCEDURE DECLARATIONPART.PROC18 (* P=18, LL=2, D=6, Callers: DECLARATIONPART *)
+  BASE8=TOP:DISPRANGE
   BASE10
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE32
   BASE33
@@ -8934,12 +9281,12 @@ END
   BASE80
   BASE87
   BASE101=TYPEDELS
-  BASE134
-  DECLARAT:MP1
-  DECLARAT:MP8
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  DECLARATIONPART:MP1
+  DECLARATIONPART:MP8
   MP1
   MP2
-  MP3
+  MP3=:CTP
   MP4
   MP5
   MP6
@@ -9012,16 +9359,18 @@ BEGIN
    1445: INC  000b        Inc field ptr (TOS+11)
    1447: SLDC 00          Short load constant 0
    1448: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP3)
 -> 1449: SLDL 03          Short load local MP3
-   144a: CXP  01 07       Call external procedure PASCALCO.PROC7
+   144a: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    144d: SLDL 03          Short load local MP3
    144e: STL  0002        Store TOS into MP2
-   1450: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1450: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1453: UJP  $1459       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 1455: SLDC 02          Short load constant 2
-   1456: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1456: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1459: SLDO 0f          Short load global BASE15
-   145a: LDA  01 0001     Load addr DECLARAT:MP1
+   145a: LDA  01 0001     Load addr DECLARATIONPART:MP1
    145d: LDM  04          Load 4 words from (TOS)
    145f: SLDC 04          Short load constant 4
    1460: SLDC 06          Short load constant 6
@@ -9034,9 +9383,10 @@ BEGIN
    1469: INN              Set membership (TOS-1 in set TOS)
    146a: LNOT             Logical NOT (~TOS)
    146b: FJP  $1485       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    146d: SLDC 06          Short load constant 6
-   146e: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1471: LDA  01 0001     Load addr DECLARAT:MP1
+   146e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1471: LDA  01 0001     Load addr DECLARATIONPART:MP1
    1474: LDM  04          Load 4 words from (TOS)
    1476: SLDC 04          Short load constant 4
    1477: SLDC 0e          Short load constant 14
@@ -9047,7 +9397,7 @@ BEGIN
    147e: SLDC 04          Short load constant 4
    147f: UNI              Set union (TOS OR TOS-1)
    1480: ADJ  04          Adjust set to 4 words
-   1482: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1482: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1485: SLDO 0f          Short load global BASE15
    1486: SLDC 01          Short load constant 1
    1487: NEQI             Integer TOS-1 <> TOS
@@ -9055,20 +9405,21 @@ BEGIN
    148a: SLDO 0b          Short load global BASE11
    148b: LNOT             Logical NOT (~TOS)
    148c: FJP  $1491       Jump if TOS false
-   148e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   148e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 1491: SLDO 0b          Short load global BASE11
    1492: FJP  $13e5       Jump if TOS false
    1494: SLDO 0f          Short load global BASE15
    1495: SLDC 02          Short load constant 2
    1496: EQUI             Integer TOS-1 = TOS
    1497: FJP  $149e       Jump if TOS false
-   1499: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1499: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    149c: UJP  $14a2       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 149e: SLDC 05          Short load constant 5
-   149f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   149f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 14a2: SLDL 02          Short load local MP2
    14a3: STL  0001        Store TOS into MP1
-   14a5: LDA  01 0001     Load addr DECLARAT:MP1
+   14a5: LDA  01 0001     Load addr DECLARATIONPART:MP1
    14a8: LDM  04          Load 4 words from (TOS)
    14aa: SLDC 04          Short load constant 4
    14ab: SLDC 08          Short load constant 8
@@ -9081,7 +9432,7 @@ BEGIN
    14b4: ADJ  04          Adjust set to 4 words
    14b6: LLA  0004        Load local address MP4
    14b8: LLA  0005        Load local address MP5
-   14ba: CIP  03          Call intermediate procedure 3 DECLARAT.PROC3
+   14ba: CIP  03          Call intermediate procedure 3 DECLARATIONPART.PROC3
 -> 14bc: SLDL 02          Short load local MP2
    14bd: LDCN             Load constant NIL
    14be: NEQI             Integer TOS-1 <> TOS
@@ -9135,10 +9486,10 @@ BEGIN
    1500: SLDC 03          Short load constant 3
    1501: EQUI             Integer TOS-1 = TOS
    1502: FJP  $1510       Jump if TOS false
-   1504: CXP  01 08       Call external procedure PASCALCO.PROC8
-   1507: LDA  01 0008     Load addr DECLARAT:MP8
+   1504: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   1507: LDA  01 0008     Load addr DECLARATIONPART:MP8
    150a: LDM  04          Load 4 words from (TOS)
-   150c: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   150c: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    150e: UJP  $151d       Unconditional jump
 -> 1510: SLDO 0f          Short load global BASE15
    1511: SLDC 09          Short load constant 9
@@ -9147,8 +9498,9 @@ BEGIN
    1515: LAND             Logical AND (TOS & TOS-1)
    1516: LNOT             Logical NOT (~TOS)
    1517: FJP  $151d       Jump if TOS false
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
    1519: SLDC 0e          Short load constant 14
-   151a: CXP  01 04       Call external procedure PASCALCO.ERROR
+   151a: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 151d: SLDO 0f          Short load global BASE15
    151e: SLDC 00          Short load constant 0
    151f: NEQI             Integer TOS-1 <> TOS
@@ -9164,18 +9516,19 @@ BEGIN
    152d: LDCN             Load constant NIL
    152e: NEQI             Integer TOS-1 <> TOS
    152f: FJP  $1538       Jump if TOS false
+  PASCALCOMPILER.ERROR(117) { Unsatisified forward reference }
    1531: SLDC 75          Short load constant 117
-   1532: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1532: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1535: LDCN             Load constant NIL
    1536: SRO  0043        Store global word BASE67 (FWPTR)
 -> 1538: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC19(PARAM1; PARAM2) (* P=19, LL=2, D=22, Callers: DECLARAT *)
-  BASE8
+### PROCEDURE DECLARATIONPART.PROC19(PARAM1; PARAM2) (* P=19, LL=2, D=22, Callers: DECLARATIONPART *)
+  BASE8=TOP:DISPRANGE
   BASE10
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE17
   BASE21
   BASE32
@@ -9191,21 +9544,21 @@ END
   BASE86
   BASE88
   BASE89
-  BASE95=SCREENDOTS
-  BASE96=LINEINFO
+  BASE95=SCREENDOTS:INTEGER
+  BASE96=LINEINFO:INTEGER
   BASE99=NEXTPROC
   BASE100
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   BASE190
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE1098
-  DECLARAT:MP1
-  DECLARAT:MP6
+  DECLARATIONPART:MP1
+  DECLARATIONPART:MP6
   MP1=PARAM2
   MP2=PARAM1
   MP3
   MP4
-  MP5
+  MP5=:CTP
   MP6
   MP7
   MP8
@@ -9228,8 +9581,9 @@ BEGIN
    17d5: FJP  $1817       Jump if TOS false
    17d7: LDO  0031        Load global word BASE49
    17d9: FJP  $17e8       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    17db: LDCI 018f        Load word 399
-   17de: CXP  01 04       Call external procedure PASCALCO.ERROR
+   17de: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    17e1: SLDC 00          Short load constant 0
    17e2: SRO  0059        Store global word BASE89
    17e4: SLDC 00          Short load constant 0
@@ -9245,15 +9599,16 @@ BEGIN
    17f6: SLDO 0f          Short load global BASE15
    17f7: STL  0003        Store TOS into MP3
    17f9: SLDO 0f          Short load global BASE15
-   17fc: LDC  03          Load multiple-word constant
+   17fa: LDC  03          Load multiple-word constant
                             0000 8000 0001 
    1802: SLDC 03          Short load constant 3
    1803: INN              Set membership (TOS-1 in set TOS)
    1804: FJP  $180b       Jump if TOS false
-   1806: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1806: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1809: UJP  $1814       Unconditional jump
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
 -> 180b: LDCI 018f        Load word 399
-   180e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   180e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1811: SLDC 1f          Short load constant 31
    1812: STL  0003        Store TOS into MP3
 -> 1814: SLDL 03          Short load local MP3
@@ -9294,7 +9649,7 @@ BEGIN
    1848: IXA  0004        Index array (TOS-1 + TOS * 4)
    184a: SIND 00          Short index load *TOS+0
    184b: LLA  0005        Load local address MP5
-   184d: CXP  01 09       Call external procedure PASCALCO.PROC9
+   184d: CXP  01 09       Call external procedure PASCALCOMPILER.PROC9
    1850: SLDL 05          Short load local MP5
    1851: LDCN             Load constant NIL
    1852: NEQI             Integer TOS-1 <> TOS
@@ -9340,8 +9695,9 @@ BEGIN
 -> 1888: SLDL 07          Short load local MP7
    1889: LNOT             Logical NOT (~TOS)
    188a: FJP  $1892       Jump if TOS false
+  PASCALCOMPILER.ERROR(160) { Previous declaration was not forward }
    188c: LDCI 00a0        Load word 160
-   188f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   188f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1892: UJP  $1897       Unconditional jump
 -> 1894: SLDC 00          Short load constant 0
    1895: STL  0007        Store TOS into MP7
@@ -9429,7 +9785,7 @@ BEGIN
 -> 191b: SLDL 01          Short load local MP1
    191c: FJP  $1939       Jump if TOS false
    191e: SLDC 01          Short load constant 1
-   191f: CXP  01 0d       Call external procedure PASCALCO.PROC13
+   191f: CXP  01 0d       Call external procedure PASCALCOMPILER.PROC13
    1922: LAO  01bd        Load global BASE445 (SEGTABLE)
    1925: LDO  0015        Load global word BASE21
    1927: IXA  0009        Index array (TOS-1 + TOS * 9)
@@ -9442,10 +9798,11 @@ BEGIN
    1935: INC  0006        Inc field ptr (TOS+6)
    1937: SLDO 0d          Short load global BASE13 (SEG)
    1938: STO              Store indirect (TOS into TOS-1)
+  PASCALCOMPILER.PROC12(NEXTPROC,254,251) { Too many nested procedures or functions }
 -> 1939: LAO  0063        Load global BASE99 (NEXTPROC)
    193b: LDCI 00fe        Load word 254
    193e: LDCI 00fb        Load word 251
-   1941: CXP  01 0c       Call external procedure PASCALCO.PROC12
+   1941: CXP  01 0c       Call external procedure PASCALCOMPILER.PROC12
    1944: SLDL 02          Short load local MP2
    1945: SLDC 1f          Short load constant 31
    1946: EQUI             Integer TOS-1 = TOS
@@ -9459,8 +9816,9 @@ BEGIN
    1953: INC  0008        Inc field ptr (TOS+8)
    1955: SLDC 06          Short load constant 6
    1956: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP5)
 -> 1957: SLDL 05          Short load local MP5
-   1958: CXP  01 07       Call external procedure PASCALCO.PROC7
+   1958: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    195b: UJP  $19c9       Unconditional jump
 -> 195d: SLDL 05          Short load local MP5
    195e: SIND 07          Short index load *TOS+7
@@ -9531,12 +9889,14 @@ BEGIN
    19bf: SLDL 01          Short load local MP1
    19c0: LNOT             Logical NOT (~TOS)
    19c1: FJP  $19c9       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    19c3: LDCI 018f        Load word 399
-   19c6: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 19c9: CXP  01 08       Call external procedure PASCALCO.PROC8
+   19c6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 19c9: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    19cc: UJP  $19d6       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 19ce: SLDC 02          Short load constant 2
-   19cf: CXP  01 04       Call external procedure PASCALCO.ERROR
+   19cf: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    19d2: LDO  0049        Load global word BASE73
    19d4: STL  0005        Store TOS into MP5
 -> 19d6: LDO  0050        Load global word BASE80
@@ -9560,7 +9920,7 @@ BEGIN
    19f3: SRO  0050        Store global word BASE80
    19f5: UJP  $19fd       Unconditional jump
 -> 19f7: LDCI 00fb        Load word 251
-   19fa: CXP  01 04       Call external procedure PASCALCO.ERROR
+   19fa: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 19fd: SLDO 08          Short load global BASE8
    19fe: SLDC 0c          Short load constant 12
    19ff: LESI             Integer TOS-1 < TOS
@@ -9597,7 +9957,7 @@ BEGIN
    1a2e: STO              Store indirect (TOS into TOS-1)
    1a2f: UJP  $1a37       Unconditional jump
 -> 1a31: LDCI 00fa        Load word 250
-   1a34: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1a34: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1a37: SLDL 02          Short load local MP2
    1a38: SLDC 1f          Short load constant 31
    1a39: EQUI             Integer TOS-1 = TOS
@@ -9607,7 +9967,7 @@ BEGIN
    1a3e: ADJ  04          Adjust set to 4 words
    1a40: LLA  0004        Load local address MP4
    1a42: SLDL 05          Short load local MP5
-   1a43: CLP  14          Call local procedure DECLARAT.PROC20
+   1a43: CLP  14          Call local procedure DECLARATIONPART.PROC20
    1a45: SLDL 07          Short load local MP7
    1a46: LNOT             Logical NOT (~TOS)
    1a47: FJP  $1a4e       Jump if TOS false
@@ -9621,7 +9981,7 @@ BEGIN
    1a52: ADJ  04          Adjust set to 4 words
    1a54: LLA  0004        Load local address MP4
    1a56: SLDL 05          Short load local MP5
-   1a57: CLP  14          Call local procedure DECLARAT.PROC20
+   1a57: CLP  14          Call local procedure DECLARATIONPART.PROC20
    1a59: SLDL 07          Short load local MP7
    1a5a: LNOT             Logical NOT (~TOS)
    1a5b: FJP  $1a62       Jump if TOS false
@@ -9633,20 +9993,21 @@ BEGIN
    1a63: SLDC 02          Short load constant 2
    1a64: EQUI             Integer TOS-1 = TOS
    1a65: FJP  $1ab7       Jump if TOS false
-   1a67: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1a67: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1a6a: SLDO 0f          Short load global BASE15
    1a6b: SLDC 00          Short load constant 0
    1a6c: EQUI             Integer TOS-1 = TOS
    1a6d: FJP  $1aa3       Jump if TOS false
    1a6f: SLDL 07          Short load local MP7
    1a70: FJP  $1a76       Jump if TOS false
+  PASCALCOMPILER.ERROR(122) { Result type of forward declared function cannot be respecified }
    1a72: SLDC 7a          Short load constant 122
-   1a73: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1a73: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1a76: SLDC 01          Short load constant 1
    1a77: SLDC 01          Short load constant 1
    1a78: ADJ  01          Adjust set to 1 words
    1a7a: LLA  0004        Load local address MP4
-   1a7c: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   1a7c: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    1a7f: SLDL 04          Short load local MP4
    1a80: SIND 06          Short index load *TOS+6
    1a81: STL  0006        Store TOS into MP6
@@ -9665,38 +10026,42 @@ BEGIN
    1a91: INN              Set membership (TOS-1 in set TOS)
    1a92: LNOT             Logical NOT (~TOS)
    1a93: FJP  $1a9e       Jump if TOS false
+  PASCALCOMPILER.ERROR(120) { Function result type must be scalar, subrange or pointer }
    1a95: SLDC 78          Short load constant 120
-   1a96: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1a96: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1a99: SLDL 05          Short load local MP5
    1a9a: INC  0006        Inc field ptr (TOS+6)
    1a9c: LDCN             Load constant NIL
    1a9d: STO              Store indirect (TOS into TOS-1)
--> 1a9e: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 1a9e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1aa1: UJP  $1ab5       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 1aa3: SLDC 02          Short load constant 2
-   1aa4: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1aa7: LDA  01 0001     Load addr DECLARAT:MP1
+   1aa4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1aa7: LDA  01 0001     Load addr DECLARATIONPART:MP1
    1aaa: LDM  04          Load 4 words from (TOS)
    1aac: SLDC 04          Short load constant 4
    1aad: SLDC 08          Short load constant 8
    1aae: SLDC 01          Short load constant 1
    1aaf: UNI              Set union (TOS OR TOS-1)
    1ab0: ADJ  04          Adjust set to 4 words
-   1ab2: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1ab2: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1ab5: UJP  $1abf       Unconditional jump
 -> 1ab7: SLDL 07          Short load local MP7
    1ab8: LNOT             Logical NOT (~TOS)
    1ab9: FJP  $1abf       Jump if TOS false
+  PASCALCOMPILER.ERROR(123) { Missing result type in function declaration }
    1abb: SLDC 7b          Short load constant 123
-   1abc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1abc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1abf: SLDO 0f          Short load global BASE15
    1ac0: SLDC 03          Short load constant 3
    1ac1: EQUI             Integer TOS-1 = TOS
    1ac2: FJP  $1ac9       Jump if TOS false
-   1ac4: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1ac4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1ac7: UJP  $1acd       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 1ac9: SLDC 0e          Short load constant 14
-   1aca: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1aca: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1acd: SLDO 0f          Short load global BASE15
    1ace: SLDC 35          Short load constant 53
    1acf: EQUI             Integer TOS-1 = TOS
@@ -9705,8 +10070,9 @@ BEGIN
    1ad4: SLDC 02          Short load constant 2
    1ad5: NEQI             Integer TOS-1 <> TOS
    1ad6: FJP  $1ade       Jump if TOS false
+  PASCALCOMPILER.ERROR(183) { EXTERNAL declaration not allowed at this nesting level }
    1ad8: LDCI 00b7        Load word 183
-   1adb: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1adb: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1ade: LDO  0021        Load global word BASE33
    1ae0: FJP  $1af0       Jump if TOS false
    1ae2: LDO  0020        Load global word BASE32
@@ -9714,12 +10080,14 @@ BEGIN
    1ae6: LNOT             Logical NOT (~TOS)
    1ae7: LAND             Logical AND (TOS & TOS-1)
    1ae8: FJP  $1af0       Jump if TOS false
+  PASCALCOMPILER.ERROR(184) { EXTERNAL declaration not allowed in interface section }
    1aea: LDCI 00b8        Load word 184
-   1aed: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1aed: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1af0: SLDL 01          Short load local MP1
    1af1: FJP  $1af9       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    1af3: LDCI 018f        Load word 399
-   1af6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1af6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1af9: SLDL 05          Short load local MP5
    1afa: STL  0015        Store TOS into MP21
    1afc: LDL  0015        Load local word MP21
@@ -9780,18 +10148,19 @@ BEGIN
    1b6d: STO              Store indirect (TOS into TOS-1)
    1b6e: SLDC 01          Short load constant 1
    1b6f: SRO  002d        Store global word BASE45
-   1b71: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1b71: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1b74: SLDO 0f          Short load global BASE15
    1b75: SLDC 03          Short load constant 3
    1b76: EQUI             Integer TOS-1 = TOS
    1b77: FJP  $1b7e       Jump if TOS false
-   1b79: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1b79: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1b7c: UJP  $1b82       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 1b7e: SLDC 0e          Short load constant 14
-   1b7f: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 1b82: LDA  01 0001     Load addr DECLARAT:MP1
+   1b7f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 1b82: LDA  01 0001     Load addr DECLARATIONPART:MP1
    1b85: LDM  04          Load 4 words from (TOS)
-   1b87: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   1b87: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
 -> 1b89: UJP  $1c10       Unconditional jump
 -> 1b8b: LDO  0025        Load global word BASE37
    1b8d: FJP  $1b96       Jump if TOS false
@@ -9810,8 +10179,9 @@ BEGIN
    1b9f: FJP  $1bd0       Jump if TOS false
    1ba1: SLDL 07          Short load local MP7
    1ba2: FJP  $1bac       Jump if TOS false
+  PASCALCOMPILER.ERROR(161) { Forward declared twice }
    1ba4: LDCI 00a1        Load word 161
-   1ba7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1ba7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1baa: UJP  $1bb1       Unconditional jump
 -> 1bac: SLDL 05          Short load local MP5
    1bad: INC  000f        Inc field ptr (TOS+15)
@@ -9821,27 +10191,29 @@ BEGIN
    1bb2: SLDC 22          Short load constant 34
    1bb3: EQUI             Integer TOS-1 = TOS
    1bb4: FJP  $1bc7       Jump if TOS false
-   1bb6: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1bb6: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1bb9: SLDO 0f          Short load global BASE15
    1bba: SLDC 03          Short load constant 3
    1bbb: EQUI             Integer TOS-1 = TOS
    1bbc: FJP  $1bc3       Jump if TOS false
-   1bbe: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1bbe: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1bc1: UJP  $1bc7       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 1bc3: SLDC 0e          Short load constant 14
-   1bc4: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 1bc7: LDA  01 0001     Load addr DECLARAT:MP1
+   1bc4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 1bc7: LDA  01 0001     Load addr DECLARATIONPART:MP1
    1bca: LDM  04          Load 4 words from (TOS)
-   1bcc: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   1bcc: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    1bce: UJP  $1c10       Unconditional jump
 -> 1bd0: SLDL 08          Short load local MP8
    1bd1: FJP  $1bd7       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    1bd3: SLDC 07          Short load constant 7
-   1bd4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1bd4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1bd7: SLDC 01          Short load constant 1
    1bd8: SRO  0056        Store global word BASE86
    1bda: SLDC 01          Short load constant 1
-   1bdb: STR  01 0006     Store TOS to DECLARAT:MP6
+   1bdb: STR  01 0006     Store TOS to DECLARATIONPART:MP6
    1bde: LLA  0012        Load local address MP18
    1be0: CSP  20          Call standard procedure MARK
    1be2: SLDL 05          Short load local MP5
@@ -9890,15 +10262,15 @@ BEGIN
 -> 1c25: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE DECLARAT.PROC20(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=20, LL=3, D=16, Callers: PROC19 *)
+### PROCEDURE DECLARATIONPART.PROC20(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5; PARAM6) (* P=20, LL=3, D=16, Callers: PROC19 *)
   BASE10
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE57
   BASE58
   BASE80
-  DECLARAT:MP1
+  DECLARATIONPART:MP1
   PROC19:MP7
   PROC19:MP8
   MP1=PARAM6
@@ -9910,7 +10282,7 @@ END
   MP7
   MP8
   MP9
-  MP10
+  MP10=:CTP
   MP11
   MP12
   MP13
@@ -9932,9 +10304,10 @@ BEGIN
    1559: INN              Set membership (TOS-1 in set TOS)
    155a: LNOT             Logical NOT (~TOS)
    155b: FJP  $1575       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    155d: SLDC 07          Short load constant 7
-   155e: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1561: LDA  02 0001     Load addr DECLARAT:MP1
+   155e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1561: LDA  02 0001     Load addr DECLARATIONPART:MP1
    1564: LDM  04          Load 4 words from (TOS)
    1566: SLDC 04          Short load constant 4
    1567: LLA  0003        Load local address MP3
@@ -9945,35 +10318,37 @@ BEGIN
    156e: SLDC 01          Short load constant 1
    156f: UNI              Set union (TOS OR TOS-1)
    1570: ADJ  04          Adjust set to 4 words
-   1572: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1572: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 1575: SLDO 0f          Short load global BASE15
    1576: SLDC 04          Short load constant 4
    1577: EQUI             Integer TOS-1 = TOS
    1578: FJP  $17b8       Jump if TOS false
    157a: LOD  01 0007     Load word at PROC19:MP7
    157d: FJP  $1583       Jump if TOS false
+  PASCALCOMPILER.ERROR(119) { Re-specified params not OK for a forward declared procedure }
    157f: SLDC 77          Short load constant 119
-   1580: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 1583: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1580: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 1583: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1586: SLDO 0f          Short load global BASE15
-   158a: LDC  02          Load multiple-word constant
+   1587: LDC  02          Load multiple-word constant
                             0001 4000 
    158e: SLDC 02          Short load constant 2
    158f: INN              Set membership (TOS-1 in set TOS)
    1590: LNOT             Logical NOT (~TOS)
    1591: FJP  $15a5       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    1593: SLDC 07          Short load constant 7
-   1594: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1597: LDA  02 0001     Load addr DECLARAT:MP1
+   1594: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1597: LDA  02 0001     Load addr DECLARATIONPART:MP1
    159a: LDM  04          Load 4 words from (TOS)
    159c: SLDC 04          Short load constant 4
    159d: SLDC 21          Short load constant 33
    159e: SLDC 01          Short load constant 1
    159f: UNI              Set union (TOS OR TOS-1)
    15a0: ADJ  04          Adjust set to 4 words
-   15a2: CXP  01 10       Call external procedure PASCALCO.PROC16
+   15a2: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 15a5: SLDO 0f          Short load global BASE15
-   15a8: LDC  02          Load multiple-word constant
+   15a6: LDC  02          Load multiple-word constant
                             0001 4000 
    15ac: SLDC 02          Short load constant 2
    15ad: INN              Set membership (TOS-1 in set TOS)
@@ -9984,7 +10359,7 @@ BEGIN
    15b3: FJP  $15bd       Jump if TOS false
    15b5: SLDC 01          Short load constant 1
    15b6: STL  000c        Store TOS into MP12
-   15b8: CXP  01 08       Call external procedure PASCALCO.PROC8
+   15b8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    15bb: UJP  $15c0       Unconditional jump
 -> 15bd: SLDC 00          Short load constant 0
    15be: STL  000c        Store TOS into MP12
@@ -9996,8 +10371,9 @@ BEGIN
    15c7: SLDC 00          Short load constant 0
    15c8: NEQI             Integer TOS-1 <> TOS
    15c9: FJP  $15d1       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    15cb: SLDC 02          Short load constant 2
-   15cc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   15cc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    15cf: UJP  $160e       Unconditional jump
 -> 15d1: LLA  000a        Load local address MP10
    15d3: SLDC 0b          Short load constant 11
@@ -10032,17 +10408,18 @@ BEGIN
    15fa: INC  0009        Inc field ptr (TOS+9)
    15fc: LDO  0050        Load global word BASE80
    15fe: STO              Store indirect (TOS into TOS-1)
+   PASCALCOMPILER.ENTERID(MP10)
    15ff: SLDL 0a          Short load local MP10
-   1600: CXP  01 07       Call external procedure PASCALCO.PROC7
+   1600: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
    1603: SLDL 0a          Short load local MP10
    1604: STL  0008        Store TOS into MP8
    1606: SLDL 0f          Short load local MP15
    1607: SLDC 01          Short load constant 1
    1608: ADI              Add integers (TOS + TOS-1)
    1609: STL  000f        Store TOS into MP15
-   160b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   160b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 160e: SLDO 0f          Short load global BASE15
-   160f: LDA  02 0001     Load addr DECLARAT:MP1
+   160f: LDA  02 0001     Load addr DECLARATIONPART:MP1
    1612: LDM  04          Load 4 words from (TOS)
    1614: SLDC 04          Short load constant 4
    1615: SLDC 2e          Short load constant 46
@@ -10051,16 +10428,17 @@ BEGIN
    1618: INN              Set membership (TOS-1 in set TOS)
    1619: LNOT             Logical NOT (~TOS)
    161a: FJP  $162e       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    161c: SLDC 07          Short load constant 7
-   161d: CXP  01 04       Call external procedure PASCALCO.ERROR
-   1620: LDA  02 0001     Load addr DECLARAT:MP1
+   161d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   1620: LDA  02 0001     Load addr DECLARATIONPART:MP1
    1623: LDM  04          Load 4 words from (TOS)
    1625: SLDC 04          Short load constant 4
    1626: SLDC 2e          Short load constant 46
    1627: SLDC 01          Short load constant 1
    1628: UNI              Set union (TOS OR TOS-1)
    1629: ADJ  04          Adjust set to 4 words
-   162b: CXP  01 10       Call external procedure PASCALCO.PROC16
+   162b: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 162e: SLDO 0f          Short load global BASE15
    162f: SLDC 01          Short load constant 1
    1630: NEQI             Integer TOS-1 <> TOS
@@ -10068,7 +10446,7 @@ BEGIN
    1633: SLDO 0b          Short load global BASE11
    1634: LNOT             Logical NOT (~TOS)
    1635: FJP  $163a       Jump if TOS false
-   1637: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1637: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 163a: SLDO 0b          Short load global BASE11
    163b: FJP  $15c6       Jump if TOS false
    163d: LDCN             Load constant NIL
@@ -10077,7 +10455,7 @@ BEGIN
    1641: SLDC 02          Short load constant 2
    1642: EQUI             Integer TOS-1 = TOS
    1643: FJP  $16a0       Jump if TOS false
-   1645: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1645: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1648: SLDO 0f          Short load global BASE15
    1649: SLDC 00          Short load constant 0
    164a: EQUI             Integer TOS-1 = TOS
@@ -10086,8 +10464,8 @@ BEGIN
    164e: SLDC 01          Short load constant 1
    164f: ADJ  01          Adjust set to 1 words
    1651: LLA  000a        Load local address MP10
-   1653: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   1656: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1653: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   1656: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1659: SLDL 0a          Short load local MP10
    165a: SIND 06          Short index load *TOS+6
    165b: STL  000b        Store TOS into MP11
@@ -10106,8 +10484,9 @@ BEGIN
    166c: SLDC 07          Short load constant 7
    166d: EQUI             Integer TOS-1 = TOS
    166e: FJP  $1676       Jump if TOS false
+  PASCALCOMPILER.ERROR(121) { File value parameter not allowed }
    1670: SLDC 79          Short load constant 121
-   1671: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1671: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1674: UJP  $1691       Unconditional jump
 -> 1676: SLDL 0b          Short load local MP11
    1677: LDO  0039        Load global word BASE57
@@ -10117,8 +10496,9 @@ BEGIN
    167d: EQUI             Integer TOS-1 = TOS
    167e: LOR              Logical OR (TOS | TOS-1)
    167f: FJP  $1687       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    1681: SLDC 07          Short load constant 7
-   1682: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1682: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1685: UJP  $1691       Unconditional jump
 -> 1687: SLDL 0b          Short load local MP11
    1688: SIND 01          Short index load *TOS+1
@@ -10135,8 +10515,9 @@ BEGIN
    1695: ADI              Add integers (TOS + TOS-1)
    1696: SRO  000a        Store global word BASE10
    1698: UJP  $169e       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 169a: SLDC 02          Short load constant 2
-   169b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   169b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 169e: UJP  $16b6       Unconditional jump
 -> 16a0: SLDL 0c          Short load local MP12
    16a1: SLDC 01          Short load constant 1
@@ -10151,10 +10532,11 @@ BEGIN
    16ad: ADI              Add integers (TOS + TOS-1)
    16ae: SRO  000a        Store global word BASE10
    16b0: UJP  $16b6       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 16b2: SLDC 05          Short load constant 5
-   16b3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   16b3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 16b6: SLDO 0f          Short load global BASE15
-   16b7: LDA  02 0001     Load addr DECLARAT:MP1
+   16b7: LDA  02 0001     Load addr DECLARATIONPART:MP1
    16ba: LDM  04          Load 4 words from (TOS)
    16bc: SLDC 04          Short load constant 4
    16bd: SLDC 28          Short load constant 40
@@ -10163,16 +10545,17 @@ BEGIN
    16c0: INN              Set membership (TOS-1 in set TOS)
    16c1: LNOT             Logical NOT (~TOS)
    16c2: FJP  $16d6       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    16c4: SLDC 07          Short load constant 7
-   16c5: CXP  01 04       Call external procedure PASCALCO.ERROR
-   16c8: LDA  02 0001     Load addr DECLARAT:MP1
+   16c5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   16c8: LDA  02 0001     Load addr DECLARATIONPART:MP1
    16cb: LDM  04          Load 4 words from (TOS)
    16cd: SLDC 04          Short load constant 4
    16ce: SLDC 28          Short load constant 40
    16cf: SLDC 01          Short load constant 1
    16d0: UNI              Set union (TOS OR TOS-1)
    16d1: ADJ  04          Adjust set to 4 words
-   16d3: CXP  01 10       Call external procedure PASCALCO.PROC16
+   16d3: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 16d6: SLDL 08          Short load local MP8
    16d7: STL  0007        Store TOS into MP7
    16d9: LDCN             Load constant NIL
@@ -10207,46 +10590,48 @@ BEGIN
    1700: SLDC 03          Short load constant 3
    1701: EQUI             Integer TOS-1 = TOS
    1702: FJP  $172c       Jump if TOS false
-   1704: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1704: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1707: SLDO 0f          Short load global BASE15
-   1708: LDA  02 0001     Load addr DECLARAT:MP1
+   1708: LDA  02 0001     Load addr DECLARATIONPART:MP1
    170b: LDM  04          Load 4 words from (TOS)
    170d: SLDC 04          Short load constant 4
-   1710: LDC  02          Load multiple-word constant
+   170e: LDC  02          Load multiple-word constant
                             0001 4000 
    1714: SLDC 02          Short load constant 2
    1715: UNI              Set union (TOS OR TOS-1)
    1716: INN              Set membership (TOS-1 in set TOS)
    1717: LNOT             Logical NOT (~TOS)
    1718: FJP  $172c       Jump if TOS false
+  PASCALCOMPILER.ERROR(7) { Error in parameter list }
    171a: SLDC 07          Short load constant 7
-   171b: CXP  01 04       Call external procedure PASCALCO.ERROR
-   171e: LDA  02 0001     Load addr DECLARAT:MP1
+   171b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   171e: LDA  02 0001     Load addr DECLARATIONPART:MP1
    1721: LDM  04          Load 4 words from (TOS)
    1723: SLDC 04          Short load constant 4
    1724: SLDC 21          Short load constant 33
    1725: SLDC 01          Short load constant 1
    1726: UNI              Set union (TOS OR TOS-1)
    1727: ADJ  04          Adjust set to 4 words
-   1729: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1729: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 172c: UJP  $15a5       Unconditional jump
 -> 172e: SLDO 0f          Short load global BASE15
    172f: SLDC 05          Short load constant 5
    1730: EQUI             Integer TOS-1 = TOS
    1731: FJP  $1748       Jump if TOS false
-   1733: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1733: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1736: LLA  0003        Load local address MP3
    1738: LDM  04          Load 4 words from (TOS)
    173a: SLDC 04          Short load constant 4
-   173b: LDA  02 0001     Load addr DECLARAT:MP1
+   173b: LDA  02 0001     Load addr DECLARATIONPART:MP1
    173e: LDM  04          Load 4 words from (TOS)
    1740: SLDC 04          Short load constant 4
    1741: UNI              Set union (TOS OR TOS-1)
    1742: ADJ  04          Adjust set to 4 words
-   1744: CIP  02          Call intermediate procedure 2 DECLARAT.PROC2
+   1744: CIP  02          Call intermediate procedure 2 DECLARATIONPART.PROC2
    1746: UJP  $174c       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 1748: SLDC 04          Short load constant 4
-   1749: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1749: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 174c: SLDL 01          Short load local MP1
    174d: INC  000e        Inc field ptr (TOS+14)
    174f: SLDO 0a          Short load global BASE10
@@ -10361,7 +10746,7 @@ END
 ### PROCEDURE BODYPART.PROC2(PARAM1; PARAM2; PARAM3) (* P=2, LL=2, D=4, Callers: PROC31, PROC5 *)
   BASE89
   BASE133=VARS
-  BASE665
+  BASE665=:FIB
   BASE705
   BASE706
   BASE707
@@ -10386,8 +10771,9 @@ BEGIN
    01b0: SLDC 01          Short load constant 1
    01b1: NEQI             Integer TOS-1 <> TOS
    01b2: FJP  $01ba       Jump if TOS false
+  PASCALCOMPILER.ERROR(402) { Error in writing code file, not enough room }
    01b4: LDCI 0192        Load word 402
-   01b7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01b7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01ba: LDO  02c1        Load global word BASE705
    01bd: SLDC 01          Short load constant 1
    01be: ADI              Add integers (TOS + TOS-1)
@@ -10432,7 +10818,7 @@ END
 
 ### PROCEDURE BODYPART.PROC3(PARAM1) (* P=3, LL=2, D=5, Callers: PROC11, PROC20, PROC4, PROC34, PROC35, PROC6, PROC9, PROC22, PROC36, PROC8, PROC32, PROC10, PROC31 *)
   BASE5
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE91
   MP1=PARAM1
   MP2
@@ -10447,7 +10833,7 @@ BEGIN
    0209: SLDL 01          Short load local MP1
    020a: LDCI 0080        Load word 128
    020d: ADI              Add integers (TOS + TOS-1)
-   020e: CXP  01 16       Call external procedure PASCALCO.PROC22
+   020e: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0211: UJP  $0257       Unconditional jump
 -> 0213: SLDO 09          Short load global BASE9 (IC)
    0214: STL  0003        Store TOS into MP3
@@ -10457,14 +10843,14 @@ BEGIN
    021a: LNOT             Logical NOT (~TOS)
    021b: FJP  $0223       Jump if TOS false
    021d: LDCI 00d7        Load word 215
-   0220: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0220: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 0223: LDCI 00a6        Load word 166
-   0226: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0226: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0229: SLDO 05          Short load global BASE5
    022a: STL  0004        Store TOS into MP4
    022c: SLDL 04          Short load local MP4
    022d: SIND 01          Short index load *TOS+1
-   022e: CXP  01 16       Call external procedure PASCALCO.PROC22
+   022e: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0231: SLDC 01          Short load constant 1
    0232: STL  0002        Store TOS into MP2
    0234: SLDL 04          Short load local MP4
@@ -10480,7 +10866,7 @@ BEGIN
    0241: SLDC 01          Short load constant 1
    0242: SBI              Subtract integers (TOS-1 - TOS)
    0243: LDB              Load byte at byte ptr TOS-1 + TOS
-   0244: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0244: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0247: SLDL 02          Short load local MP2
    0248: SLDC 01          Short load constant 1
    0249: ADI              Add integers (TOS + TOS-1)
@@ -10489,7 +10875,7 @@ BEGIN
 -> 024e: SLDL 03          Short load local MP3
    024f: FJP  $0257       Jump if TOS false
    0251: LDCI 00d7        Load word 215
-   0254: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0254: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 0257: RNP  00          Return from nonbase procedure
 END
 
@@ -10505,22 +10891,22 @@ BEGIN
    026c: LAND             Logical AND (TOS & TOS-1)
    026d: FJP  $0275       Jump if TOS false
    026f: SLDL 01          Short load local MP1
-   0270: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0270: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0273: UJP  $0297       Unconditional jump
 -> 0275: SLDC 33          Short load constant 51
    0276: LDCI 0094        Load word 148
    0279: ADI              Add integers (TOS + TOS-1)
-   027a: CXP  01 16       Call external procedure PASCALCO.PROC22
+   027a: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    027d: SLDL 01          Short load local MP1
    027e: ABI              Absolute value of integer (TOS)
    027f: LDCI 0100        Load word 256
    0282: MODI             Modulo integers (TOS-1 % TOS)
-   0283: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0283: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0286: SLDL 01          Short load local MP1
    0287: ABI              Absolute value of integer (TOS)
    0288: LDCI 0100        Load word 256
    028b: DVI              Divide integers (TOS-1 / TOS)
-   028c: CXP  01 16       Call external procedure PASCALCO.PROC22
+   028c: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    028f: SLDL 01          Short load local MP1
    0290: SLDC 00          Short load constant 0
    0291: LESI             Integer TOS-1 < TOS
@@ -10533,7 +10919,7 @@ END
 ### PROCEDURE BODYPART.PROC5(PARAM1; PARAM2) (* P=5, LL=2, D=5, Callers: PROC29, PROC8, PROC20, PROC10, PROC30, PROC9, PROC22, PROC6, PROC31 *)
   BASE3
   BASE5
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE33
   MP1=PARAM2
   MP2=PARAM1
@@ -10544,7 +10930,7 @@ BEGIN
 -> 02d0: SLDL 02          Short load local MP2
    02d1: LDCI 0080        Load word 128
    02d4: ADI              Add integers (TOS + TOS-1)
-   02d5: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02d5: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    02d8: SLDL 02          Short load local MP2
    02d9: SLDC 33          Short load constant 51
    02da: EQUI             Integer TOS-1 = TOS
@@ -10587,7 +10973,7 @@ BEGIN
    030c: GRTI             Integer TOS-1 > TOS
    030d: FJP  $0333       Jump if TOS false
    030f: SLDL 04          Short load local MP4
-   0310: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0310: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0313: SLDL 04          Short load local MP4
    0314: STL  0003        Store TOS into MP3
    0316: SLDC 01          Short load constant 1
@@ -10603,7 +10989,7 @@ BEGIN
    0323: SBI              Subtract integers (TOS-1 - TOS)
    0324: IXA  0001        Index array (TOS-1 + TOS * 1)
    0326: SIND 00          Short index load *TOS+0
-   0327: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0327: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    032a: SLDL 03          Short load local MP3
    032b: SLDC 01          Short load constant 1
    032c: SBI              Subtract integers (TOS-1 - TOS)
@@ -10628,17 +11014,17 @@ BEGIN
    0346: CIP  04          Call intermediate procedure 4 BODYPART.PROC4
 -> 0348: UJP  $03ca       Unconditional jump
 -> 034a: SLDL 02          Short load local MP2
-   034e: LDC  05          Load multiple-word constant
+   034b: LDC  05          Load multiple-word constant
                             0000 4000 6401 3000 c006 
    0358: SLDC 05          Short load constant 5
    0359: INN              Set membership (TOS-1 in set TOS)
    035a: FJP  $0362       Jump if TOS false
    035c: SLDL 01          Short load local MP1
-   035d: CXP  01 16       Call external procedure PASCALCO.PROC22
+   035d: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0360: UJP  $03ca       Unconditional jump
 -> 0362: LDO  0021        Load global word BASE33
    0364: SLDL 02          Short load local MP2
-   0368: LDC  03          Load multiple-word constant
+   0365: LDC  03          Load multiple-word constant
                             0000 0000 0a20 
    036e: SLDC 03          Short load constant 3
    036f: INN              Set membership (TOS-1 in set TOS)
@@ -10649,9 +11035,9 @@ BEGIN
    0375: SLDO 09          Short load global BASE9 (IC)
    0376: CIP  02          Call intermediate procedure 2 BODYPART.PROC2
    0378: LDCI 0080        Load word 128
-   037b: CXP  01 16       Call external procedure PASCALCO.PROC22
+   037b: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    037e: SLDC 00          Short load constant 0
-   037f: CXP  01 16       Call external procedure PASCALCO.PROC22
+   037f: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0382: UJP  $03ca       Unconditional jump
 -> 0384: SLDL 02          Short load local MP2
    0385: SLDC 4a          Short load constant 74
@@ -10676,12 +11062,12 @@ BEGIN
    039b: LDCI 00e7        Load word 231
    039e: SLDL 01          Short load local MP1
    039f: ADI              Add integers (TOS + TOS-1)
-   03a0: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03a0: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    03a3: UJP  $03ad       Unconditional jump
 -> 03a5: LDCI 00d7        Load word 215
    03a8: SLDL 01          Short load local MP1
    03a9: ADI              Add integers (TOS + TOS-1)
-   03aa: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03aa: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 03ad: UJP  $03ca       Unconditional jump
 -> 03af: SLDL 02          Short load local MP2
    03b0: SLDC 23          Short load constant 35
@@ -10698,7 +11084,7 @@ BEGIN
    03bd: LDCI 00f8        Load word 248
    03c0: SLDL 01          Short load local MP1
    03c1: ADI              Add integers (TOS + TOS-1)
-   03c2: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03c2: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    03c5: UJP  $03ca       Unconditional jump
 -> 03c7: SLDL 01          Short load local MP1
    03c8: CIP  1c          Call intermediate procedure 28 BODYPART.28
@@ -10722,14 +11108,14 @@ BEGIN
    03e5: SLDL 03          Short load local MP3
    03e6: LDCI 0080        Load word 128
    03e9: ADI              Add integers (TOS + TOS-1)
-   03ea: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03ea: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    03ed: SLDL 02          Short load local MP2
-   03ee: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03ee: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    03f1: SLDL 01          Short load local MP1
-   03f2: CXP  01 16       Call external procedure PASCALCO.PROC22
+   03f2: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    03f5: UJP  $047e       Unconditional jump
 -> 03f7: SLDL 03          Short load local MP3
-   03fa: LDC  04          Load multiple-word constant
+   03f8: LDC  04          Load multiple-word constant
                             0000 0000 8000 00b3 
    0402: SLDC 04          Short load constant 4
    0403: INN              Set membership (TOS-1 in set TOS)
@@ -10784,31 +11170,31 @@ BEGIN
    0444: EQUI             Integer TOS-1 = TOS
    0445: FJP  $044f       Jump if TOS false
    0447: LDCI 009d        Load word 157
-   044a: CXP  01 16       Call external procedure PASCALCO.PROC22
+   044a: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    044d: UJP  $0462       Unconditional jump
 -> 044f: SLDL 03          Short load local MP3
    0450: SLDC 38          Short load constant 56
    0451: EQUI             Integer TOS-1 = TOS
    0452: FJP  $045c       Jump if TOS false
    0454: LDCI 00d1        Load word 209
-   0457: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0457: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    045a: UJP  $0462       Unconditional jump
 -> 045c: LDCI 00a7        Load word 167
-   045f: CXP  01 16       Call external procedure PASCALCO.PROC22
+   045f: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 0462: SLDL 02          Short load local MP2
    0463: NGI              Negate integer
-   0464: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0464: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0467: SLDL 01          Short load local MP1
    0468: CIP  1c          Call intermediate procedure 28 BODYPART.28
    046a: UJP  $047e       Unconditional jump
 -> 046c: SLDL 03          Short load local MP3
    046d: LDCI 0080        Load word 128
    0470: ADI              Add integers (TOS + TOS-1)
-   0471: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0471: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0474: LDO  0050        Load global word BASE80
    0476: SLDL 02          Short load local MP2
    0477: SBI              Subtract integers (TOS-1 - TOS)
-   0478: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0478: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    047b: SLDL 01          Short load local MP1
    047c: CIP  1c          Call intermediate procedure 28 BODYPART.28
 -> 047e: RNP  00          Return from nonbase procedure
@@ -10984,8 +11370,15 @@ BEGIN
    06b4: SLDC 3e          Short load constant 62
    06b5: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    06b7: UJP  $06ca       Unconditional jump
+-> 06b9: XJP  0000 0004 06ca Case jump
+           0000 -> 069b   0001 -> 06a2   0002 -> 06a8   0003 -> 06ad
+           0004 -> 06b4
+       default -> 06ca
 -> 06ca: UJP  $06dc       Unconditional jump
    06cc: UJP  $06dc       Unconditional jump
+-> 06ce: XJP  0000 0002 06dc Case jump
+           0000 -> 05fe   0001 -> 0698   0002 -> 06cc
+       default -> 06dc
 -> 06dc: SLDO 03          Short load global BASE3
    06dd: STL  0003        Store TOS into MP3
    06df: SLDL 03          Short load local MP3
@@ -11030,13 +11423,14 @@ BEGIN
    076c: SLDO 03          Short load global BASE3
    076d: SLDC 00          Short load constant 0
    076e: SLDC 00          Short load constant 0
-   076f: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   076f: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0772: FJP  $0779       Jump if TOS false
    0774: SLDC 26          Short load constant 38
    0775: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    0777: UJP  $077f       Unconditional jump
+  PASCALCOMPILER.ERROR(409) { General Compiler error }
 -> 0779: LDCI 0199        Load word 409
-   077c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   077c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 077f: UJP  $07b8       Unconditional jump
    0781: SLDO 05          Short load global BASE5
    0782: UJP  $079c       Unconditional jump
@@ -11053,10 +11447,17 @@ BEGIN
    0791: SLDO 06          Short load global BASE6
    0792: CIP  05          Call intermediate procedure 5 BODYPART.PROC5
 -> 0794: UJP  $07aa       Unconditional jump
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    0796: SLDC 67          Short load constant 103
-   0797: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0797: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    079a: UJP  $07aa       Unconditional jump
+-> 079c: XJP  0000 0002 07aa Case jump
+           0000 -> 0784   0001 -> 078b   0002 -> 0796
+       default -> 07aa
 -> 07aa: UJP  $07b8       Unconditional jump
+-> 07ac: XJP  0000 0001 07b8 Case jump
+           0000 -> 076c   0001 -> 0781
+       default -> 07b8
 -> 07b8: SLDC 01          Short load constant 1
    07b9: SRO  0004        Store global word BASE4
    07bb: SLDC 01          Short load constant 1
@@ -11082,13 +11483,14 @@ BEGIN
    07d6: SLDO 03          Short load global BASE3
    07d7: SLDC 00          Short load constant 0
    07d8: SLDC 00          Short load constant 0
-   07d9: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   07d9: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    07dc: FJP  $07e3       Jump if TOS false
    07de: SLDC 26          Short load constant 38
    07df: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    07e1: UJP  $07e9       Unconditional jump
+  PASCALCOMPILER.ERROR(409) { General Compiler error }
 -> 07e3: LDCI 0199        Load word 409
-   07e6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   07e6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 07e9: UJP  $0822       Unconditional jump
    07eb: SLDO 05          Short load global BASE5
    07ec: UJP  $0806       Unconditional jump
@@ -11105,10 +11507,17 @@ BEGIN
    07fb: SLDO 06          Short load global BASE6
    07fc: CIP  05          Call intermediate procedure 5 BODYPART.PROC5
 -> 07fe: UJP  $0814       Unconditional jump
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    0800: SLDC 67          Short load constant 103
-   0801: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0801: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0804: UJP  $0814       Unconditional jump
+-> 0806: XJP  0000 0002 0814 Case jump
+           0000 -> 07ee   0001 -> 07f5   0002 -> 0800
+       default -> 0814
 -> 0814: UJP  $0822       Unconditional jump
+-> 0816: XJP  0000 0001 0822 Case jump
+           0000 -> 07d6   0001 -> 07eb
+       default -> 0822
 -> 0822: SLDO 04          Short load global BASE4
    0823: SLDC 01          Short load constant 1
    0824: NEQI             Integer TOS-1 <> TOS
@@ -11132,7 +11541,7 @@ END
 ### PROCEDURE BODYPART.PROC11(PARAM1; PARAM2; PARAM3; PARAM4) (* P=11, LL=2, D=17, Callers: PROC22, PROC23, PROC30, PROC31, PROC36 *)
   BASE3
   BASE4
-  BASE15
+  BASE15=SY:SYMBOL
   BASE16
   BASE57
   BASE58
@@ -11157,7 +11566,7 @@ BEGIN
 -> 1a18: LLA  0001        Load local address MP1
    1a1a: LDM  04          Load 4 words from (TOS)
    1a1c: SLDC 04          Short load constant 4
-   1a20: LDC  03          Load multiple-word constant
+   1a1d: LDC  03          Load multiple-word constant
                             0000 0000 0200 
    1a26: SLDC 03          Short load constant 3
    1a27: UNI              Set union (TOS OR TOS-1)
@@ -11173,7 +11582,7 @@ BEGIN
    1a34: SLDO 03          Short load global BASE3
    1a35: SLDC 00          Short load constant 0
    1a36: SLDC 00          Short load constant 0
-   1a37: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1a37: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1a3a: SLDO 03          Short load global BASE3
    1a3b: LDO  003e        Load global word BASE62
    1a3d: EQUI             Integer TOS-1 = TOS
@@ -11204,7 +11613,7 @@ BEGIN
    1a61: STL  000a        Store TOS into MP10
    1a63: LDO  005b        Load global word BASE91
    1a65: STL  000d        Store TOS into MP13
-   1a67: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1a67: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1a6a: LLA  0001        Load local address MP1
    1a6c: LDM  04          Load 4 words from (TOS)
    1a6e: CLP  22          Call local procedure BODYPART.PROC34
@@ -11214,7 +11623,7 @@ BEGIN
    1a73: SLDO 03          Short load global BASE3
    1a74: SLDC 00          Short load constant 0
    1a75: SLDC 00          Short load constant 0
-   1a76: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1a76: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1a79: SLDO 03          Short load global BASE3
    1a7a: LDO  003e        Load global word BASE62
    1a7c: EQUI             Integer TOS-1 = TOS
@@ -11255,18 +11664,18 @@ BEGIN
    1aa8: SIND 02          Short index load *TOS+2
    1aa9: SLDC 00          Short load constant 0
    1aaa: SLDC 00          Short load constant 0
-   1aab: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1aab: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1aae: FJP  $1ab5       Jump if TOS false
    1ab0: SLDC 0b          Short load constant 11
    1ab1: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    1ab3: UJP  $1abe       Unconditional jump
 -> 1ab5: LDCI 0081        Load word 129
-   1ab8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1ab8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1abb: LDCN             Load constant NIL
    1abc: SRO  0003        Store global word BASE3
 -> 1abe: UJP  $1ac9       Unconditional jump
 -> 1ac0: LDCI 0082        Load word 130
-   1ac3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1ac3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1ac6: LDCN             Load constant NIL
    1ac7: SRO  0003        Store global word BASE3
 -> 1ac9: UJP  $1c7a       Unconditional jump
@@ -11284,7 +11693,7 @@ BEGIN
    1adc: SLDO 03          Short load global BASE3
    1add: SLDC 00          Short load constant 0
    1ade: SLDC 00          Short load constant 0
-   1adf: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   1adf: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    1ae2: FJP  $1af1       Jump if TOS false
    1ae4: SLDO 03          Short load global BASE3
    1ae5: SIND 07          Short index load *TOS+7
@@ -11301,7 +11710,7 @@ BEGIN
    1af6: SLDL 05          Short load local MP5
    1af7: SLDC 00          Short load constant 0
    1af8: SLDC 00          Short load constant 0
-   1af9: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   1af9: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    1afc: FJP  $1b0c       Jump if TOS false
    1afe: SLDL 05          Short load local MP5
    1aff: SIND 07          Short index load *TOS+7
@@ -11316,13 +11725,13 @@ BEGIN
    1b0d: SLDO 03          Short load global BASE3
    1b0e: SLDC 00          Short load constant 0
    1b0f: SLDC 00          Short load constant 0
-   1b10: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1b10: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1b13: LAND             Logical AND (TOS & TOS-1)
    1b14: SLDL 0e          Short load local MP14
    1b15: SLDL 05          Short load local MP5
    1b16: SLDC 00          Short load constant 0
    1b17: SLDC 00          Short load constant 0
-   1b18: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1b18: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1b1b: LAND             Logical AND (TOS & TOS-1)
    1b1c: LOR              Logical OR (TOS | TOS-1)
    1b1d: FJP  $1b21       Jump if TOS false
@@ -11331,7 +11740,7 @@ BEGIN
    1b22: SLDO 03          Short load global BASE3
    1b23: SLDC 00          Short load constant 0
    1b24: SLDC 00          Short load constant 0
-   1b25: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1b25: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1b28: FJP  $1c74       Jump if TOS false
    1b2a: SLDL 05          Short load local MP5
    1b2b: SIND 00          Short index load *TOS+0
@@ -11362,7 +11771,7 @@ BEGIN
    1b52: INN              Set membership (TOS-1 in set TOS)
    1b53: FJP  $1b5b       Jump if TOS false
    1b55: LDCI 0083        Load word 131
-   1b58: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1b58: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1b5b: SLDC 00          Short load constant 0
    1b5c: STL  000b        Store TOS into MP11
    1b5e: UJP  $1c20       Unconditional jump
@@ -11375,7 +11784,7 @@ BEGIN
    1b6a: INN              Set membership (TOS-1 in set TOS)
    1b6b: FJP  $1b73       Jump if TOS false
    1b6d: LDCI 0084        Load word 132
-   1b70: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1b70: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1b73: SLDC 04          Short load constant 4
    1b74: STL  000b        Store TOS into MP11
    1b76: UJP  $1c20       Unconditional jump
@@ -11384,7 +11793,7 @@ BEGIN
    1b7b: SLDL 05          Short load local MP5
    1b7c: SLDC 00          Short load constant 0
    1b7d: SLDC 00          Short load constant 0
-   1b7e: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   1b7e: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    1b81: FJP  $1bbf       Jump if TOS false
    1b83: SLDL 05          Short load local MP5
    1b84: SIND 07          Short index load *TOS+7
@@ -11403,7 +11812,7 @@ BEGIN
    1b98: EQUI             Integer TOS-1 = TOS
    1b99: FJP  $1ba3       Jump if TOS false
    1b9b: LDCI 0081        Load word 129
-   1b9e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1b9e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1ba1: UJP  $1ba6       Unconditional jump
 -> 1ba3: SLDO 03          Short load global BASE3
    1ba4: STL  0005        Store TOS into MP5
@@ -11416,7 +11825,7 @@ BEGIN
    1bad: SIND 02          Short index load *TOS+2
    1bae: LLA  0011        Load local address MP17
    1bb0: LLA  0010        Load local address MP16
-   1bb2: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   1bb2: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    1bb5: SLDL 10          Short load local MP16
    1bb6: LDL  0011        Load local word MP17
    1bb8: SBI              Subtract integers (TOS-1 - TOS)
@@ -11433,7 +11842,7 @@ BEGIN
    1bc8: EQUI             Integer TOS-1 = TOS
    1bc9: FJP  $1bd3       Jump if TOS false
    1bcb: LDCI 0081        Load word 129
-   1bce: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1bce: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1bd1: UJP  $1bda       Unconditional jump
 -> 1bd3: SLDO 03          Short load global BASE3
    1bd4: STL  0005        Store TOS into MP5
@@ -11446,7 +11855,7 @@ BEGIN
    1bdf: INN              Set membership (TOS-1 in set TOS)
    1be0: FJP  $1be8       Jump if TOS false
    1be2: LDCI 0083        Load word 131
-   1be5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1be5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1be8: UJP  $1c20       Unconditional jump
    1bea: SLDL 0a          Short load local MP10
    1beb: LDCI 0f00        Load word 3840
@@ -11454,15 +11863,19 @@ BEGIN
    1bef: INN              Set membership (TOS-1 in set TOS)
    1bf0: FJP  $1bf8       Jump if TOS false
    1bf2: LDCI 0083        Load word 131
-   1bf5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1bf5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1bf8: SLDC 06          Short load constant 6
    1bf9: STL  000b        Store TOS into MP11
    1bfb: UJP  $1c20       Unconditional jump
    1bfd: LDCI 0085        Load word 133
-   1c00: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1c00: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1c03: SLDC 00          Short load constant 0
    1c04: STL  000b        Store TOS into MP11
    1c06: UJP  $1c20       Unconditional jump
+-> 1c08: XJP  0000 0007 1c20 Case jump
+           0000 -> 1b32   0001 -> 1c0e   0002 -> 1b4d   0003 -> 1b60
+           0004 -> 1b65   0005 -> 1b78   0006 -> 1bea   0007 -> 1bfd
+       default -> 1c20
 -> 1c20: SLDL 0b          Short load local MP11
    1c21: SLDC 07          Short load constant 7
    1c22: EQUI             Integer TOS-1 = TOS
@@ -11507,9 +11920,13 @@ BEGIN
    1c59: SLDL 0c          Short load local MP12
    1c5a: CIP  06          Call intermediate procedure 6 BODYPART.PROC6
    1c5c: UJP  $1c72       Unconditional jump
+-> 1c5e: XJP  0008 000d 1c72 Case jump
+           0008 -> 1c34   0009 -> 1c3b   000a -> 1c49   000b -> 1c42
+           000c -> 1c50   000d -> 1c57
+       default -> 1c72
 -> 1c72: UJP  $1c7a       Unconditional jump
 -> 1c74: LDCI 0081        Load word 129
-   1c77: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1c77: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1c7a: LDO  003d        Load global word BASE61
    1c7c: SRO  0003        Store global word BASE3
    1c7e: SLDC 02          Short load constant 2
@@ -11518,7 +11935,7 @@ BEGIN
 END
 
 ### PROCEDURE BODYPART.PROC12(PARAM1; PARAM2; PARAM3; PARAM4) (* P=12, LL=2, D=5, Callers: PROC29 *)
-  BASE15
+  BASE15=SY:SYMBOL
   BASE76
   BASE133=VARS
   MP1=PARAM4
@@ -11538,11 +11955,12 @@ BEGIN
    0c01: UNI              Set union (TOS OR TOS-1)
    0c02: ADJ  01          Adjust set to 1 words
    0c04: LLA  0005        Load local address MP5
-   0c06: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   0c09: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0c06: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   0c09: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0c0c: UJP  $0c16       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0c0e: SLDC 02          Short load constant 2
-   0c0f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0c0f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0c12: LDO  004c        Load global word BASE76
    0c14: STL  0005        Store TOS into MP5
 -> 0c16: LLA  0001        Load local address MP1
@@ -11570,8 +11988,9 @@ BEGIN
    0c36: LDCI 00fe        Load word 254
    0c39: GRTI             Integer TOS-1 > TOS
    0c3a: FJP  $0c44       Jump if TOS false
+    PASCALCOMPILER.ERROR(251) { Too many nested procedures or functions }
    0c3c: LDCI 00fb        Load word 251
-   0c3f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0c3f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0c42: UJP  $0c4a       Unconditional jump
 -> 0c44: LDO  0063        Load global word BASE99 (NEXTPROC)
    0c46: SLDC 01          Short load constant 1
@@ -11628,15 +12047,15 @@ BEGIN
    04b1: EQUI             Integer TOS-1 = TOS
    04b2: FJP  $04be       Jump if TOS false
    04b4: SLDC 01          Short load constant 1
-   04b5: CXP  01 16       Call external procedure PASCALCO.PROC22
+   04b5: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    04b8: LDCI 0084        Load word 132
-   04bb: CXP  01 16       Call external procedure PASCALCO.PROC22
+   04bb: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 04be: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE BODYPART.PROC16(PARAM1; PARAM2) (* P=16, LL=2, D=4, Callers: PROC19, PROC17 *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE627
   BASE628
   MP1=PARAM2
@@ -11652,7 +12071,7 @@ BEGIN
    04d1: SLDL 02          Short load local MP2
    04d2: LDCI 0080        Load word 128
    04d5: ADI              Add integers (TOS + TOS-1)
-   04d6: CXP  01 16       Call external procedure PASCALCO.PROC22
+   04d6: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    04d9: SLDL 04          Short load local MP4
    04da: SIND 01          Short index load *TOS+1
    04db: SLDO 09          Short load global BASE9 (IC)
@@ -11669,7 +12088,7 @@ BEGIN
    04e7: LAND             Logical AND (TOS & TOS-1)
    04e8: FJP  $04f0       Jump if TOS false
    04ea: SLDL 03          Short load local MP3
-   04eb: CXP  01 16       Call external procedure PASCALCO.PROC22
+   04eb: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    04ee: UJP  $052f       Unconditional jump
 -> 04f0: SLDL 04          Short load local MP4
    04f1: SIND 02          Short index load *TOS+2
@@ -11684,8 +12103,9 @@ BEGIN
    0500: SLDC 24          Short load constant 36
    0501: EQUI             Integer TOS-1 = TOS
    0502: FJP  $050c       Jump if TOS false
+    PASCALCOMPILER.ERROR(254) { Procedure too complex }
    0504: LDCI 00fe        Load word 254
-   0507: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0507: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    050a: UJP  $0514       Unconditional jump
 -> 050c: LDO  0273        Load global word BASE627
    050f: SLDC 01          Short load constant 1
@@ -11709,7 +12129,7 @@ BEGIN
    0529: SLDL 04          Short load local MP4
    052a: SIND 02          Short index load *TOS+2
    052b: SBI              Subtract integers (TOS-1 - TOS)
-   052c: CXP  01 16       Call external procedure PASCALCO.PROC22
+   052c: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 052f: UJP  $0555       Unconditional jump
 -> 0531: SLDL 04          Short load local MP4
    0532: INC  0001        Inc field ptr (TOS+1)
@@ -11754,8 +12174,9 @@ BEGIN
    056a: NEQI             Integer TOS-1 <> TOS
    056b: LAND             Logical AND (TOS & TOS-1)
    056c: FJP  $0574       Jump if TOS false
+  PASCALCOMPILER.ERROR(135) { Type of operand must be boolean }
    056e: LDCI 0087        Load word 135
-   0571: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0571: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0574: SLDC 21          Short load constant 33
    0575: SLDL 01          Short load local MP1
    0576: CIP  10          Call intermediate procedure 16 BODYPART.PROC16
@@ -11784,7 +12205,7 @@ END
 
 ### PROCEDURE BODYPART.PROC19(PARAM1) (* P=19, LL=2, D=4 *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   MP1=PARAM1
   MP2
   MP3
@@ -11867,8 +12288,9 @@ BEGIN
    0724: SLDC 00          Short load constant 0
    0725: NEQI             Integer TOS-1 <> TOS
    0726: FJP  $0730       Jump if TOS false
+  PASCALCOMPILER.ERROR(409) { General Compiler error }
    0728: LDCI 0199        Load word 409
-   072b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   072b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    072e: UJP  $0733       Unconditional jump
 -> 0730: SLDC 1a          Short load constant 26
    0731: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
@@ -11885,6 +12307,10 @@ BEGIN
    0742: SLDC 3f          Short load constant 63
    0743: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    0745: UJP  $0758       Unconditional jump
+-> 0747: XJP  0000 0004 0758 Case jump
+           0000 -> 0719   0001 -> 0722   0002 -> 0735   0003 -> 073a
+           0004 -> 0742
+       default -> 0758
 -> 0758: RNP  00          Return from nonbase procedure
 END
 
@@ -11962,14 +12388,14 @@ END
   BASE5
   BASE6
   BASE7
-  BASE15
+  BASE15=SY:SYMBOL
   BASE24
   BASE33
   BASE52
   BASE62
   BASE80
   BASE113=SELECTSYS
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1=PARAM5
   MP2=PARAM4
   MP3=PARAM3
@@ -12078,15 +12504,17 @@ BEGIN
    092a: SLDC 01          Short load constant 1
    092b: NEQI             Integer TOS-1 <> TOS
    092c: FJP  $0936       Jump if TOS false
+  PASCALCOMPILER.ERROR(150) { Assignment to standard function is not allowed }
    092e: LDCI 0096        Load word 150
-   0931: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0931: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0934: UJP  $094f       Unconditional jump
 -> 0936: SLDL 0e          Short load local MP14
    0937: IND  0011        Static index and load word (TOS+17)
    0939: LNOT             Logical NOT (~TOS)
    093a: FJP  $0942       Jump if TOS false
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    093c: SLDC 67          Short load constant 103
-   093d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   093d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0940: UJP  $094f       Unconditional jump
 -> 0942: SLDC 00          Short load constant 0
    0943: SRO  0005        Store global word BASE5
@@ -12098,6 +12526,10 @@ BEGIN
    094c: SLDC 01          Short load constant 1
    094d: SRO  0007        Store global word BASE7
 -> 094f: UJP  $0962       Unconditional jump
+-> 0951: XJP  0002 0006 0962 Case jump
+           0002 -> 08d1   0003 -> 08ab   0004 -> 08e2   0005 -> 0956
+           0006 -> 0927
+       default -> 0962
 -> 0962: SLDO 03          Short load global BASE3
    0963: LDCN             Load constant NIL
    0964: NEQI             Integer TOS-1 <> TOS
@@ -12126,8 +12558,9 @@ BEGIN
    0983: INN              Set membership (TOS-1 in set TOS)
    0984: LNOT             Logical NOT (~TOS)
    0985: FJP  $099b       Jump if TOS false
+  PASCALCOMPILER.ERROR(59) { Error in variable }
    0987: SLDC 3b          Short load constant 59
-   0988: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0988: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    098b: LAO  0071        Load global BASE113 (SELECTSYS)
    098d: LDM  04          Load 4 words from (TOS)
    098f: SLDC 04          Short load constant 4
@@ -12136,7 +12569,7 @@ BEGIN
    0994: SLDC 04          Short load constant 4
    0995: UNI              Set union (TOS OR TOS-1)
    0996: ADJ  04          Adjust set to 4 words
-   0998: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0998: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 099b: SLDO 0f          Short load global BASE15
    099c: LAO  0071        Load global BASE113 (SELECTSYS)
    099e: LDM  04          Load 4 words from (TOS)
@@ -12159,16 +12592,17 @@ BEGIN
    09b6: SLDC 05          Short load constant 5
    09b7: NEQI             Integer TOS-1 <> TOS
    09b8: FJP  $09c3       Jump if TOS false
+  PASCALCOMPILER.ERROR(138) { Type of variable is not array }
    09ba: LDCI 008a        Load word 138
-   09bd: CXP  01 04       Call external procedure PASCALCO.ERROR
+   09bd: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    09c0: LDCN             Load constant NIL
    09c1: STL  0006        Store TOS into MP6
 -> 09c3: CIP  09          Call intermediate procedure 9 BODYPART.PROC9
-   09c5: CXP  01 08       Call external procedure PASCALCO.PROC8
+   09c5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    09c8: LLA  0002        Load local address MP2
    09ca: LDM  04          Load 4 words from (TOS)
    09cc: SLDC 04          Short load constant 4
-   09d0: LDC  02          Load multiple-word constant
+   09cd: LDC  02          Load multiple-word constant
                             0002 0001 
    09d4: SLDC 02          Short load constant 2
    09d5: UNI              Set union (TOS OR TOS-1)
@@ -12185,8 +12619,9 @@ BEGIN
    09e5: SLDC 00          Short load constant 0
    09e6: NEQI             Integer TOS-1 <> TOS
    09e7: FJP  $09ed       Jump if TOS false
+  PASCALCOMPILER.ERROR(113) { Index type must be a scalar or a subrange }
    09e9: SLDC 71          Short load constant 113
-   09ea: CXP  01 04       Call external procedure PASCALCO.ERROR
+   09ea: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 09ed: SLDL 06          Short load local MP6
    09ee: LDCN             Load constant NIL
    09ef: NEQI             Integer TOS-1 <> TOS
@@ -12198,7 +12633,7 @@ BEGIN
    09f7: SLDO 03          Short load global BASE3
    09f8: SLDC 00          Short load constant 0
    09f9: SLDC 00          Short load constant 0
-   09fa: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   09fa: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    09fd: FJP  $0a3b       Jump if TOS false
    09ff: SLDL 0e          Short load local MP14
    0a00: SIND 02          Short index load *TOS+2
@@ -12207,7 +12642,7 @@ BEGIN
    0a03: SLDL 06          Short load local MP6
    0a04: SLDC 00          Short load constant 0
    0a05: SLDC 00          Short load constant 0
-   0a06: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0a06: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0a09: LNOT             Logical NOT (~TOS)
    0a0a: LAND             Logical AND (TOS & TOS-1)
    0a0b: FJP  $0a39       Jump if TOS false
@@ -12215,7 +12650,7 @@ BEGIN
    0a0e: SIND 02          Short index load *TOS+2
    0a0f: LLA  000d        Load local address MP13
    0a11: LLA  000c        Load local address MP12
-   0a13: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0a13: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0a16: LDO  0034        Load global word BASE52
    0a18: FJP  $0a23       Jump if TOS false
    0a1a: SLDL 0d          Short load local MP13
@@ -12241,8 +12676,9 @@ BEGIN
 -> 0a36: SLDC 02          Short load constant 2
    0a37: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
 -> 0a39: UJP  $0a41       Unconditional jump
+  PASCALCOMPILER.ERROR(139) { Index type is not compatible with the declaration }
 -> 0a3b: LDCI 008b        Load word 139
-   0a3e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0a3e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0a41: SLDL 0e          Short load local MP14
    0a42: SIND 03          Short index load *TOS+3
    0a43: SRO  0003        Store global word BASE3
@@ -12269,7 +12705,7 @@ BEGIN
    0a60: SLDL 06          Short load local MP6
    0a61: SLDC 00          Short load constant 0
    0a62: SLDC 00          Short load constant 0
-   0a63: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0a63: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0a66: LDO  0034        Load global word BASE52
    0a68: LAND             Logical AND (TOS & TOS-1)
    0a69: FJP  $0a70       Jump if TOS false
@@ -12310,10 +12746,11 @@ BEGIN
    0a97: SLDC 10          Short load constant 16
    0a98: EQUI             Integer TOS-1 = TOS
    0a99: FJP  $0aa0       Jump if TOS false
-   0a9b: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0a9b: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0a9e: UJP  $0aa4       Unconditional jump
+  PASCALCOMPILER.ERROR(12) { ']' expected }
 -> 0aa0: SLDC 0c          Short load constant 12
-   0aa1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0aa1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0aa4: UJP  $0bb1       Unconditional jump
 -> 0aa6: SLDO 0f          Short load global BASE15
    0aa7: SLDC 12          Short load constant 18
@@ -12328,11 +12765,12 @@ BEGIN
    0ab2: SLDC 06          Short load constant 6
    0ab3: NEQI             Integer TOS-1 <> TOS
    0ab4: FJP  $0abf       Jump if TOS false
+  PASCALCOMPILER.ERROR(140) { Type of variable is not record }
    0ab6: LDCI 008c        Load word 140
-   0ab9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ab9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0abc: LDCN             Load constant NIL
    0abd: SRO  0003        Store global word BASE3
--> 0abf: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0abf: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0ac2: SLDO 0f          Short load global BASE15
    0ac3: SLDC 00          Short load constant 0
    0ac4: EQUI             Integer TOS-1 = TOS
@@ -12344,13 +12782,14 @@ BEGIN
    0acc: SLDO 03          Short load global BASE3
    0acd: SIND 02          Short index load *TOS+2
    0ace: LLA  000b        Load local address MP11
-   0ad0: CXP  01 09       Call external procedure PASCALCO.PROC9
+   0ad0: CXP  01 09       Call external procedure PASCALCOMPILER.PROC9
    0ad3: SLDL 0b          Short load local MP11
    0ad4: LDCN             Load constant NIL
    0ad5: EQUI             Integer TOS-1 = TOS
    0ad6: FJP  $0ae3       Jump if TOS false
+  PASCALCOMPILER.ERROR(152) { No such field in this record }
    0ad8: LDCI 0098        Load word 152
-   0adb: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0adb: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0ade: LDCN             Load constant NIL
    0adf: SRO  0003        Store global word BASE3
    0ae1: UJP  $0b41       Unconditional jump
@@ -12373,9 +12812,14 @@ BEGIN
    0afa: ADI              Add integers (TOS + TOS-1)
    0afb: SRO  0006        Store global word BASE6
    0afd: UJP  $0b18       Unconditional jump
+  PASCALCOMPILER.ERROR(409) { General Compiler error }
    0aff: LDCI 0199        Load word 409
-   0b02: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0b02: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0b05: UJP  $0b18       Unconditional jump
+-> 0b07: XJP  0000 0004 0b18 Case jump
+           0000 -> 0aed   0001 -> 0af6   0002 -> 0aff   0003 -> 0aff
+           0004 -> 0aff
+       default -> 0b18
 -> 0b18: SLDL 0e          Short load local MP14
    0b19: IND  000a        Static index and load word (TOS+10)
    0b1b: FJP  $0b2c       Jump if TOS false
@@ -12405,10 +12849,11 @@ BEGIN
    0b3c: CIP  09          Call intermediate procedure 9 BODYPART.PROC9
    0b3e: SLDC 03          Short load constant 3
    0b3f: SRO  0005        Store global word BASE5
--> 0b41: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0b41: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0b44: UJP  $0b4a       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0b46: SLDC 02          Short load constant 2
-   0b47: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0b47: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0b4a: UJP  $0bb1       Unconditional jump
 -> 0b4c: SLDO 03          Short load global BASE3
    0b4d: LDCN             Load constant NIL
@@ -12449,8 +12894,9 @@ BEGIN
    0b7b: LDCN             Load constant NIL
    0b7c: EQUI             Integer TOS-1 = TOS
    0b7d: FJP  $0b87       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    0b7f: LDCI 018f        Load word 399
-   0b82: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0b82: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0b85: UJP  $0b93       Unconditional jump
 -> 0b87: SLDO 03          Short load global BASE3
    0b88: LDO  003e        Load global word BASE62
@@ -12477,9 +12923,10 @@ BEGIN
    0ba3: SLDC 03          Short load constant 3
    0ba4: SRO  0005        Store global word BASE5
 -> 0ba6: UJP  $0bae       Unconditional jump
+  PASCALCOMPILER.ERROR(141) { Type of variable must be file or pointer }
 -> 0ba8: LDCI 008d        Load word 141
-   0bab: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0bae: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0bab: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0bae: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0bb1: SLDO 0f          Short load global BASE15
    0bb2: LLA  0002        Load local address MP2
    0bb4: LDM  04          Load 4 words from (TOS)
@@ -12491,8 +12938,9 @@ BEGIN
    0bbd: INN              Set membership (TOS-1 in set TOS)
    0bbe: LNOT             Logical NOT (~TOS)
    0bbf: FJP  $0bd5       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    0bc1: SLDC 06          Short load constant 6
-   0bc2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0bc2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0bc5: LLA  0002        Load local address MP2
    0bc7: LDM  04          Load 4 words from (TOS)
    0bc9: SLDC 04          Short load constant 4
@@ -12501,13 +12949,13 @@ BEGIN
    0bce: SLDC 04          Short load constant 4
    0bcf: UNI              Set union (TOS OR TOS-1)
    0bd0: ADJ  04          Adjust set to 4 words
-   0bd2: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0bd2: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0bd5: UJP  $099b       Unconditional jump
 -> 0bd7: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE BODYPART.PROC23(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5) (* P=23, LL=2, D=7, Callers: PROC36 *)
-  BASE15
+  BASE15=SY:SYMBOL
   MP1=PARAM5
   MP2=PARAM4
   MP3=PARAM3
@@ -12530,7 +12978,7 @@ BEGIN
    1294: SLDC 04          Short load constant 4
    1295: EQUI             Integer TOS-1 = TOS
    1296: FJP  $129d       Jump if TOS false
-   1298: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1298: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    129b: UJP  $12ac       Unconditional jump
 -> 129d: SLDL 06          Short load local MP6
    129e: SLDC 74          Short load constant 116
@@ -12540,10 +12988,11 @@ BEGIN
    12a3: SLDC 00          Short load constant 0
    12a4: STL  0007        Store TOS into MP7
    12a6: UJP  $12ac       Unconditional jump
+  PASCALCOMPILER.ERROR(9) { '(' expected }
 -> 12a8: SLDC 09          Short load constant 9
-   12a9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   12a9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 12ac: SLDL 06          Short load local MP6
-   12b0: LDC  03          Load multiple-word constant
+   12ad: LDC  03          Load multiple-word constant
                             6f80 0200 0490 
    12b6: SLDC 03          Short load constant 3
    12b7: INN              Set membership (TOS-1 in set TOS)
@@ -12576,17 +13025,18 @@ BEGIN
    12de: LDM  04          Load 4 words from (TOS)
    12e0: SLDL 07          Short load local MP7
    12e1: SLDL 06          Short load local MP6
-   12e2: CXP  0a 01       Call external procedure ROUTINE.1
+   12e2: CXP  0a 01       Call external procedure ROUTINE.ROUTINE
 -> 12e5: SLDL 07          Short load local MP7
    12e6: FJP  $12f6       Jump if TOS false
    12e8: SLDO 0f          Short load global BASE15
    12e9: SLDC 05          Short load constant 5
    12ea: EQUI             Integer TOS-1 = TOS
    12eb: FJP  $12f2       Jump if TOS false
-   12ed: CXP  01 08       Call external procedure PASCALCO.PROC8
+   12ed: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    12f0: UJP  $12f6       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 12f2: SLDC 04          Short load constant 4
-   12f3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   12f3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 12f6: UJP  $12fa       Unconditional jump
 -> 12f8: CLP  1f          Call local procedure BODYPART.PROC31
 -> 12fa: RNP  00          Return from nonbase procedure
@@ -12596,20 +13046,20 @@ END
   BASE35=NOSWAP:BOOLEAN
   MP19
 BEGIN
--> 017a: CXP  0e 01       Call external procedure BODY1.1
+-> 017a: CXP  0e 01       Call external procedure BODY1.BODY1
    017d: LDO  0023        Load global word BASE35 (NOSWAP)
    017f: FJP  $0185       Jump if TOS false
    0181: CLP  1b          Call local procedure BODYPART.PROC27
    0183: UJP  $0187       Unconditional jump
 -> 0185: CLP  19          Call local procedure BODYPART.PROC25
--> 0187: CXP  0f 01       Call external procedure BODY3.1
+-> 0187: CXP  0f 01       Call external procedure BODY3.BODY3
 -> 018a: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE BODYPART.PROC25 (* P=25, LL=3, D=2, Callers: PROC24, PROC27 *)
-  BASE8
+  BASE8=TOP:DISPRANGE
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE33
   BASE46
   BASE50=NOISY:BOOLEAN
@@ -12617,9 +13067,9 @@ END
   BASE62
   BASE66
   BASE92
-  BASE95=SCREENDOTS
-  BASE105=STATBEGSYS
-  BASE134
+  BASE95=SCREENDOTS:INTEGER
+  BASE105=STATBEGSYS:SETOFSYS
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   ????????:MP1
   ????????:MP2
   PROC24:MP6
@@ -12771,7 +13221,7 @@ BEGIN
    012a: SLDC 01          Short load constant 1
    012b: UNI              Set union (TOS OR TOS-1)
    012c: ADJ  04          Adjust set to 4 words
-   012e: CXP  0b 01       Call external procedure STATEMEN.1
+   012e: CXP  0b 01       Call external procedure STATEMENT.STATEMENT
    0131: SLDO 0f          Short load global BASE15
    0132: LAO  0069        Load global BASE105 (STATBEGSYS)
    0134: LDM  04          Load 4 words from (TOS)
@@ -12786,7 +13236,7 @@ BEGIN
    0140: SLDO 0b          Short load global BASE11
    0141: LNOT             Logical NOT (~TOS)
    0142: FJP  $0147       Jump if TOS false
-   0144: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0144: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0147: SLDO 0b          Short load global BASE11
    0148: FJP  $0121       Jump if TOS false
 -> 014a: RNP  00          Return from nonbase procedure
@@ -12838,18 +13288,18 @@ BEGIN
    02a6: LEQI             Integer TOS-1 <= TOS
    02a7: FJP  $02af       Jump if TOS false
    02a9: SLDL 01          Short load local MP1
-   02aa: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02aa: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    02ad: UJP  $02c3       Unconditional jump
 -> 02af: LDCI 0080        Load word 128
    02b2: SLDL 01          Short load local MP1
    02b3: LDCI 0100        Load word 256
    02b6: DVI              Divide integers (TOS-1 / TOS)
    02b7: ADI              Add integers (TOS + TOS-1)
-   02b8: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02b8: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    02bb: SLDL 01          Short load local MP1
    02bc: LDCI 0100        Load word 256
    02bf: MODI             Modulo integers (TOS-1 % TOS)
-   02c0: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02c0: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 02c3: RNP  00          Return from nonbase procedure
 END
 
@@ -12858,7 +13308,7 @@ END
   BASE5
   BASE11
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE48
   BASE62
   BASE63
@@ -12886,7 +13336,7 @@ BEGIN
    0ca5: UNI              Set union (TOS OR TOS-1)
    0ca6: ADJ  01          Adjust set to 1 words
    0ca8: LLA  0001        Load local address MP1
-   0caa: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0caa: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    0cad: SLDL 01          Short load local MP1
    0cae: SIND 06          Short index load *TOS+6
    0caf: LDCN             Load constant NIL
@@ -12904,7 +13354,7 @@ BEGIN
    0cbd: LDO  003e        Load global word BASE62
    0cbf: EQUI             Integer TOS-1 = TOS
    0cc0: FJP  $0cdb       Jump if TOS false
-   0cc2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0cc2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0cc5: SLDL 01          Short load local MP1
    0cc6: STL  0002        Store TOS into MP2
    0cc8: SLDO 0f          Short load global BASE15
@@ -12913,18 +13363,20 @@ BEGIN
    0ccb: INN              Set membership (TOS-1 in set TOS)
    0ccc: LNOT             Logical NOT (~TOS)
    0ccd: FJP  $0cd3       Jump if TOS false
+  PASCALCOMPILER.ERROR(20) { ',' expected }
    0ccf: SLDC 14          Short load constant 20
-   0cd0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0cd0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0cd3: SLDO 0f          Short load global BASE15
    0cd4: SLDC 01          Short load constant 1
    0cd5: EQUI             Integer TOS-1 = TOS
    0cd6: FJP  $0cdb       Jump if TOS false
-   0cd8: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0cd8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0cdb: UJP  $0ce6       Unconditional jump
 -> 0cdd: LOD  01 0007     Load word at PROC23:MP7
    0ce0: FJP  $0ce6       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    0ce2: SLDC 02          Short load constant 2
-   0ce3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ce3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0ce6: LOD  01 0007     Load word at PROC23:MP7
    0ce9: SLDO 0f          Short load global BASE15
    0cea: SLDC 05          Short load constant 5
@@ -12945,8 +13397,9 @@ BEGIN
    0d00: SLDC 04          Short load constant 4
    0d01: EQUI             Integer TOS-1 = TOS
    0d02: FJP  $0d08       Jump if TOS false
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
    0d04: SLDC 67          Short load constant 103
-   0d05: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0d05: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0d08: CIP  09          Call intermediate procedure 9 BODYPART.PROC9
    0d0a: SLDO 03          Short load global BASE3
    0d0b: LDCN             Load constant NIL
@@ -12956,7 +13409,7 @@ BEGIN
    0d10: SLDO 03          Short load global BASE3
    0d11: SLDC 00          Short load constant 0
    0d12: SLDC 00          Short load constant 0
-   0d13: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0d13: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0d16: FJP  $0d1f       Jump if TOS false
    0d18: SLDC 4d          Short load constant 77
    0d19: SLDC 00          Short load constant 0
@@ -12967,7 +13420,7 @@ BEGIN
    0d21: SLDO 03          Short load global BASE3
    0d22: SLDC 00          Short load constant 0
    0d23: SLDC 00          Short load constant 0
-   0d24: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0d24: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0d27: FJP  $0d2f       Jump if TOS false
    0d29: SLDC 1f          Short load constant 31
    0d2a: SLDC 03          Short load constant 3
@@ -12977,7 +13430,7 @@ BEGIN
    0d31: SLDO 03          Short load global BASE3
    0d32: SLDC 00          Short load constant 0
    0d33: SLDC 00          Short load constant 0
-   0d34: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0d34: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0d37: FJP  $0d43       Jump if TOS false
    0d39: SLDO 03          Short load global BASE3
    0d3a: SIND 00          Short index load *TOS+0
@@ -12990,7 +13443,7 @@ BEGIN
    0d45: SLDO 03          Short load global BASE3
    0d46: SLDC 00          Short load constant 0
    0d47: SLDC 00          Short load constant 0
-   0d48: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0d48: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0d4b: FJP  $0d54       Jump if TOS false
    0d4d: SLDC 4d          Short load constant 77
    0d4e: SLDC 00          Short load constant 0
@@ -13000,7 +13453,7 @@ BEGIN
 -> 0d54: SLDO 03          Short load global BASE3
    0d55: SLDC 00          Short load constant 0
    0d56: SLDC 00          Short load constant 0
-   0d57: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0d57: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0d5a: FJP  $0d68       Jump if TOS false
    0d5c: SLDO 03          Short load global BASE3
    0d5d: IND  0008        Static index and load word (TOS+8)
@@ -13010,8 +13463,9 @@ BEGIN
    0d63: SLDC 12          Short load constant 18
    0d64: CIP  06          Call intermediate procedure 6 BODYPART.PROC6
    0d66: UJP  $0d6c       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0d68: SLDC 7d          Short load constant 125
-   0d69: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0d69: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0d6c: LDO  0030        Load global word BASE48
    0d6e: FJP  $0d74       Jump if TOS false
    0d70: SLDC 1e          Short load constant 30
@@ -13024,7 +13478,7 @@ BEGIN
    0d79: SLDO 0b          Short load global BASE11
    0d7a: LNOT             Logical NOT (~TOS)
    0d7b: FJP  $0d80       Jump if TOS false
-   0d7d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0d7d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0d80: SLDO 0b          Short load global BASE11
    0d81: FJP  $0cef       Jump if TOS false
 -> 0d83: LOD  01 0006     Load word at PROC23:MP6
@@ -13049,7 +13503,7 @@ END
   BASE3
   BASE11
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE48
   BASE57
   BASE62
@@ -13083,7 +13537,7 @@ BEGIN
    0dbd: UNI              Set union (TOS OR TOS-1)
    0dbe: ADJ  01          Adjust set to 1 words
    0dc0: LLA  0003        Load local address MP3
-   0dc2: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0dc2: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    0dc5: SLDL 03          Short load local MP3
    0dc6: SIND 06          Short index load *TOS+6
    0dc7: LDCN             Load constant NIL
@@ -13101,7 +13555,7 @@ BEGIN
    0dd5: LDO  003e        Load global word BASE62
    0dd7: EQUI             Integer TOS-1 = TOS
    0dd8: FJP  $0df3       Jump if TOS false
-   0dda: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0dda: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0ddd: SLDL 03          Short load local MP3
    0dde: STL  0004        Store TOS into MP4
    0de0: SLDO 0f          Short load global BASE15
@@ -13110,13 +13564,14 @@ BEGIN
    0de3: INN              Set membership (TOS-1 in set TOS)
    0de4: LNOT             Logical NOT (~TOS)
    0de5: FJP  $0deb       Jump if TOS false
+  PASCALCOMPILER.ERROR(20) { ',' expected }
    0de7: SLDC 14          Short load constant 20
-   0de8: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0de8: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0deb: SLDO 0f          Short load global BASE15
    0dec: SLDC 01          Short load constant 1
    0ded: EQUI             Integer TOS-1 = TOS
    0dee: FJP  $0df3       Jump if TOS false
-   0df0: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0df0: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0df3: LOD  01 0007     Load word at PROC23:MP7
    0df6: SLDO 0f          Short load global BASE15
    0df7: SLDC 05          Short load constant 5
@@ -13157,7 +13612,7 @@ BEGIN
    0e29: SLDC 24          Short load constant 36
    0e2a: SLDC 00          Short load constant 0
    0e2b: SLDC 00          Short load constant 0
-   0e2c: CXP  01 13       Call external procedure PASCALCO.FUNC19
+   0e2c: CXP  01 13       Call external procedure PASCALCOMPILER.FUNC19
    0e2f: CIP  04          Call intermediate procedure 4 BODYPART.PROC4
    0e31: SLDC 00          Short load constant 0
    0e32: CIP  04          Call intermediate procedure 4 BODYPART.PROC4
@@ -13168,7 +13623,7 @@ BEGIN
    0e39: SLDC 02          Short load constant 2
    0e3a: EQUI             Integer TOS-1 = TOS
    0e3b: FJP  $0e62       Jump if TOS false
-   0e3d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0e3d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0e40: LDA  01 0002     Load addr PROC23:MP2
    0e43: LDM  04          Load 4 words from (TOS)
    0e45: SLDC 04          Short load constant 4
@@ -13185,8 +13640,9 @@ BEGIN
    0e53: SLDO 0c          Short load global BASE12
    0e54: NEQI             Integer TOS-1 <> TOS
    0e55: FJP  $0e5b       Jump if TOS false
+  PASCALCOMPILER.ERROR(20) { ',' expected }
    0e57: SLDC 14          Short load constant 20
-   0e58: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0e58: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0e5b: CIP  08          Call intermediate procedure 8 BODYPART.PROC8
    0e5d: SLDC 00          Short load constant 0
    0e5e: STL  0002        Store TOS into MP2
@@ -13218,7 +13674,7 @@ BEGIN
    0e84: SLDC 02          Short load constant 2
    0e85: EQUI             Integer TOS-1 = TOS
    0e86: FJP  $0eaa       Jump if TOS false
-   0e88: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0e88: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0e8b: LDA  01 0002     Load addr PROC23:MP2
    0e8e: LDM  04          Load 4 words from (TOS)
    0e90: SLDC 04          Short load constant 4
@@ -13236,8 +13692,9 @@ BEGIN
    0ea0: SLDO 0c          Short load global BASE12
    0ea1: NEQI             Integer TOS-1 <> TOS
    0ea2: FJP  $0ea8       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    0ea4: SLDC 7d          Short load constant 125
-   0ea5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0ea5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0ea8: UJP  $0ead       Unconditional jump
 -> 0eaa: SLDC 00          Short load constant 0
    0eab: CIP  04          Call intermediate procedure 4 BODYPART.PROC4
@@ -13249,7 +13706,7 @@ BEGIN
    0eb4: LDO  003f        Load global word BASE63
    0eb6: SLDC 00          Short load constant 0
    0eb7: SLDC 00          Short load constant 0
-   0eb8: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0eb8: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0ebb: FJP  $0ec9       Jump if TOS false
    0ebd: SLDL 02          Short load local MP2
    0ebe: FJP  $0ec3       Jump if TOS false
@@ -13275,7 +13732,7 @@ BEGIN
 -> 0edc: SLDL 01          Short load local MP1
    0edd: SLDC 00          Short load constant 0
    0ede: SLDC 00          Short load constant 0
-   0edf: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0edf: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0ee2: FJP  $0ef1       Jump if TOS false
    0ee4: SLDL 02          Short load local MP2
    0ee5: FJP  $0eea       Jump if TOS false
@@ -13289,7 +13746,7 @@ BEGIN
 -> 0ef1: SLDL 01          Short load local MP1
    0ef2: SLDC 00          Short load constant 0
    0ef3: SLDC 00          Short load constant 0
-   0ef4: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   0ef4: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    0ef7: SLDL 01          Short load local MP1
    0ef8: LDO  0039        Load global word BASE57
    0efa: NEQI             Integer TOS-1 <> TOS
@@ -13306,7 +13763,7 @@ BEGIN
    0f08: SIND 02          Short index load *TOS+2
    0f09: LLA  0006        Load local address MP6
    0f0b: LLA  0005        Load local address MP5
-   0f0d: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0f0d: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0f10: SLDL 05          Short load local MP5
    0f11: SLDL 06          Short load local MP6
    0f12: SBI              Subtract integers (TOS-1 - TOS)
@@ -13324,8 +13781,9 @@ BEGIN
    0f22: SLDC 14          Short load constant 20
    0f23: CIP  06          Call intermediate procedure 6 BODYPART.PROC6
    0f25: UJP  $0f2b       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0f27: SLDC 7d          Short load constant 125
-   0f28: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0f28: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0f2b: LDO  0030        Load global word BASE48
    0f2d: FJP  $0f33       Jump if TOS false
    0f2f: SLDC 1e          Short load constant 30
@@ -13338,7 +13796,7 @@ BEGIN
    0f38: SLDO 0b          Short load global BASE11
    0f39: LNOT             Logical NOT (~TOS)
    0f3a: FJP  $0f3f       Jump if TOS false
-   0f3c: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f3c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0f3f: SLDO 0b          Short load global BASE11
    0f40: FJP  $0dfc       Jump if TOS false
 -> 0f42: LOD  01 0006     Load word at PROC23:MP6
@@ -13364,10 +13822,10 @@ END
   BASE4
   BASE5
   BASE6
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE12
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE33
   BASE40
   BASE52
@@ -13405,8 +13863,9 @@ BEGIN
    0f7f: SLDC 00          Short load constant 0
    0f80: NEQI             Integer TOS-1 <> TOS
    0f81: FJP  $0f89       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    0f83: LDCI 018f        Load word 399
-   0f86: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0f86: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0f89: SLDO 0f          Short load global BASE15
    0f8a: SLDC 04          Short load constant 4
    0f8b: EQUI             Integer TOS-1 = TOS
@@ -13415,9 +13874,10 @@ BEGIN
    0f8f: LDCN             Load constant NIL
    0f90: EQUI             Integer TOS-1 = TOS
    0f91: FJP  $0f97       Jump if TOS false
+  PASCALCOMPILER.ERROR(126) { Number of parameters does not agree with declaration }
    0f93: SLDC 7e          Short load constant 126
-   0f94: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0f97: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0f94: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0f97: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0f9a: LDA  01 0002     Load addr PROC23:MP2
    0f9d: LDM  04          Load 4 words from (TOS)
    0f9f: SLDC 04          Short load constant 4
@@ -13558,7 +14018,7 @@ BEGIN
    104f: LDO  0040        Load global word BASE64
    1051: SLDC 00          Short load constant 0
    1052: SLDC 00          Short load constant 0
-   1053: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1053: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1056: LAND             Logical AND (TOS & TOS-1)
    1057: FJP  $1062       Jump if TOS false
    1059: SLDC 0a          Short load constant 10
@@ -13570,7 +14030,7 @@ BEGIN
    1063: SLDL 03          Short load local MP3
    1064: SLDC 00          Short load constant 0
    1065: SLDC 00          Short load constant 0
-   1066: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1066: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1069: LAND             Logical AND (TOS & TOS-1)
    106a: FJP  $1070       Jump if TOS false
    106c: LDO  0037        Load global word BASE55
@@ -13579,7 +14039,7 @@ BEGIN
 -> 1072: SLDO 03          Short load global BASE3
    1073: SLDC 00          Short load constant 0
    1074: SLDC 00          Short load constant 0
-   1075: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   1075: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    1078: SLDO 04          Short load global BASE4
    1079: SLDC 00          Short load constant 0
    107a: EQUI             Integer TOS-1 = TOS
@@ -13590,7 +14050,7 @@ BEGIN
    1081: SLDL 03          Short load local MP3
    1082: SLDC 00          Short load constant 0
    1083: SLDC 00          Short load constant 0
-   1084: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   1084: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    1087: LAND             Logical AND (TOS & TOS-1)
    1088: FJP  $10b6       Jump if TOS false
    108a: SLDL 03          Short load local MP3
@@ -13608,7 +14068,7 @@ BEGIN
    109a: SIND 02          Short index load *TOS+2
    109b: LLA  0007        Load local address MP7
    109d: LLA  0006        Load local address MP6
-   109f: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   109f: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    10a2: SLDL 06          Short load local MP6
    10a3: SLDL 07          Short load local MP7
    10a4: SBI              Subtract integers (TOS-1 - TOS)
@@ -13618,8 +14078,9 @@ BEGIN
    10a8: IND  0008        Static index and load word (TOS+8)
    10aa: NEQI             Integer TOS-1 <> TOS
    10ab: FJP  $10b3       Jump if TOS false
+  PASCALCOMPILER.ERROR(142) { Illegal actual parameter }
    10ad: LDCI 008e        Load word 142
-   10b0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   10b0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 10b3: SLDL 03          Short load local MP3
    10b4: SRO  0003        Store global word BASE3
 -> 10b6: UJP  $1126       Unconditional jump
@@ -13642,8 +14103,9 @@ BEGIN
    10ce: SLDC 00          Short load constant 0
    10cf: SRO  0006        Store global word BASE6
    10d1: UJP  $10d7       Unconditional jump
+  PASCALCOMPILER.ERROR(103) { Identifier is not of the appropriate class }
 -> 10d3: SLDC 67          Short load constant 103
-   10d4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   10d4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 10d7: CIP  09          Call intermediate procedure 9 BODYPART.PROC9
    10d9: SLDL 03          Short load local MP3
    10da: LDCN             Load constant NIL
@@ -13660,8 +14122,9 @@ BEGIN
    10e8: SIND 00          Short index load *TOS+0
    10e9: NEQI             Integer TOS-1 <> TOS
    10ea: FJP  $10f2       Jump if TOS false
+  PASCALCOMPILER.ERROR(142) { Illegal actual parameter }
    10ec: LDCI 008e        Load word 142
-   10ef: CXP  01 04       Call external procedure PASCALCO.ERROR
+   10ef: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 10f2: UJP  $111e       Unconditional jump
    10f4: SLDL 09          Short load local MP9
    10f5: SIND 04          Short index load *TOS+4
@@ -13677,17 +14140,22 @@ BEGIN
    1103: LDO  0028        Load global word BASE40
    1105: LAND             Logical AND (TOS & TOS-1)
    1106: FJP  $110e       Jump if TOS false
+  PASCALCOMPILER.ERROR(175) { Actual parameter max string length < formal max length }
    1108: LDCI 00af        Load word 175
-   110b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   110b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 110e: UJP  $111e       Unconditional jump
+-> 1110: XJP  0003 0005 111e Case jump
+           0003 -> 10e5   0004 -> 10e5   0005 -> 10f4
+       default -> 111e
 -> 111e: UJP  $1126       Unconditional jump
+  PASCALCOMPILER.ERROR(154) { Actual parameter must be a variable }
 -> 1120: LDCI 009a        Load word 154
-   1123: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1123: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1126: SLDL 03          Short load local MP3
    1127: SLDO 03          Short load global BASE3
    1128: SLDC 00          Short load constant 0
    1129: SLDC 00          Short load constant 0
-   112a: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   112a: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    112d: LNOT             Logical NOT (~TOS)
    112e: FJP  $119e       Jump if TOS false
    1130: SLDL 03          Short load local MP3
@@ -13698,8 +14166,9 @@ BEGIN
    1137: NEQI             Integer TOS-1 <> TOS
    1138: LAND             Logical AND (TOS & TOS-1)
    1139: FJP  $1143       Jump if TOS false
+  PASCALCOMPILER.ERROR(142) { Illegal actual parameter }
    113b: LDCI 008e        Load word 142
-   113e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   113e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1141: UJP  $119e       Unconditional jump
 -> 1143: SLDO 03          Short load global BASE3
    1144: STL  0009        Store TOS into MP9
@@ -13746,8 +14215,9 @@ BEGIN
    1177: LAND             Logical AND (TOS & TOS-1)
    1178: FJP  $117c       Jump if TOS false
    117a: UJP  $1182       Unconditional jump
+  PASCALCOMPILER.ERROR(142) { Illegal actual parameter }
 -> 117c: LDCI 008e        Load word 142
-   117f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   117f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 1182: UJP  $119e       Unconditional jump
 -> 1184: SLDL 09          Short load local MP9
    1185: SIND 01          Short index load *TOS+1
@@ -13765,8 +14235,9 @@ BEGIN
    1193: EQUI             Integer TOS-1 = TOS
    1194: FJP  $1198       Jump if TOS false
    1196: UJP  $119e       Unconditional jump
+  PASCALCOMPILER.ERROR(142) { Illegal actual parameter }
 -> 1198: LDCI 008e        Load word 142
-   119b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   119b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 119e: SLDL 02          Short load local MP2
    119f: LDCN             Load constant NIL
    11a0: NEQI             Integer TOS-1 <> TOS
@@ -13782,16 +14253,18 @@ BEGIN
    11ad: SLDC 05          Short load constant 5
    11ae: EQUI             Integer TOS-1 = TOS
    11af: FJP  $11b6       Jump if TOS false
-   11b1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   11b1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    11b4: UJP  $11ba       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 11b6: SLDC 04          Short load constant 4
-   11b7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   11b7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 11ba: SLDL 02          Short load local MP2
    11bb: LDCN             Load constant NIL
    11bc: NEQI             Integer TOS-1 <> TOS
    11bd: FJP  $11c3       Jump if TOS false
+  PASCALCOMPILER.ERROR(126) { Number of parameters does not agree with declaration }
    11bf: SLDC 7e          Short load constant 126
-   11c0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   11c0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 11c3: LOD  01 0001     Load word at PROC23:MP1
    11c6: STL  0009        Store TOS into MP9
    11c8: SLDL 09          Short load local MP9
@@ -13990,7 +14463,7 @@ END
 ### PROCEDURE BODYPART.PROC34(PARAM1; PARAM2; PARAM3; PARAM4) (* P=34, LL=3, D=11, Callers: PROC11 *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE16
   BASE61
   BASE64
@@ -14017,11 +14490,11 @@ BEGIN
    183a: SLDC 06          Short load constant 6
    183b: EQUI             Integer TOS-1 = TOS
    183c: STL  000b        Store TOS into MP11
-   183e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   183e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 1841: LLA  0001        Load local address MP1
    1843: LDM  04          Load 4 words from (TOS)
    1845: SLDC 04          Short load constant 4
-   1848: LDC  03          Load multiple-word constant
+   1846: LDC  03          Load multiple-word constant
                             0000 0000 0100 
    184e: SLDC 03          Short load constant 3
    184f: UNI              Set union (TOS OR TOS-1)
@@ -14055,8 +14528,9 @@ BEGIN
    1878: SLDC 04          Short load constant 4
    1879: CIP  07          Call intermediate procedure 7 BODYPART.PROC7
    187b: UJP  $1886       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 187d: LDCI 0086        Load word 134
-   1880: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1880: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1883: LDCN             Load constant NIL
    1884: SRO  0003        Store global word BASE3
 -> 1886: SLDO 0f          Short load global BASE15
@@ -14069,11 +14543,11 @@ BEGIN
    1891: MOV  0005        Move 5 words (TOS to TOS-1)
    1893: SLDO 10          Short load global BASE16
    1894: STL  000a        Store TOS into MP10
-   1896: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1896: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1899: LLA  0001        Load local address MP1
    189b: LDM  04          Load 4 words from (TOS)
    189d: SLDC 04          Short load constant 4
-   18a0: LDC  03          Load multiple-word constant
+   189e: LDC  03          Load multiple-word constant
                             0000 0000 0100 
    18a6: SLDC 03          Short load constant 3
    18a7: UNI              Set union (TOS OR TOS-1)
@@ -14141,14 +14615,15 @@ BEGIN
    18fa: SLDO 03          Short load global BASE3
    18fb: SLDC 00          Short load constant 0
    18fc: SLDC 00          Short load constant 0
-   18fd: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   18fd: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1900: LAND             Logical AND (TOS & TOS-1)
    1901: FJP  $1908       Jump if TOS false
    1903: SLDC 1c          Short load constant 28
    1904: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    1906: UJP  $1911       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 1908: LDCI 0086        Load word 134
-   190b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   190b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    190e: LDCN             Load constant NIL
    190f: SRO  0003        Store global word BASE3
 -> 1911: UJP  $1994       Unconditional jump
@@ -14203,14 +14678,15 @@ BEGIN
    1953: SLDO 03          Short load global BASE3
    1954: SLDC 00          Short load constant 0
    1955: SLDC 00          Short load constant 0
-   1956: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1956: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1959: LAND             Logical AND (TOS & TOS-1)
    195a: FJP  $1961       Jump if TOS false
    195c: SLDC 05          Short load constant 5
    195d: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    195f: UJP  $196a       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 1961: LDCI 0086        Load word 134
-   1964: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1964: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1967: LDCN             Load constant NIL
    1968: SRO  0003        Store global word BASE3
 -> 196a: UJP  $1994       Unconditional jump
@@ -14225,11 +14701,15 @@ BEGIN
    1977: SLDC 0d          Short load constant 13
    1978: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    197a: UJP  $1985       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 197c: LDCI 0086        Load word 134
-   197f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   197f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1982: LDCN             Load constant NIL
    1983: SRO  0003        Store global word BASE3
 -> 1985: UJP  $1994       Unconditional jump
+-> 1987: XJP  0005 0007 1994 Case jump
+           0005 -> 18ba   0006 -> 1913   0007 -> 196c
+       default -> 1994
 -> 1994: UJP  $1999       Unconditional jump
 -> 1996: LDCN             Load constant NIL
    1997: SRO  0003        Store global word BASE3
@@ -14240,7 +14720,7 @@ END
 ### PROCEDURE BODYPART.PROC35(PARAM1; PARAM2; PARAM3; PARAM4) (* P=35, LL=4, D=11, Callers: PROC34 *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE16
   BASE61
   BASE64
@@ -14254,7 +14734,7 @@ BEGIN
 -> 16d6: LLA  0001        Load local address MP1
    16d8: LDM  04          Load 4 words from (TOS)
    16da: SLDC 04          Short load constant 4
-   16de: LDC  03          Load multiple-word constant
+   16db: LDC  03          Load multiple-word constant
                             0000 0000 0080 
    16e4: SLDC 03          Short load constant 3
    16e5: UNI              Set union (TOS OR TOS-1)
@@ -14270,11 +14750,11 @@ BEGIN
    16f5: MOV  0005        Move 5 words (TOS to TOS-1)
    16f7: SLDO 10          Short load global BASE16
    16f8: STL  000b        Store TOS into MP11
-   16fa: CXP  01 08       Call external procedure PASCALCO.PROC8
+   16fa: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    16fd: LLA  0001        Load local address MP1
    16ff: LDM  04          Load 4 words from (TOS)
    1701: SLDC 04          Short load constant 4
-   1704: LDC  03          Load multiple-word constant
+   1702: LDC  03          Load multiple-word constant
                             0000 0000 0080 
    170a: SLDC 03          Short load constant 3
    170b: UNI              Set union (TOS OR TOS-1)
@@ -14342,14 +14822,15 @@ BEGIN
    175e: SLDO 03          Short load global BASE3
    175f: SLDC 00          Short load constant 0
    1760: SLDC 00          Short load constant 0
-   1761: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1761: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1764: LAND             Logical AND (TOS & TOS-1)
    1765: FJP  $176c       Jump if TOS false
    1767: SLDC 0c          Short load constant 12
    1768: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    176a: UJP  $1775       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 176c: LDCI 0086        Load word 134
-   176f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   176f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1772: LDCN             Load constant NIL
    1773: SRO  0003        Store global word BASE3
 -> 1775: UJP  $180e       Unconditional jump
@@ -14367,8 +14848,9 @@ BEGIN
    1787: SLDC 07          Short load constant 7
    1788: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    178a: UJP  $1795       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 178c: LDCI 0086        Load word 134
-   178f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   178f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1792: LDCN             Load constant NIL
    1793: SRO  0003        Store global word BASE3
 -> 1795: UJP  $180e       Unconditional jump
@@ -14401,8 +14883,9 @@ BEGIN
    17b8: SLDC 04          Short load constant 4
    17b9: CIP  07          Call intermediate procedure 7 BODYPART.PROC7
    17bb: UJP  $17c6       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 17bd: LDCI 0086        Load word 134
-   17c0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   17c0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    17c3: LDCN             Load constant NIL
    17c4: SRO  0003        Store global word BASE3
 -> 17c6: UJP  $180e       Unconditional jump
@@ -14417,8 +14900,9 @@ BEGIN
    17d1: SLDC 0e          Short load constant 14
    17d2: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    17d4: UJP  $17df       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 17d6: LDCI 0086        Load word 134
-   17d9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   17d9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    17dc: LDCN             Load constant NIL
    17dd: SRO  0003        Store global word BASE3
 -> 17df: UJP  $180e       Unconditional jump
@@ -14433,11 +14917,16 @@ BEGIN
    17ec: SLDC 04          Short load constant 4
    17ed: CIP  03          Call intermediate procedure 3 BODYPART.PROC3
    17ef: UJP  $17fa       Unconditional jump
+  PASCALCOMPILER.ERROR(134) { Illegal type of operand(s) }
 -> 17f1: LDCI 0086        Load word 134
-   17f4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   17f4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    17f7: LDCN             Load constant NIL
    17f8: SRO  0003        Store global word BASE3
 -> 17fa: UJP  $180e       Unconditional jump
+-> 17fc: XJP  0000 0004 180e Case jump
+           0000 -> 171e   0001 -> 1777   0002 -> 17e1   0003 -> 1797
+           0004 -> 17c8
+       default -> 180e
 -> 180e: UJP  $1813       Unconditional jump
 -> 1810: LDCN             Load constant NIL
    1811: SRO  0003        Store global word BASE3
@@ -14449,11 +14938,11 @@ END
   BASE3
   BASE4
   BASE5
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE11
   BASE12
-  BASE15
-  BASE22
+  BASE15=SY:SYMBOL
+  BASE22=LGTH:INTEGER
   BASE23
   BASE55
   BASE61
@@ -14461,7 +14950,7 @@ END
   BASE63
   BASE64
   BASE90
-  BASE109=FACBEGSYS
+  BASE109=FACBEGSYS:SETOFSYS
   MP1=PARAM4
   MP2=PARAM3
   MP3=PARAM2
@@ -14484,8 +14973,9 @@ BEGIN
    137c: INN              Set membership (TOS-1 in set TOS)
    137d: LNOT             Logical NOT (~TOS)
    137e: FJP  $1397       Jump if TOS false
+  PASCALCOMPILER.ERROR(58) { Error in <factor> (bad expression) }
    1380: SLDC 3a          Short load constant 58
-   1381: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1381: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1384: LLA  0001        Load local address MP1
    1386: LDM  04          Load 4 words from (TOS)
    1388: SLDC 04          Short load constant 4
@@ -14494,7 +14984,7 @@ BEGIN
    138d: SLDC 04          Short load constant 4
    138e: UNI              Set union (TOS OR TOS-1)
    138f: ADJ  04          Adjust set to 4 words
-   1391: CXP  01 10       Call external procedure PASCALCO.PROC16
+   1391: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
    1394: LDCN             Load constant NIL
    1395: SRO  0003        Store global word BASE3
 -> 1397: SLDO 0f          Short load global BASE15
@@ -14509,8 +14999,8 @@ BEGIN
    13a4: SLDC 01          Short load constant 1
    13a5: ADJ  01          Adjust set to 1 words
    13a7: LLA  0005        Load local address MP5
-   13a9: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   13ac: CXP  01 08       Call external procedure PASCALCO.PROC8
+   13a9: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   13ac: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    13af: SLDL 05          Short load local MP5
    13b0: IND  0008        Static index and load word (TOS+8)
    13b2: SLDC 06          Short load constant 6
@@ -14566,7 +15056,7 @@ BEGIN
    1401: LAO  0005        Load global BASE5
    1403: LAO  0017        Load global BASE23
    1405: MOV  0001        Move 1 words (TOS to TOS-1)
-   1407: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1407: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    140a: UJP  $1698       Unconditional jump
    140c: LDO  0040        Load global word BASE64
    140e: SRO  0003        Store global word BASE3
@@ -14575,7 +15065,7 @@ BEGIN
    1413: LAO  0005        Load global BASE5
    1415: LAO  0017        Load global BASE23
    1417: MOV  0001        Move 1 words (TOS to TOS-1)
-   1419: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1419: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    141c: UJP  $1698       Unconditional jump
    141e: LDO  0016        Load global word BASE22
    1420: SLDC 01          Short load constant 1
@@ -14601,7 +15091,7 @@ BEGIN
    1440: LAO  0005        Load global BASE5
    1442: LAO  0017        Load global BASE23
    1444: MOV  0001        Move 1 words (TOS to TOS-1)
-   1446: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1446: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1449: UJP  $1698       Unconditional jump
    144b: LLA  0009        Load local address MP9
    144d: SLDC 02          Short load constant 2
@@ -14613,7 +15103,7 @@ BEGIN
    1456: LDO  0016        Load global word BASE22
    1458: SLDC 00          Short load constant 0
    1459: SLDC 00          Short load constant 0
-   145a: CXP  01 13       Call external procedure PASCALCO.FUNC19
+   145a: CXP  01 13       Call external procedure PASCALCOMPILER.FUNC19
    145d: STO              Store indirect (TOS into TOS-1)
    145e: SLDL 09          Short load local MP9
    145f: SRO  0003        Store global word BASE3
@@ -14622,9 +15112,9 @@ BEGIN
    1464: LAO  0005        Load global BASE5
    1466: LAO  0017        Load global BASE23
    1468: MOV  0001        Move 1 words (TOS to TOS-1)
-   146a: CXP  01 08       Call external procedure PASCALCO.PROC8
+   146a: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    146d: UJP  $1698       Unconditional jump
-   146f: CXP  01 08       Call external procedure PASCALCO.PROC8
+   146f: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1472: LLA  0001        Load local address MP1
    1474: LDM  04          Load 4 words from (TOS)
    1476: SLDC 04          Short load constant 4
@@ -14637,12 +15127,13 @@ BEGIN
    147f: SLDC 05          Short load constant 5
    1480: EQUI             Integer TOS-1 = TOS
    1481: FJP  $1488       Jump if TOS false
-   1483: CXP  01 08       Call external procedure PASCALCO.PROC8
+   1483: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1486: UJP  $148c       Unconditional jump
+    PASCALCOMPILER.ERROR(4) { ')' expected }
 -> 1488: SLDC 04          Short load constant 4
-   1489: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1489: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 148c: UJP  $1698       Unconditional jump
-   148e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   148e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    1491: LLA  0001        Load local address MP1
    1493: LDM  04          Load 4 words from (TOS)
    1495: CIP  24          Call intermediate procedure 36 BODYPART.36
@@ -14669,12 +15160,13 @@ BEGIN
    14b2: LDO  003d        Load global word BASE61
    14b4: NEQI             Integer TOS-1 <> TOS
    14b5: FJP  $14c0       Jump if TOS false
+  PASCALCOMPILER.ERROR(135) { Type of operand must be boolean }
    14b7: LDCI 0087        Load word 135
-   14ba: CXP  01 04       Call external procedure PASCALCO.ERROR
+   14ba: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    14bd: LDCN             Load constant NIL
    14be: SRO  0003        Store global word BASE3
 -> 14c0: UJP  $1698       Unconditional jump
-   14c2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   14c2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    14c5: LLA  000e        Load local address MP14
    14c7: SLDC 00          Short load constant 0
    14c8: ADJ  08          Adjust set to 8 words
@@ -14705,12 +15197,12 @@ BEGIN
    14ed: SRO  0003        Store global word BASE3
    14ef: SLDC 00          Short load constant 0
    14f0: SRO  0004        Store global word BASE4
-   14f2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   14f2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    14f5: UJP  $15e5       Unconditional jump
 -> 14f7: LLA  0001        Load local address MP1
    14f9: LDM  04          Load 4 words from (TOS)
    14fb: SLDC 04          Short load constant 4
-   14fe: LDC  02          Load multiple-word constant
+   14fc: LDC  02          Load multiple-word constant
                             0006 0001 
    1502: SLDC 02          Short load constant 2
    1503: UNI              Set union (TOS OR TOS-1)
@@ -14725,8 +15217,9 @@ BEGIN
    150f: SLDC 00          Short load constant 0
    1510: NEQI             Integer TOS-1 <> TOS
    1511: FJP  $151e       Jump if TOS false
+  PASCALCOMPILER.ERROR(136) { Set element type must be scalar or subrange }
    1513: LDCI 0088        Load word 136
-   1516: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1516: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1519: LDCN             Load constant NIL
    151a: SRO  0003        Store global word BASE3
    151c: UJP  $15c8       Unconditional jump
@@ -14735,7 +15228,7 @@ BEGIN
    1520: SLDO 03          Short load global BASE3
    1521: SLDC 00          Short load constant 0
    1522: SLDC 00          Short load constant 0
-   1523: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1523: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    1526: FJP  $15c2       Jump if TOS false
    1528: SLDC 00          Short load constant 0
    1529: STL  0007        Store TOS into MP7
@@ -14763,13 +15256,13 @@ BEGIN
    1548: SLDC 02          Short load constant 2
    1549: EQUI             Integer TOS-1 = TOS
    154a: FJP  $1593       Jump if TOS false
-   154c: CXP  01 08       Call external procedure PASCALCO.PROC8
+   154c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    154f: SLDC 14          Short load constant 20
    1550: STL  000a        Store TOS into MP10
    1552: LLA  0001        Load local address MP1
    1554: LDM  04          Load 4 words from (TOS)
    1556: SLDC 04          Short load constant 4
-   155a: LDC  02          Load multiple-word constant
+   1557: LDC  02          Load multiple-word constant
                             0002 0001 
    155e: SLDC 02          Short load constant 2
    155f: UNI              Set union (TOS OR TOS-1)
@@ -14780,11 +15273,12 @@ BEGIN
    1566: SLDO 03          Short load global BASE3
    1567: SLDC 00          Short load constant 0
    1568: SLDC 00          Short load constant 0
-   1569: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   1569: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    156c: FJP  $1570       Jump if TOS false
    156e: UJP  $1579       Unconditional jump
+  PASCALCOMPILER.ERROR(137) { Set element types must be compatible }
 -> 1570: LDCI 0089        Load word 137
-   1573: CXP  01 04       Call external procedure PASCALCO.ERROR
+   1573: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    1576: LDCN             Load constant NIL
    1577: SRO  0003        Store global word BASE3
 -> 1579: SLDL 07          Short load local MP7
@@ -14836,8 +15330,9 @@ BEGIN
    15bd: SLDL 09          Short load local MP9
    15be: SRO  0003        Store global word BASE3
    15c0: UJP  $15c8       Unconditional jump
+  PASCALCOMPILER.ERROR(137) { Set element types must be compatible }
 -> 15c2: LDCI 0089        Load word 137
-   15c5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   15c5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 15c8: SLDO 0f          Short load global BASE15
    15c9: SLDC 01          Short load constant 1
    15ca: NEQI             Integer TOS-1 <> TOS
@@ -14845,17 +15340,18 @@ BEGIN
    15cd: SLDO 0b          Short load global BASE11
    15ce: LNOT             Logical NOT (~TOS)
    15cf: FJP  $15d4       Jump if TOS false
-   15d1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   15d1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 15d4: SLDO 0b          Short load global BASE11
    15d5: FJP  $14f7       Jump if TOS false
    15d7: SLDO 0f          Short load global BASE15
    15d8: SLDC 10          Short load constant 16
    15d9: EQUI             Integer TOS-1 = TOS
    15da: FJP  $15e1       Jump if TOS false
-   15dc: CXP  01 08       Call external procedure PASCALCO.PROC8
+   15dc: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    15df: UJP  $15e5       Unconditional jump
+  PASCALCOMPILER.ERROR(12) { ']' expected }
 -> 15e1: SLDC 0c          Short load constant 12
-   15e2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   15e2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 15e5: SLDL 08          Short load local MP8
    15e6: FJP  $1614       Jump if TOS false
    15e8: LLA  000e        Load local address MP14
@@ -14899,6 +15395,21 @@ BEGIN
    1629: SLDC 00          Short load constant 0
    162a: SRO  0004        Store global word BASE4
 -> 162c: UJP  $1698       Unconditional jump
+-> 162e: XJP  0000 0030 1698 Case jump
+           0000 -> 13a3   0001 -> 1634   0002 -> 1634   0003 -> 1634
+           0004 -> 146f   0005 -> 1634   0006 -> 1634   0007 -> 1634
+           0008 -> 1634   0009 -> 1634   000a -> 1634   000b -> 1634
+           000c -> 1634   000d -> 1634   000e -> 1634   000f -> 14c2
+           0010 -> 1634   0011 -> 1634   0012 -> 1634   0013 -> 1634
+           0014 -> 1634   0015 -> 1634   0016 -> 1634   0017 -> 1634
+           0018 -> 1634   0019 -> 1634   001a -> 1634   001b -> 1634
+           001c -> 1634   001d -> 1634   001e -> 1634   001f -> 1634
+           0020 -> 1634   0021 -> 1634   0022 -> 1634   0023 -> 13fb
+           0024 -> 140c   0025 -> 141e   0026 -> 148e   0027 -> 1634
+           0028 -> 1634   0029 -> 1634   002a -> 1634   002b -> 1634
+           002c -> 1634   002d -> 1634   002e -> 1634   002f -> 1634
+           0030 -> 144b
+       default -> 1698
 -> 1698: SLDO 0f          Short load global BASE15
    1699: LLA  0001        Load local address MP1
    169b: LDM  04          Load 4 words from (TOS)
@@ -14906,8 +15417,9 @@ BEGIN
    169e: INN              Set membership (TOS-1 in set TOS)
    169f: LNOT             Logical NOT (~TOS)
    16a0: FJP  $16b6       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    16a2: SLDC 06          Short load constant 6
-   16a3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   16a3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    16a6: LLA  0001        Load local address MP1
    16a8: LDM  04          Load 4 words from (TOS)
    16aa: SLDC 04          Short load constant 4
@@ -14916,7 +15428,7 @@ BEGIN
    16af: SLDC 04          Short load constant 4
    16b0: UNI              Set union (TOS OR TOS-1)
    16b1: ADJ  04          Adjust set to 4 words
-   16b3: CXP  01 10       Call external procedure PASCALCO.PROC16
+   16b3: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 16b6: UJP  $1397       Unconditional jump
 -> 16b8: RNP  00          Return from nonbase procedure
 END
@@ -14945,7 +15457,7 @@ BEGIN
    19bf: SIND 02          Short index load *TOS+2
    19c0: LLA  0004        Load local address MP4
    19c2: LLA  0003        Load local address MP3
-   19c4: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   19c4: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    19c7: SLDL 03          Short load local MP3
    19c8: SLDL 04          Short load local MP4
    19c9: SBI              Subtract integers (TOS-1 - TOS)
@@ -14957,7 +15469,7 @@ BEGIN
    19d0: NEQI             Integer TOS-1 <> TOS
    19d1: FJP  $19d9       Jump if TOS false
    19d3: LDCI 0081        Load word 129
-   19d6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   19d6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 19d9: SLDL 02          Short load local MP2
    19da: SLDL 01          Short load local MP1
    19db: STO              Store indirect (TOS into TOS-1)
@@ -15055,7 +15567,7 @@ BEGIN
    0a8b: ADJ  04          Adjust set to 4 words
    0a8d: STM  04          Store 4 words at TOS to TOS-1
    0a8f: SLDL 01          Short load local MP1
-   0a92: LDC  03          Load multiple-word constant
+   0a90: LDC  03          Load multiple-word constant
                             f000 88ec 0f7d 
    0a98: SLDC 03          Short load constant 3
    0a99: INN              Set membership (TOS-1 in set TOS)
@@ -15089,20 +15601,31 @@ BEGIN
    0ace: UJP  $0b1c       Unconditional jump
    0ad0: CLP  0b          Call local procedure ROUTINE.PROC11
    0ad2: UJP  $0b1c       Unconditional jump
+-> 0ad4: XJP  000c 002b 0b1c Case jump
+           000c -> 0aa4   000d -> 0aa8   000e -> 0aa8   000f -> 0aac
+           0010 -> 0ada   0011 -> 0ada   0012 -> 0ab0   0013 -> 0ab0
+           0014 -> 0ada   0015 -> 0ab4   0016 -> 0ab4   0017 -> 0ab8
+           0018 -> 0ada   0019 -> 0ada   001a -> 0ada   001b -> 0ab4
+           001c -> 0ada   001d -> 0ada   001e -> 0ada   001f -> 0abc
+           0020 -> 0ac0   0021 -> 0ada   0022 -> 0ac0   0023 -> 0ac0
+           0024 -> 0ac4   0025 -> 0ac8   0026 -> 0ac8   0027 -> 0ada
+           0028 -> 0ac0   0029 -> 0acc   002a -> 0ad0   002b -> 0ab0
+       default -> 0b1c
 -> 0b1c: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE ROUTINE.PROC2 (* P=2, LL=3, D=0, Callers: PROC6, PROC15, PROC10, PROC8, PROC14, PROC17, PROC11 *)
-  BASE15
+  BASE15=SY:SYMBOL
 BEGIN
 -> 0000: SLDO 0f          Short load global BASE15
    0001: SLDC 01          Short load constant 1
    0002: EQUI             Integer TOS-1 = TOS
    0003: FJP  $000a       Jump if TOS false
-   0005: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0005: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0008: UJP  $000e       Unconditional jump
+  PASCALCOMPILER.ERROR(20) { ',' expected }
 -> 000a: SLDC 14          Short load constant 20
-   000b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   000b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 000e: RNP  00          Return from nonbase procedure
 END
 
@@ -15114,8 +15637,9 @@ BEGIN
    001b: SLDO 0c          Short load global BASE12
    001c: NEQI             Integer TOS-1 <> TOS
    001d: FJP  $0023       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    001f: SLDC 7d          Short load constant 125
-   0020: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0020: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0023: RNP  00          Return from nonbase procedure
 END
 
@@ -15146,7 +15670,7 @@ BEGIN
    003f: SLDO 03          Short load global BASE3
    0040: SLDC 00          Short load constant 0
    0041: SLDC 00          Short load constant 0
-   0042: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0042: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0045: LOR              Logical OR (TOS | TOS-1)
    0046: FJP  $0092       Jump if TOS false
    0048: SLDO 04          Short load global BASE4
@@ -15157,8 +15681,9 @@ BEGIN
    0050: UJP  $0090       Unconditional jump
 -> 0052: SLDL 01          Short load local MP1
    0053: FJP  $005b       Jump if TOS false
+  PASCALCOMPILER.ERROR(154) { Actual parameter must be a variable }
    0055: LDCI 009a        Load word 154
-   0058: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0058: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 005b: SLDO 04          Short load global BASE4
    005c: SLDC 00          Short load constant 0
    005d: EQUI             Integer TOS-1 = TOS
@@ -15201,8 +15726,9 @@ BEGIN
    0093: LDCN             Load constant NIL
    0094: NEQI             Integer TOS-1 <> TOS
    0095: FJP  $009b       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    0097: SLDC 7d          Short load constant 125
-   0098: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0098: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 009b: LDO  0037        Load global word BASE55
    009d: SRO  0003        Store global word BASE3
 -> 009f: RNP  00          Return from nonbase procedure
@@ -15210,7 +15736,7 @@ END
 
 ### PROCEDURE ROUTINE.PROC5 (* P=5, LL=3, D=10, Callers: ROUTINE *)
   BASE3
-  BASE15
+  BASE15=SY:SYMBOL
   BASE64
   ROUTINE:MP7
   MP1
@@ -15262,18 +15788,19 @@ BEGIN
    00e3: SIND 03          Short index load *TOS+3
    00e4: STL  0002        Store TOS into MP2
 -> 00e6: UJP  $00ec       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 00e8: SLDC 7d          Short load constant 125
-   00e9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00e9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00ec: SLDO 0f          Short load global BASE15
    00ed: SLDC 01          Short load constant 1
    00ee: EQUI             Integer TOS-1 = TOS
    00ef: FJP  $0179       Jump if TOS false
-   00f1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00f1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00f4: LDA  01 0007     Load addr ROUTINE:MP7
    00f7: LDM  04          Load 4 words from (TOS)
    00f9: LLA  0001        Load local address MP1
    00fb: LLA  0008        Load local address MP8
-   00fd: CXP  01 14       Call external procedure PASCALCO.PROC20
+   00fd: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    0100: SLDL 05          Short load local MP5
    0101: SLDC 01          Short load constant 1
    0102: ADI              Add integers (TOS + TOS-1)
@@ -15282,16 +15809,18 @@ BEGIN
    0106: LDCN             Load constant NIL
    0107: EQUI             Integer TOS-1 = TOS
    0108: FJP  $0112       Jump if TOS false
+  PASCALCOMPILER.ERROR(158) { No such variant in this record }
    010a: LDCI 009e        Load word 158
-   010d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   010d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0110: UJP  $0177       Unconditional jump
 -> 0112: SLDL 02          Short load local MP2
    0113: SIND 01          Short index load *TOS+1
    0114: SLDC 08          Short load constant 8
    0115: NEQI             Integer TOS-1 <> TOS
    0116: FJP  $0120       Jump if TOS false
+  PASCALCOMPILER.ERROR(162) { Parameter size must be constant }
    0118: LDCI 00a2        Load word 162
-   011b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   011b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    011e: UJP  $0177       Unconditional jump
 -> 0120: SLDL 02          Short load local MP2
    0121: SIND 02          Short index load *TOS+2
@@ -15301,14 +15830,15 @@ BEGIN
    0126: SLDL 01          Short load local MP1
    0127: SLDC 00          Short load constant 0
    0128: SLDC 00          Short load constant 0
-   0129: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0129: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    012c: SLDL 01          Short load local MP1
    012d: LDO  0040        Load global word BASE64
    012f: EQUI             Integer TOS-1 = TOS
    0130: LOR              Logical OR (TOS | TOS-1)
    0131: FJP  $013b       Jump if TOS false
+  PASCALCOMPILER.ERROR(159) { Real or string tagfields not allowed }
    0133: LDCI 009f        Load word 159
-   0136: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0136: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0139: UJP  $0177       Unconditional jump
 -> 013b: SLDL 02          Short load local MP2
    013c: SIND 02          Short index load *TOS+2
@@ -15316,7 +15846,7 @@ BEGIN
    013e: SLDL 01          Short load local MP1
    013f: SLDC 00          Short load constant 0
    0140: SLDC 00          Short load constant 0
-   0141: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0141: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0144: FJP  $0173       Jump if TOS false
    0146: SLDL 02          Short load local MP2
    0147: SIND 03          Short index load *TOS+3
@@ -15350,8 +15880,9 @@ BEGIN
    016e: LDCN             Load constant NIL
    016f: STL  0002        Store TOS into MP2
    0171: UJP  $0177       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0173: SLDC 7d          Short load constant 125
-   0174: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0174: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0177: UJP  $00ec       Unconditional jump
 -> 0179: SLDL 07          Short load local MP7
    017a: CXP  09 04       Call external procedure BODYPART.PROC4
@@ -15412,8 +15943,8 @@ BEGIN
 END
 
 ### PROCEDURE ROUTINE.PROC7 (* P=7, LL=3, D=2, Callers: ROUTINE *)
-  BASE9=IC
-  BASE15
+  BASE9=IC:ADDRRANGE
+  BASE15=SY:SYMBOL
   BASE33
   BASE42
   BASE68
@@ -15428,8 +15959,8 @@ BEGIN
    0200: SLDC 01          Short load constant 1
    0201: ADJ  01          Adjust set to 1 words
    0203: LLA  0001        Load local address MP1
-   0205: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   0208: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0205: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   0208: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    020b: UJP  $021e       Unconditional jump
 -> 020d: SLDO 0f          Short load global BASE15
    020e: SLDC 21          Short load constant 33
@@ -15437,7 +15968,7 @@ BEGIN
    0210: FJP  $021b       Jump if TOS false
    0212: LDO  0044        Load global word BASE68
    0214: STL  0001        Store TOS into MP1
-   0216: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0216: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0219: UJP  $021e       Unconditional jump
 -> 021b: LDCN             Load constant NIL
    021c: STL  0001        Store TOS into MP1
@@ -15478,11 +16009,13 @@ BEGIN
    0253: IND  000b        Static index and load word (TOS+11)
    0255: CXP  09 04       Call external procedure BODYPART.PROC4
    0258: UJP  $025e       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 025a: SLDC 7d          Short load constant 125
-   025b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   025b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 025e: UJP  $0264       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0260: SLDC 7d          Short load constant 125
-   0261: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0261: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0264: SLDC 1e          Short load constant 30
    0265: SLDC 04          Short load constant 4
    0266: CXP  09 05       Call external procedure BODYPART.PROC5
@@ -15490,7 +16023,7 @@ BEGIN
 END
 
 ### PROCEDURE ROUTINE.PROC8 (* P=8, LL=3, D=0, Callers: ROUTINE *)
-  BASE15
+  BASE15=SY:SYMBOL
   ROUTINE:MP1
   ROUTINE:MP7
   ROUTINE:MP11
@@ -15512,7 +16045,7 @@ BEGIN
    0295: SLDC 01          Short load constant 1
    0296: EQUI             Integer TOS-1 = TOS
    0297: FJP  $02b6       Jump if TOS false
-   0299: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0299: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    029c: SLDO 0f          Short load global BASE15
    029d: SLDC 01          Short load constant 1
    029e: EQUI             Integer TOS-1 = TOS
@@ -15532,7 +16065,7 @@ BEGIN
    02bb: SLDC 01          Short load constant 1
    02bc: EQUI             Integer TOS-1 = TOS
    02bd: FJP  $02d1       Jump if TOS false
-   02bf: CXP  01 08       Call external procedure PASCALCO.PROC8
+   02bf: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    02c2: LDA  01 000b     Load addr ROUTINE:MP11
    02c5: LDM  04          Load 4 words from (TOS)
    02c7: CXP  09 0b       Call external procedure BODYPART.PROC11
@@ -15559,7 +16092,7 @@ END
   BASE3
   BASE10
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE25
   BASE55
   BASE80
@@ -15622,7 +16155,7 @@ BEGIN
    034b: SLDO 0b          Short load global BASE11
    034c: LNOT             Logical NOT (~TOS)
    034d: FJP  $0352       Jump if TOS false
-   034f: CXP  01 08       Call external procedure PASCALCO.PROC8
+   034f: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0352: SLDO 0b          Short load global BASE11
    0353: FJP  $0317       Jump if TOS false
    0355: SLDL 02          Short load local MP2
@@ -15785,7 +16318,7 @@ BEGIN
    044c: SLDO 03          Short load global BASE3
    044d: SLDC 00          Short load constant 0
    044e: SLDC 00          Short load constant 0
-   044f: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   044f: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0452: FJP  $0456       Jump if TOS false
    0454: UJP  $046e       Unconditional jump
 -> 0456: SLDO 03          Short load global BASE3
@@ -15800,8 +16333,9 @@ BEGIN
    0464: LDO  003f        Load global word BASE63
    0466: SRO  0003        Store global word BASE3
    0468: UJP  $046e       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 046a: SLDC 7d          Short load constant 125
-   046b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   046b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 046e: CIP  02          Call intermediate procedure 2 ROUTINE.PROC2
    0470: LDA  01 000b     Load addr ROUTINE:MP11
    0473: LDM  04          Load 4 words from (TOS)
@@ -15810,7 +16344,7 @@ BEGIN
    0478: SLDO 03          Short load global BASE3
    0479: SLDC 00          Short load constant 0
    047a: SLDC 00          Short load constant 0
-   047b: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   047b: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    047e: FJP  $0491       Jump if TOS false
    0480: SLDO 03          Short load global BASE3
    0481: IND  0008        Static index and load word (TOS+8)
@@ -15821,14 +16355,15 @@ BEGIN
    048b: SLDC 04          Short load constant 4
    048c: CXP  09 07       Call external procedure BODYPART.PROC7
    048f: UJP  $0495       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0491: SLDC 7d          Short load constant 125
-   0492: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0492: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0495: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE ROUTINE.PROC12 (* P=12, LL=3, D=0, Callers: ROUTINE *)
   BASE3
-  BASE15
+  BASE15=SY:SYMBOL
   BASE17
   BASE48
   ROUTINE:MP7
@@ -15846,13 +16381,14 @@ BEGIN
    04b4: SLDC 07          Short load constant 7
    04b5: NEQI             Integer TOS-1 <> TOS
    04b6: FJP  $04bc       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    04b8: SLDC 7d          Short load constant 125
-   04b9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   04b9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 04bc: SLDO 0f          Short load global BASE15
    04bd: SLDC 01          Short load constant 1
    04be: EQUI             Integer TOS-1 = TOS
    04bf: FJP  $0538       Jump if TOS false
-   04c1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   04c1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    04c4: SLDO 0f          Short load global BASE15
    04c5: SLDC 00          Short load constant 0
    04c6: EQUI             Integer TOS-1 = TOS
@@ -15893,12 +16429,14 @@ BEGIN
    0523: SLDC 03          Short load constant 3
    0524: CXP  09 04       Call external procedure BODYPART.PROC4
    0527: UJP  $052d       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0529: SLDC 02          Short load constant 2
-   052a: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 052d: CXP  01 08       Call external procedure PASCALCO.PROC8
+   052a: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 052d: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0530: UJP  $0536       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 0532: SLDC 02          Short load constant 2
-   0533: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0533: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0536: UJP  $053c       Unconditional jump
 -> 0538: SLDC 00          Short load constant 0
    0539: CXP  09 04       Call external procedure BODYPART.PROC4
@@ -15916,7 +16454,7 @@ END
 
 ### PROCEDURE ROUTINE.PROC13 (* P=13, LL=3, D=0, Callers: ROUTINE *)
   BASE3
-  BASE15
+  BASE15=SY:SYMBOL
   BASE48
   BASE62
   ROUTINE:MP1
@@ -15936,31 +16474,34 @@ BEGIN
    056a: SLDC 07          Short load constant 7
    056b: NEQI             Integer TOS-1 <> TOS
    056c: FJP  $0574       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    056e: SLDC 7d          Short load constant 125
-   056f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   056f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0572: UJP  $0580       Unconditional jump
 -> 0574: SLDO 03          Short load global BASE3
    0575: SIND 02          Short index load *TOS+2
    0576: LDCN             Load constant NIL
    0577: EQUI             Integer TOS-1 = TOS
    0578: FJP  $0580       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    057a: LDCI 018f        Load word 399
-   057d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   057d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0580: LOD  01 0001     Load word at ROUTINE:MP1
    0583: UJP  $05d9       Unconditional jump
    0585: SLDO 0f          Short load global BASE15
    0586: SLDC 01          Short load constant 1
    0587: EQUI             Integer TOS-1 = TOS
    0588: FJP  $059c       Jump if TOS false
-   058a: CXP  01 08       Call external procedure PASCALCO.PROC8
+   058a: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    058d: LDA  01 000b     Load addr ROUTINE:MP11
    0590: LDM  04          Load 4 words from (TOS)
    0592: CXP  09 0b       Call external procedure BODYPART.PROC11
    0595: CXP  09 08       Call external procedure BODYPART.PROC8
    0598: CIP  03          Call intermediate procedure 3 ROUTINE.PROC3
    059a: UJP  $05a0       Unconditional jump
+  PASCALCOMPILER.ERROR(20) { ',' expected }
 -> 059c: SLDC 14          Short load constant 20
-   059d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   059d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 05a0: SLDC 1f          Short load constant 31
    05a1: SLDC 02          Short load constant 2
    05a2: CXP  09 07       Call external procedure BODYPART.PROC7
@@ -15984,8 +16525,9 @@ BEGIN
    05be: LDO  003e        Load global word BASE62
    05c0: NEQI             Integer TOS-1 <> TOS
    05c1: FJP  $05c9       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    05c3: LDCI 018f        Load word 399
-   05c6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   05c6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 05c9: SLDC 0c          Short load constant 12
    05ca: CXP  09 04       Call external procedure BODYPART.PROC4
    05cd: SLDC 00          Short load constant 0
@@ -15995,6 +16537,11 @@ BEGIN
    05d3: SLDC 11          Short load constant 17
    05d4: CXP  09 06       Call external procedure BODYPART.PROC6
    05d7: UJP  $05f2       Unconditional jump
+-> 05d9: XJP  0020 0028 05f2 Case jump
+           0020 -> 0585   0021 -> 05de   0022 -> 05a7   0023 -> 05af
+           0024 -> 05de   0025 -> 05de   0026 -> 05de   0027 -> 05de
+           0028 -> 05b7
+       default -> 05f2
 -> 05f2: LDO  0030        Load global word BASE48
    05f4: FJP  $05fb       Jump if TOS false
    05f6: SLDC 1e          Short load constant 30
@@ -16006,7 +16553,7 @@ END
 ### PROCEDURE ROUTINE.PROC14 (* P=14, LL=3, D=0, Callers: ROUTINE *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE16
   BASE62
   ROUTINE:MP7
@@ -16037,12 +16584,14 @@ BEGIN
    0626: SLDC 01          Short load constant 1
    0627: CXP  09 04       Call external procedure BODYPART.PROC4
    062a: UJP  $0630       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 062c: SLDC 7d          Short load constant 125
-   062d: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0630: CXP  01 08       Call external procedure PASCALCO.PROC8
+   062d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0630: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0633: UJP  $0639       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 0635: SLDC 7d          Short load constant 125
-   0636: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0636: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0639: LDA  01 000f     Load addr ROUTINE:MP15
    063c: LDM  04          Load 4 words from (TOS)
    063e: CXP  09 0b       Call external procedure BODYPART.PROC11
@@ -16055,8 +16604,9 @@ BEGIN
    064a: LDO  003e        Load global word BASE62
    064c: NEQI             Integer TOS-1 <> TOS
    064d: FJP  $0653       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    064f: SLDC 7d          Short load constant 125
-   0650: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0650: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0653: CIP  02          Call intermediate procedure 2 ROUTINE.PROC2
    0655: LDA  01 0007     Load addr ROUTINE:MP7
    0658: LDM  04          Load 4 words from (TOS)
@@ -16066,7 +16616,7 @@ BEGIN
    0661: SLDC 01          Short load constant 1
    0662: EQUI             Integer TOS-1 = TOS
    0663: FJP  $0675       Jump if TOS false
-   0665: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0665: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0668: LDA  01 000b     Load addr ROUTINE:MP11
    066b: LDM  04          Load 4 words from (TOS)
    066d: CXP  09 0b       Call external procedure BODYPART.PROC11
@@ -16085,7 +16635,7 @@ END
 ### PROCEDURE ROUTINE.PROC15 (* P=15, LL=3, D=0, Callers: ROUTINE *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE48
   ROUTINE:MP1
   ROUTINE:MP7
@@ -16105,16 +16655,18 @@ BEGIN
    06a0: SLDC 07          Short load constant 7
    06a1: NEQI             Integer TOS-1 <> TOS
    06a2: FJP  $06aa       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    06a4: SLDC 7d          Short load constant 125
-   06a5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   06a5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    06a8: UJP  $06b6       Unconditional jump
 -> 06aa: SLDO 03          Short load global BASE3
    06ab: SIND 02          Short index load *TOS+2
    06ac: LDCN             Load constant NIL
    06ad: NEQI             Integer TOS-1 <> TOS
    06ae: FJP  $06b6       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    06b0: LDCI 018f        Load word 399
-   06b3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   06b3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 06b6: CIP  02          Call intermediate procedure 2 ROUTINE.PROC2
    06b8: LDA  01 000f     Load addr ROUTINE:MP15
    06bb: LDM  04          Load 4 words from (TOS)
@@ -16130,7 +16682,7 @@ BEGIN
    06d3: SLDC 01          Short load constant 1
    06d4: EQUI             Integer TOS-1 = TOS
    06d5: FJP  $06e9       Jump if TOS false
-   06d7: CXP  01 08       Call external procedure PASCALCO.PROC8
+   06d7: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    06da: LDA  01 000b     Load addr ROUTINE:MP11
    06dd: LDM  04          Load 4 words from (TOS)
    06df: CXP  09 0b       Call external procedure BODYPART.PROC11
@@ -16170,7 +16722,7 @@ END
 ### PROCEDURE ROUTINE.PROC16 (* P=16, LL=3, D=1, Callers: ROUTINE *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE133=VARS
   MP1
 BEGIN
@@ -16185,8 +16737,8 @@ BEGIN
    0731: UNI              Set union (TOS OR TOS-1)
    0732: ADJ  01          Adjust set to 1 words
    0734: LLA  0001        Load local address MP1
-   0736: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   0739: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0736: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   0739: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    073c: SLDL 01          Short load local MP1
    073d: SIND 06          Short index load *TOS+6
    073e: LDCN             Load constant NIL
@@ -16206,7 +16758,7 @@ END
 ### PROCEDURE ROUTINE.PROC17 (* P=17, LL=3, D=0, Callers: ROUTINE *)
   BASE3
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE48
   BASE61
   BASE62
@@ -16235,8 +16787,9 @@ BEGIN
    0776: SLDC 07          Short load constant 7
    0777: NEQI             Integer TOS-1 <> TOS
    0778: FJP  $0780       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    077a: SLDC 7d          Short load constant 125
-   077b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   077b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    077e: UJP  $0793       Unconditional jump
 -> 0780: SLDO 03          Short load global BASE3
    0781: SIND 02          Short index load *TOS+2
@@ -16247,8 +16800,9 @@ BEGIN
    0789: EQUI             Integer TOS-1 = TOS
    078a: LAND             Logical AND (TOS & TOS-1)
    078b: FJP  $0793       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    078d: LDCI 018f        Load word 399
-   0790: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0790: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0793: UJP  $079a       Unconditional jump
 -> 0795: LDO  0046        Load global word BASE70
    0797: CXP  09 0e       Call external procedure BODYPART.PROC14
@@ -16293,8 +16847,9 @@ BEGIN
 -> 07d9: SLDC 15          Short load constant 21
    07da: CXP  09 03       Call external procedure BODYPART.PROC3
 -> 07dd: UJP  $07e3       Unconditional jump
+  PASCALCOMPILER.ERROR(115) { Base type must be a scalar or a subrange }
 -> 07df: SLDC 73          Short load constant 115
-   07e0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   07e0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 07e3: UJP  $0a52       Unconditional jump
    07e5: SLDO 03          Short load global BASE3
    07e6: LDCN             Load constant NIL
@@ -16310,8 +16865,9 @@ BEGIN
    07f1: NEQI             Integer TOS-1 <> TOS
    07f2: LOR              Logical OR (TOS | TOS-1)
    07f3: FJP  $07f9       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    07f5: SLDC 7d          Short load constant 125
-   07f6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   07f6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 07f9: SLDO 0c          Short load global BASE12
    07fa: SRO  0003        Store global word BASE3
    07fc: UJP  $0a52       Unconditional jump
@@ -16333,8 +16889,9 @@ BEGIN
    0814: SLDC 19          Short load constant 25
    0815: CXP  09 03       Call external procedure BODYPART.PROC3
    0818: UJP  $0821       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 081a: SLDC 7d          Short load constant 125
-   081b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   081b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    081e: SLDO 0c          Short load global BASE12
    081f: SRO  0003        Store global word BASE3
 -> 0821: UJP  $0a52       Unconditional jump
@@ -16356,8 +16913,9 @@ BEGIN
    0839: SLDC 01          Short load constant 1
    083a: CXP  09 03       Call external procedure BODYPART.PROC3
    083d: UJP  $0846       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 083f: SLDC 7d          Short load constant 125
-   0840: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0840: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0843: SLDO 0c          Short load global BASE12
    0844: SRO  0003        Store global word BASE3
 -> 0846: UJP  $0a52       Unconditional jump
@@ -16429,7 +16987,7 @@ BEGIN
    08c8: CXP  09 0c       Call external procedure BODYPART.PROC12
    08cb: CXP  09 09       Call external procedure BODYPART.PROC9
    08ce: SLDC 7c          Short load constant 124
-   08cf: CXP  01 04       Call external procedure PASCALCO.ERROR
+   08cf: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    08d2: UJP  $0a52       Unconditional jump
    08d4: CIP  02          Call intermediate procedure 2 ROUTINE.PROC2
    08d6: LDA  01 000f     Load addr ROUTINE:MP15
@@ -16444,7 +17002,7 @@ BEGIN
    08ee: LDCN             Load constant NIL
    08ef: SRO  0003        Store global word BASE3
    08f1: SLDC 7c          Short load constant 124
-   08f2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   08f2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    08f5: UJP  $0a52       Unconditional jump
    08f7: LDA  01 000f     Load addr ROUTINE:MP15
    08fa: LDM  04          Load 4 words from (TOS)
@@ -16482,8 +17040,9 @@ BEGIN
    0936: SLDC 07          Short load constant 7
    0937: NEQI             Integer TOS-1 <> TOS
    0938: FJP  $093e       Jump if TOS false
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
    093a: SLDC 7d          Short load constant 125
-   093b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   093b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 093e: SLDO 0f          Short load global BASE15
    093f: SLDC 01          Short load constant 1
    0940: NEQI             Integer TOS-1 <> TOS
@@ -16497,10 +17056,11 @@ BEGIN
    094c: SLDC 04          Short load constant 4
    094d: CXP  09 06       Call external procedure BODYPART.PROC6
    0950: UJP  $0956       Unconditional jump
+  PASCALCOMPILER.ERROR(20) { ',' expected }
 -> 0952: SLDC 14          Short load constant 20
-   0953: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0953: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0956: UJP  $0984       Unconditional jump
--> 0958: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0958: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    095b: LDA  01 000b     Load addr ROUTINE:MP11
    095e: LDM  04          Load 4 words from (TOS)
    0960: SLDC 00          Short load constant 0
@@ -16561,8 +17121,9 @@ BEGIN
    09b9: SLDC 04          Short load constant 4
    09ba: CXP  09 07       Call external procedure BODYPART.PROC7
    09bd: UJP  $09c3       Unconditional jump
+  PASCALCOMPILER.ERROR(125) { Error in type of standard procedure parameter }
 -> 09bf: SLDC 7d          Short load constant 125
-   09c0: CXP  01 04       Call external procedure PASCALCO.ERROR
+   09c0: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 09c3: SLDO 0c          Short load global BASE12
    09c4: SRO  0003        Store global word BASE3
    09c6: UJP  $0a52       Unconditional jump
@@ -16589,25 +17150,37 @@ BEGIN
    09f5: SLDC 0c          Short load constant 12
    09f6: CXP  09 05       Call external procedure BODYPART.PROC5
    09f9: UJP  $0a52       Unconditional jump
+-> 09fb: XJP  0005 002c 0a52 Case jump
+           0005 -> 075f   0006 -> 075f   0007 -> 07bd   0008 -> 07bd
+           0009 -> 07e5   000a -> 07fe   000b -> 0823   000c -> 0a00
+           000d -> 0a00   000e -> 0a00   000f -> 0a00   0010 -> 0848
+           0011 -> 085d   0012 -> 0a00   0013 -> 0a00   0014 -> 0891
+           0015 -> 0a00   0016 -> 0a00   0017 -> 0a00   0018 -> 08b6
+           0019 -> 08d4   001a -> 08f7   001b -> 0a00   001c -> 0924
+           001d -> 0924   001e -> 0924   001f -> 0a00   0020 -> 0a00
+           0021 -> 0924   0022 -> 0a00   0023 -> 0a00   0024 -> 0a00
+           0025 -> 0a00   0026 -> 0a00   0027 -> 098f   0028 -> 0a00
+           0029 -> 0a00   002a -> 0a00   002b -> 0a00   002c -> 09c8
+       default -> 0a52
 -> 0a52: RNP  00          Return from nonbase procedure
 END
 
-## Segment STATEMEN (11)
+## Segment STATEMENT (11)
 
-### PROCEDURE STATEMEN.STATEMEN(PARAM1; PARAM2; PARAM3; PARAM4) (* P=1, LL=2, D=10, Callers: PROC4, PROC7, PROC6, PROC5, PROC8 *)
-  BASE8
-  BASE9=IC
+### PROCEDURE STATEMENT.STATEMENT(PARAM1; PARAM2; PARAM3; PARAM4) (* P=1, LL=2, D=10, Callers: PROC4, PROC7, PROC6, PROC5, PROC8 *)
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
   BASE10
-  BASE15
+  BASE15=SY:SYMBOL
   BASE23
   BASE25
   BASE47
   BASE51
   BASE81
-  BASE95=SCREENDOTS
-  BASE105=STATBEGSYS
+  BASE95=SCREENDOTS:INTEGER
+  BASE105=STATBEGSYS:SETOFSYS
   BASE133=VARS
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1=PARAM4
   MP2=PARAM3
   MP3=PARAM2
@@ -16661,8 +17234,9 @@ BEGIN
    0527: SIND 02          Short index load *TOS+2
    0528: SIND 00          Short index load *TOS+0
    0529: FJP  $0531       Jump if TOS false
+  PASCALCOMPILER.ERROR(165) { Multidefined label }
    052b: LDCI 00a5        Load word 165
-   052e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   052e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0531: SLDL 0a          Short load local MP10
    0532: SIND 02          Short index load *TOS+2
    0533: CXP  09 13       Call external procedure BODYPART.PROC19
@@ -16672,17 +17246,19 @@ BEGIN
    053b: SIND 01          Short index load *TOS+1
    053c: STL  0007        Store TOS into MP7
 -> 053e: UJP  $0517       Unconditional jump
+  PASCALCOMPILER.ERROR(167) { Undeclared label }
 -> 0540: LDCI 00a7        Load word 167
-   0543: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0546: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0543: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0546: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0549: SLDO 0f          Short load global BASE15
    054a: SLDC 02          Short load constant 2
    054b: EQUI             Integer TOS-1 = TOS
    054c: FJP  $0553       Jump if TOS false
-   054e: CXP  01 08       Call external procedure PASCALCO.PROC8
+   054e: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0551: UJP  $0557       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 0553: SLDC 05          Short load constant 5
-   0554: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0554: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0557: LDO  0033        Load global word BASE51
    0559: FJP  $0566       Jump if TOS false
    055b: SLDC 55          Short load constant 85
@@ -16702,11 +17278,12 @@ BEGIN
    056f: INN              Set membership (TOS-1 in set TOS)
    0570: LNOT             Logical NOT (~TOS)
    0571: FJP  $057e       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    0573: SLDC 06          Short load constant 6
-   0574: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0574: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0577: LLA  0001        Load local address MP1
    0579: LDM  04          Load 4 words from (TOS)
-   057b: CXP  01 10       Call external procedure PASCALCO.PROC16
+   057b: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 057e: SLDO 0f          Short load global BASE15
    057f: LAO  0069        Load global BASE105 (STATBEGSYS)
    0581: LDM  04          Load 4 words from (TOS)
@@ -16729,8 +17306,8 @@ BEGIN
    059a: UNI              Set union (TOS OR TOS-1)
    059b: ADJ  01          Adjust set to 1 words
    059d: LLA  0005        Load local address MP5
-   059f: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   05a2: CXP  01 08       Call external procedure PASCALCO.PROC8
+   059f: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   05a2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    05a5: SLDL 05          Short load local MP5
    05a6: IND  0008        Static index and load word (TOS+8)
    05a8: SLDC 05          Short load constant 5
@@ -16742,32 +17319,41 @@ BEGIN
    05b1: CXP  09 17       Call external procedure BODYPART.PROC23
    05b4: UJP  $05b9       Unconditional jump
 -> 05b6: SLDL 05          Short load local MP5
-   05b7: CLP  02          Call local procedure STATEMEN.PROC2
+   05b7: CLP  02          Call local procedure STATEMENT.PROC2
 -> 05b9: UJP  $0632       Unconditional jump
-   05bb: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05be: CLP  04          Call local procedure STATEMEN.PROC4
+   05bb: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05be: CLP  04          Call local procedure STATEMENT.PROC4
    05c0: UJP  $0632       Unconditional jump
-   05c2: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05c5: CLP  03          Call local procedure STATEMEN.PROC3
+   05c2: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05c5: CLP  03          Call local procedure STATEMENT.PROC3
    05c7: UJP  $0632       Unconditional jump
-   05c9: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05cc: CLP  05          Call local procedure STATEMEN.PROC5
+   05c9: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05cc: CLP  05          Call local procedure STATEMENT.PROC5
    05ce: UJP  $0632       Unconditional jump
-   05d0: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05d3: CXP  0c 01       Call external procedure CASESTAT.1
+   05d0: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05d3: CXP  0c 01       Call external procedure CASESTATEMENT.CASESTATEMENT
    05d6: UJP  $0632       Unconditional jump
-   05d8: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05db: CLP  07          Call local procedure STATEMEN.PROC7
+   05d8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05db: CLP  07          Call local procedure STATEMENT.PROC7
    05dd: UJP  $0632       Unconditional jump
-   05df: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05e2: CLP  06          Call local procedure STATEMEN.PROC6
+   05df: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05e2: CLP  06          Call local procedure STATEMENT.PROC6
    05e4: UJP  $0632       Unconditional jump
-   05e6: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05e9: CXP  0d 01       Call external procedure FORSTATE.1
+   05e6: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05e9: CXP  0d 01       Call external procedure FORSTATEMENT.FORSTATEMENT
    05ec: UJP  $0632       Unconditional jump
-   05ee: CXP  01 08       Call external procedure PASCALCO.PROC8
-   05f1: CLP  08          Call local procedure STATEMEN.PROC8
+   05ee: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   05f1: CLP  08          Call local procedure STATEMENT.PROC8
    05f3: UJP  $0632       Unconditional jump
+-> 05f5: XJP  0000 001a 0632 Case jump
+           0000 -> 0594   0001 -> 05fa   0002 -> 05fa   0003 -> 05fa
+           0004 -> 05fa   0005 -> 05fa   0006 -> 05fa   0007 -> 05fa
+           0008 -> 05fa   0009 -> 05fa   000a -> 05fa   000b -> 05fa
+           000c -> 05fa   000d -> 05fa   000e -> 05fa   000f -> 05fa
+           0010 -> 05fa   0011 -> 05fa   0012 -> 05fa   0013 -> 05bb
+           0014 -> 05c9   0015 -> 05d0   0016 -> 05df   0017 -> 05d8
+           0018 -> 05e6   0019 -> 05ee   001a -> 05c2
+       default -> 0632
 -> 0632: SLDO 0a          Short load global BASE10
    0633: LDO  0019        Load global word BASE25
    0635: GRTI             Integer TOS-1 > TOS
@@ -16784,22 +17370,24 @@ BEGIN
    0645: LDCI 07cf        Load word 1999
    0648: GRTI             Integer TOS-1 > TOS
    0649: FJP  $0654       Jump if TOS false
+    PASCALCOMPILER.ERROR(253) { Procedure too long }
    064b: LDCI 00fd        Load word 253
-   064e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   064e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0651: SLDC 00          Short load constant 0
    0652: SRO  0009        Store global word BASE9 (IC)
 -> 0654: SLDO 0f          Short load global BASE15
-   0658: LDC  04          Load multiple-word constant
+   0655: LDC  04          Load multiple-word constant
                             2608 0000 0000 0040 
    0660: SLDC 04          Short load constant 4
    0661: INN              Set membership (TOS-1 in set TOS)
    0662: LNOT             Logical NOT (~TOS)
    0663: FJP  $0670       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    0665: SLDC 06          Short load constant 6
-   0666: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0666: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0669: LLA  0001        Load local address MP1
    066b: LDM  04          Load 4 words from (TOS)
-   066d: CXP  01 10       Call external procedure PASCALCO.PROC16
+   066d: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0670: LDO  0051        Load global word BASE81
    0672: SLDC 01          Short load constant 1
    0673: SBI              Subtract integers (TOS-1 - TOS)
@@ -16807,12 +17395,12 @@ BEGIN
 -> 0676: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC2(PARAM1) (* P=2, LL=3, D=10, Callers: STATEMEN *)
+### PROCEDURE STATEMENT.PROC2(PARAM1) (* P=2, LL=3, D=10, Callers: STATEMENT *)
   BASE3
   BASE4
   BASE5
   BASE12
-  BASE15
+  BASE15=SY:SYMBOL
   BASE52
   BASE55
   BASE57
@@ -16821,7 +17409,7 @@ END
   BASE63
   BASE64
   BASE91
-  STATEMEN:MP1
+  STATEMENT:MP1
   MP1=PARAM1
   MP2
   MP7
@@ -16829,7 +17417,7 @@ END
   MP9
   MP10
 BEGIN
--> 0000: LDA  01 0001     Load addr STATEMEN:MP1
+-> 0000: LDA  01 0001     Load addr STATEMENT:MP1
    0003: LDM  04          Load 4 words from (TOS)
    0005: SLDC 04          Short load constant 4
    0006: LDCI 4000        Load word 16384
@@ -16863,13 +17451,13 @@ BEGIN
 -> 002e: SLDO 03          Short load global BASE3
    002f: SLDC 00          Short load constant 0
    0030: SLDC 00          Short load constant 0
-   0031: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   0031: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    0034: STL  0007        Store TOS into MP7
    0036: LLA  0002        Load local address MP2
    0038: LAO  0003        Load global BASE3
    003a: MOV  0005        Move 5 words (TOS to TOS-1)
-   003c: CXP  01 08       Call external procedure PASCALCO.PROC8
-   003f: LDA  01 0001     Load addr STATEMEN:MP1
+   003c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   003f: LDA  01 0001     Load addr STATEMENT:MP1
    0042: LDM  04          Load 4 words from (TOS)
    0044: CXP  09 0b       Call external procedure BODYPART.PROC11
    0047: SLDO 04          Short load global BASE4
@@ -16882,7 +17470,7 @@ BEGIN
    0050: SLDO 03          Short load global BASE3
    0051: SLDC 00          Short load constant 0
    0052: SLDC 00          Short load constant 0
-   0053: CXP  01 12       Call external procedure PASCALCO.FUNC18
+   0053: CXP  01 12       Call external procedure PASCALCOMPILER.FUNC18
    0056: LOR              Logical OR (TOS | TOS-1)
    0057: STL  0008        Store TOS into MP8
 -> 0059: SLDO 03          Short load global BASE3
@@ -16913,7 +17501,7 @@ BEGIN
    007c: SLDL 02          Short load local MP2
    007d: SLDC 00          Short load constant 0
    007e: SLDC 00          Short load constant 0
-   007f: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   007f: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0082: FJP  $008c       Jump if TOS false
    0084: SLDC 0a          Short load constant 10
    0085: CXP  09 03       Call external procedure BODYPART.PROC3
@@ -16923,7 +17511,7 @@ BEGIN
    008e: SLDL 02          Short load local MP2
    008f: SLDC 00          Short load constant 0
    0090: SLDC 00          Short load constant 0
-   0091: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0091: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0094: FJP  $00b8       Jump if TOS false
    0096: SLDO 03          Short load global BASE3
    0097: SLDO 0c          Short load global BASE12
@@ -16942,7 +17530,7 @@ BEGIN
    00ab: NEQI             Integer TOS-1 <> TOS
    00ac: FJP  $00b8       Jump if TOS false
    00ae: LDCI 0081        Load word 129
-   00b1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00b1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    00b4: LDO  003f        Load global word BASE63
    00b6: SRO  0003        Store global word BASE3
 -> 00b8: SLDL 07          Short load local MP7
@@ -16968,14 +17556,14 @@ BEGIN
    00d6: SLDO 03          Short load global BASE3
    00d7: SLDC 00          Short load constant 0
    00d8: SLDC 00          Short load constant 0
-   00d9: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   00d9: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    00dc: FJP  $00f1       Jump if TOS false
    00de: SLDO 03          Short load global BASE3
    00df: LDO  0039        Load global word BASE57
    00e1: EQUI             Integer TOS-1 = TOS
    00e2: FJP  $00ec       Jump if TOS false
    00e4: LDCI 0081        Load word 129
-   00e7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00e7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    00ea: UJP  $00ef       Unconditional jump
 -> 00ec: SLDO 03          Short load global BASE3
    00ed: STL  0002        Store TOS into MP2
@@ -17008,7 +17596,7 @@ BEGIN
    0114: SIND 02          Short index load *TOS+2
    0115: LLA  000a        Load local address MP10
    0117: LLA  0009        Load local address MP9
-   0119: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0119: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    011c: SLDL 09          Short load local MP9
    011d: SLDL 0a          Short load local MP10
    011e: SBI              Subtract integers (TOS-1 - TOS)
@@ -17029,7 +17617,7 @@ BEGIN
    0134: NEQI             Integer TOS-1 <> TOS
    0135: FJP  $013d       Jump if TOS false
    0137: LDCI 0081        Load word 129
-   013a: CXP  01 04       Call external procedure PASCALCO.ERROR
+   013a: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 013d: SLDL 02          Short load local MP2
    013e: SRO  0003        Store global word BASE3
 -> 0140: UJP  $0145       Unconditional jump
@@ -17039,7 +17627,7 @@ BEGIN
    0146: SLDO 03          Short load global BASE3
    0147: SLDC 00          Short load constant 0
    0148: SLDC 00          Short load constant 0
-   0149: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0149: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    014c: FJP  $01f8       Jump if TOS false
    014e: SLDL 02          Short load local MP2
    014f: SIND 01          Short index load *TOS+1
@@ -17105,7 +17693,7 @@ BEGIN
    01b8: EQUI             Integer TOS-1 = TOS
    01b9: FJP  $01c3       Jump if TOS false
    01bb: LDCI 0081        Load word 129
-   01be: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01be: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    01c1: UJP  $01c6       Unconditional jump
 -> 01c3: SLDO 03          Short load global BASE3
    01c4: STL  0002        Store TOS into MP2
@@ -17119,24 +17707,30 @@ BEGIN
    01d0: SIND 00          Short index load *TOS+0
    01d1: CXP  09 05       Call external procedure BODYPART.PROC5
    01d4: UJP  $01f6       Unconditional jump
+  PASCALCOMPILER.ERROR(146) { Assignment of files not allowed }
    01d6: LDCI 0092        Load word 146
-   01d9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01d9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    01dc: UJP  $01f6       Unconditional jump
+-> 01de: XJP  0000 0007 01f6 Case jump
+           0000 -> 0178   0001 -> 0152   0002 -> 0178   0003 -> 017f
+           0004 -> 016b   0005 -> 0194   0006 -> 01ce   0007 -> 01d6
+       default -> 01f6
 -> 01f6: UJP  $01fe       Unconditional jump
 -> 01f8: LDCI 0081        Load word 129
-   01fb: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01fb: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01fe: UJP  $0204       Unconditional jump
+  PASCALCOMPILER.ERROR(51) { ':=' expected }
 -> 0200: SLDC 33          Short load constant 51
-   0201: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0201: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0204: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC3 (* P=3, LL=3, D=4, Callers: STATEMEN *)
-  BASE8
-  BASE15
+### PROCEDURE STATEMENT.PROC3 (* P=3, LL=3, D=4, Callers: STATEMENT *)
+  BASE8=TOP:DISPRANGE
+  BASE15=SY:SYMBOL
   BASE23
   BASE53
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   MP1
   MP2
   MP3
@@ -17145,8 +17739,9 @@ BEGIN
 -> 021c: LDO  0035        Load global word BASE53
    021e: LNOT             Logical NOT (~TOS)
    021f: FJP  $0225       Jump if TOS false
+  PASCALCOMPILER.ERROR(6) { Illegal symbol (possibly missing ';' on line above) }
    0221: SLDC 06          Short load constant 6
-   0222: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0222: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0225: SLDO 0f          Short load global BASE15
    0226: SLDC 23          Short load constant 35
    0227: EQUI             Integer TOS-1 = TOS
@@ -17200,29 +17795,31 @@ BEGIN
 -> 026e: SLDL 02          Short load local MP2
    026f: LNOT             Logical NOT (~TOS)
    0270: FJP  $0278       Jump if TOS false
+  PASCALCOMPILER.ERROR(167) { Undeclared label }
    0272: LDCI 00a7        Load word 167
-   0275: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0278: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0275: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0278: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    027b: UJP  $0281       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 027d: SLDC 0f          Short load constant 15
-   027e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   027e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0281: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC4 (* P=4, LL=3, D=0, Callers: STATEMEN *)
+### PROCEDURE STATEMENT.PROC4 (* P=4, LL=3, D=0, Callers: STATEMENT *)
   BASE11
-  BASE15
-  BASE105=STATBEGSYS
-  STATEMEN:MP1
+  BASE15=SY:SYMBOL
+  BASE105=STATBEGSYS:SETOFSYS
+  STATEMENT:MP1
 BEGIN
--> 0292: LDA  01 0001     Load addr STATEMEN:MP1
+-> 0292: LDA  01 0001     Load addr STATEMENT:MP1
    0295: LDM  04          Load 4 words from (TOS)
    0297: SLDC 04          Short load constant 4
    0298: LDCI 0208        Load word 520
    029b: SLDC 01          Short load constant 1
    029c: UNI              Set union (TOS OR TOS-1)
    029d: ADJ  04          Adjust set to 4 words
-   029f: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   029f: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    02a1: SLDO 0f          Short load global BASE15
    02a2: LAO  0069        Load global BASE105 (STATBEGSYS)
    02a4: LDM  04          Load 4 words from (TOS)
@@ -17237,24 +17834,25 @@ BEGIN
    02b0: SLDO 0b          Short load global BASE11
    02b1: LNOT             Logical NOT (~TOS)
    02b2: FJP  $02b7       Jump if TOS false
-   02b4: CXP  01 08       Call external procedure PASCALCO.PROC8
+   02b4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 02b7: SLDO 0b          Short load global BASE11
    02b8: FJP  $0292       Jump if TOS false
    02ba: SLDO 0f          Short load global BASE15
    02bb: SLDC 09          Short load constant 9
    02bc: EQUI             Integer TOS-1 = TOS
    02bd: FJP  $02c4       Jump if TOS false
-   02bf: CXP  01 08       Call external procedure PASCALCO.PROC8
+   02bf: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    02c2: UJP  $02c8       Unconditional jump
+  PASCALCOMPILER.ERROR(13) { 'END' expected }
 -> 02c4: SLDC 0d          Short load constant 13
-   02c5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02c5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 02c8: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC5 (* P=5, LL=3, D=5, Callers: STATEMEN *)
-  BASE9=IC
-  BASE15
-  STATEMEN:MP1
+### PROCEDURE STATEMENT.PROC5 (* P=5, LL=3, D=5, Callers: STATEMENT *)
+  BASE9=IC:ADDRRANGE
+  BASE15=SY:SYMBOL
+  STATEMENT:MP1
   MP1
   MP2
   MP3
@@ -17263,7 +17861,7 @@ END
 BEGIN
 -> 02d8: SLDC 00          Short load constant 0
    02d9: STL  0005        Store TOS into MP5
-   02db: LDA  01 0001     Load addr STATEMEN:MP1
+   02db: LDA  01 0001     Load addr STATEMENT:MP1
    02de: LDM  04          Load 4 words from (TOS)
    02e0: SLDC 04          Short load constant 4
    02e1: LDCI 1000        Load word 4096
@@ -17282,18 +17880,19 @@ BEGIN
    02f9: SLDC 0c          Short load constant 12
    02fa: EQUI             Integer TOS-1 = TOS
    02fb: FJP  $0302       Jump if TOS false
-   02fd: CXP  01 08       Call external procedure PASCALCO.PROC8
+   02fd: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0300: UJP  $0306       Unconditional jump
+  PASCALCOMPILER.ERROR(52) { 'THEN' expected }
 -> 0302: SLDC 34          Short load constant 52
-   0303: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0306: LDA  01 0001     Load addr STATEMEN:MP1
+   0303: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0306: LDA  01 0001     Load addr STATEMENT:MP1
    0309: LDM  04          Load 4 words from (TOS)
    030b: SLDC 04          Short load constant 4
    030c: LDCI 2000        Load word 8192
    030f: SLDC 01          Short load constant 1
    0310: UNI              Set union (TOS OR TOS-1)
    0311: ADJ  04          Adjust set to 4 words
-   0313: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   0313: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    0315: SLDL 05          Short load local MP5
    0316: FJP  $0323       Jump if TOS false
    0318: SLDL 04          Short load local MP4
@@ -17317,10 +17916,10 @@ BEGIN
    0333: CXP  09 10       Call external procedure BODYPART.PROC16
    0336: SLDL 02          Short load local MP2
    0337: CXP  09 13       Call external procedure BODYPART.PROC19
--> 033a: CXP  01 08       Call external procedure PASCALCO.PROC8
-   033d: LDA  01 0001     Load addr STATEMEN:MP1
+-> 033a: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   033d: LDA  01 0001     Load addr STATEMENT:MP1
    0340: LDM  04          Load 4 words from (TOS)
-   0342: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   0342: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    0344: SLDL 05          Short load local MP5
    0345: FJP  $0350       Jump if TOS false
    0347: SLDL 04          Short load local MP4
@@ -17340,25 +17939,25 @@ BEGIN
 -> 035e: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC6 (* P=6, LL=3, D=1, Callers: STATEMEN *)
+### PROCEDURE STATEMENT.PROC6 (* P=6, LL=3, D=1, Callers: STATEMENT *)
   BASE11
-  BASE15
-  BASE105=STATBEGSYS
-  STATEMEN:MP1
+  BASE15=SY:SYMBOL
+  BASE105=STATBEGSYS:SETOFSYS
+  STATEMENT:MP1
   MP1
 BEGIN
 -> 036a: LLA  0001        Load local address MP1
    036c: CXP  09 12       Call external procedure BODYPART.PROC18
    036f: SLDL 01          Short load local MP1
    0370: CXP  09 13       Call external procedure BODYPART.PROC19
--> 0373: LDA  01 0001     Load addr STATEMEN:MP1
+-> 0373: LDA  01 0001     Load addr STATEMENT:MP1
    0376: LDM  04          Load 4 words from (TOS)
    0378: SLDC 04          Short load constant 4
    0379: LDCI 0408        Load word 1032
    037c: SLDC 01          Short load constant 1
    037d: UNI              Set union (TOS OR TOS-1)
    037e: ADJ  04          Adjust set to 4 words
-   0380: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   0380: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    0382: SLDO 0f          Short load global BASE15
    0383: LAO  0069        Load global BASE105 (STATBEGSYS)
    0385: LDM  04          Load 4 words from (TOS)
@@ -17373,28 +17972,29 @@ BEGIN
    0391: SLDO 0b          Short load global BASE11
    0392: LNOT             Logical NOT (~TOS)
    0393: FJP  $0398       Jump if TOS false
-   0395: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0395: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0398: SLDO 0b          Short load global BASE11
    0399: FJP  $0373       Jump if TOS false
    039b: SLDO 0f          Short load global BASE15
    039c: SLDC 0a          Short load constant 10
    039d: EQUI             Integer TOS-1 = TOS
    039e: FJP  $03b1       Jump if TOS false
-   03a0: CXP  01 08       Call external procedure PASCALCO.PROC8
-   03a3: LDA  01 0001     Load addr STATEMEN:MP1
+   03a0: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
+   03a3: LDA  01 0001     Load addr STATEMENT:MP1
    03a6: LDM  04          Load 4 words from (TOS)
    03a8: CXP  09 0b       Call external procedure BODYPART.PROC11
    03ab: SLDL 01          Short load local MP1
    03ac: CXP  09 11       Call external procedure BODYPART.PROC17
    03af: UJP  $03b5       Unconditional jump
+  PASCALCOMPILER.ERROR(53) { 'UNTIL' expected }
 -> 03b1: SLDC 35          Short load constant 53
-   03b2: CXP  01 04       Call external procedure PASCALCO.ERROR
+   03b2: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 03b5: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC7 (* P=7, LL=3, D=2, Callers: STATEMEN *)
-  BASE15
-  STATEMEN:MP1
+### PROCEDURE STATEMENT.PROC7 (* P=7, LL=3, D=2, Callers: STATEMENT *)
+  BASE15=SY:SYMBOL
+  STATEMENT:MP1
   MP1
   MP2
 BEGIN
@@ -17402,7 +18002,7 @@ BEGIN
    03c8: CXP  09 12       Call external procedure BODYPART.PROC18
    03cb: SLDL 02          Short load local MP2
    03cc: CXP  09 13       Call external procedure BODYPART.PROC19
-   03cf: LDA  01 0001     Load addr STATEMEN:MP1
+   03cf: LDA  01 0001     Load addr STATEMENT:MP1
    03d2: LDM  04          Load 4 words from (TOS)
    03d4: SLDC 04          Short load constant 4
    03d5: SLDC 40          Short load constant 64
@@ -17418,13 +18018,14 @@ BEGIN
    03e7: SLDC 06          Short load constant 6
    03e8: EQUI             Integer TOS-1 = TOS
    03e9: FJP  $03f0       Jump if TOS false
-   03eb: CXP  01 08       Call external procedure PASCALCO.PROC8
+   03eb: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    03ee: UJP  $03f4       Unconditional jump
+  PASCALCOMPILER.ERROR(54) { 'DO' expected }
 -> 03f0: SLDC 36          Short load constant 54
-   03f1: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 03f4: LDA  01 0001     Load addr STATEMEN:MP1
+   03f1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 03f4: LDA  01 0001     Load addr STATEMENT:MP1
    03f7: LDM  04          Load 4 words from (TOS)
-   03f9: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   03f9: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    03fb: SLDC 39          Short load constant 57
    03fc: SLDL 02          Short load local MP2
    03fd: CXP  09 10       Call external procedure BODYPART.PROC16
@@ -17433,20 +18034,20 @@ BEGIN
 -> 0404: RNP  00          Return from nonbase procedure
 END
 
-### PROCEDURE STATEMEN.PROC8 (* P=8, LL=3, D=4, Callers: STATEMEN *)
+### PROCEDURE STATEMENT.PROC8 (* P=8, LL=3, D=4, Callers: STATEMENT *)
   BASE3
   BASE5
   BASE6
   BASE7
-  BASE8
+  BASE8=TOP:DISPRANGE
   BASE10
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE76
   BASE80
   BASE133=VARS
-  BASE134
-  STATEMEN:MP1
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  STATEMENT:MP1
   MP1
   MP3
   MP4
@@ -17464,14 +18065,15 @@ BEGIN
    041e: UNI              Set union (TOS OR TOS-1)
    041f: ADJ  01          Adjust set to 1 words
    0421: LLA  0001        Load local address MP1
-   0423: CXP  01 0a       Call external procedure PASCALCO.PROC10
-   0426: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0423: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
+   0426: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0429: UJP  $0433       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 042b: SLDC 02          Short load constant 2
-   042c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   042c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    042f: LDO  004c        Load global word BASE76
    0431: STL  0001        Store TOS into MP1
--> 0433: LDA  01 0001     Load addr STATEMEN:MP1
+-> 0433: LDA  01 0001     Load addr STATEMENT:MP1
    0436: LDM  04          Load 4 words from (TOS)
    0438: SLDC 04          Short load constant 4
    0439: SLDC 42          Short load constant 66
@@ -17552,11 +18154,13 @@ BEGIN
    04a4: ADI              Add integers (TOS + TOS-1)
    04a5: SRO  000a        Store global word BASE10
 -> 04a7: UJP  $04af       Unconditional jump
+    PASCALCOMPILER.ERROR(250) { Too many scopes of nested identifiers }
 -> 04a9: LDCI 00fa        Load word 250
-   04ac: CXP  01 04       Call external procedure PASCALCO.ERROR
+   04ac: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 04af: UJP  $04b7       Unconditional jump
+  PASCALCOMPILER.ERROR(140) { Type of variable is not record }
 -> 04b1: LDCI 008c        Load word 140
-   04b4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   04b4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 04b7: SLDO 0f          Short load global BASE15
    04b8: SLDC 01          Short load constant 1
    04b9: NEQI             Integer TOS-1 <> TOS
@@ -17564,20 +18168,21 @@ BEGIN
    04bc: SLDO 0b          Short load global BASE11
    04bd: LNOT             Logical NOT (~TOS)
    04be: FJP  $04c3       Jump if TOS false
-   04c0: CXP  01 08       Call external procedure PASCALCO.PROC8
+   04c0: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 04c3: SLDO 0b          Short load global BASE11
    04c4: FJP  $0413       Jump if TOS false
    04c6: SLDO 0f          Short load global BASE15
    04c7: SLDC 06          Short load constant 6
    04c8: EQUI             Integer TOS-1 = TOS
    04c9: FJP  $04d0       Jump if TOS false
-   04cb: CXP  01 08       Call external procedure PASCALCO.PROC8
+   04cb: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    04ce: UJP  $04d4       Unconditional jump
+  PASCALCOMPILER.ERROR(54) { 'DO' expected }
 -> 04d0: SLDC 36          Short load constant 54
-   04d1: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 04d4: LDA  01 0001     Load addr STATEMEN:MP1
+   04d1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 04d4: LDA  01 0001     Load addr STATEMENT:MP1
    04d7: LDM  04          Load 4 words from (TOS)
-   04d9: CIP  01          Call intermediate procedure 1 STATEMEN.1
+   04d9: CIP  01          Call intermediate procedure 1 STATEMENT.STATEMENT
    04db: SLDO 08          Short load global BASE8
    04dc: SLDL 03          Short load local MP3
    04dd: SBI              Subtract integers (TOS-1 - TOS)
@@ -17585,15 +18190,15 @@ BEGIN
 -> 04e0: RNP  00          Return from nonbase procedure
 END
 
-## Segment CASESTAT (12)
+## Segment CASESTATEMENT (12)
 
-### PROCEDURE CASESTAT.CASESTAT (* P=1, LL=3, D=14 *)
+### PROCEDURE CASESTATEMENT.CASESTATEMENT (* P=1, LL=3, D=14 *)
   BASE3
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE11
-  BASE15
+  BASE15=SY:SYMBOL
   BASE64
-  BASE105=STATBEGSYS
+  BASE105=STATBEGSYS:SETOFSYS
   ????????:MP1
   MP1
   MP2
@@ -17640,18 +18245,20 @@ BEGIN
    002f: EQUI             Integer TOS-1 = TOS
    0030: LOR              Logical OR (TOS | TOS-1)
    0031: FJP  $003c       Jump if TOS false
+  PASCALCOMPILER.ERROR(144) { Illegal type of expression }
    0033: LDCI 0090        Load word 144
-   0036: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0036: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0039: LDCN             Load constant NIL
    003a: STL  0002        Store TOS into MP2
 -> 003c: SLDO 0f          Short load global BASE15
    003d: SLDC 0b          Short load constant 11
    003e: EQUI             Integer TOS-1 = TOS
    003f: FJP  $0046       Jump if TOS false
-   0041: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0041: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0044: UJP  $004a       Unconditional jump
+  PASCALCOMPILER.ERROR(8) { 'OF' expected }
 -> 0046: SLDC 08          Short load constant 8
-   0047: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0047: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 004a: LDCN             Load constant NIL
    004b: STL  0006        Store TOS into MP6
    004d: LLA  0009        Load local address MP9
@@ -17669,7 +18276,7 @@ BEGIN
    0063: ADJ  04          Adjust set to 4 words
    0065: LLA  0001        Load local address MP1
    0067: LLA  0007        Load local address MP7
-   0069: CXP  01 14       Call external procedure PASCALCO.PROC20
+   0069: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    006c: SLDL 02          Short load local MP2
    006d: LDCN             Load constant NIL
    006e: NEQI             Integer TOS-1 <> TOS
@@ -17678,7 +18285,7 @@ BEGIN
    0072: SLDL 01          Short load local MP1
    0073: SLDC 00          Short load constant 0
    0074: SLDC 00          Short load constant 0
-   0075: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0075: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0078: FJP  $00c9       Jump if TOS false
    007a: SLDL 06          Short load local MP6
    007b: STL  0005        Store TOS into MP5
@@ -17700,8 +18307,9 @@ BEGIN
    0090: SLDL 07          Short load local MP7
    0091: EQUI             Integer TOS-1 = TOS
    0092: FJP  $009a       Jump if TOS false
+  PASCALCOMPILER.ERROR(156) { Multidefined case label }
    0094: LDCI 009c        Load word 156
-   0097: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0097: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 009a: UJP  $00a5       Unconditional jump
 -> 009c: SLDL 05          Short load local MP5
    009d: STL  0004        Store TOS into MP4
@@ -17736,8 +18344,9 @@ BEGIN
    00c5: SLDL 03          Short load local MP3
    00c6: STO              Store indirect (TOS into TOS-1)
 -> 00c7: UJP  $00cf       Unconditional jump
+  PASCALCOMPILER.ERROR(147) { Label type incompatible with selecting expression }
 -> 00c9: LDCI 0093        Load word 147
-   00cc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00cc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00cf: SLDO 0f          Short load global BASE15
    00d0: SLDC 01          Short load constant 1
    00d1: NEQI             Integer TOS-1 <> TOS
@@ -17745,26 +18354,27 @@ BEGIN
    00d4: SLDO 0b          Short load global BASE11
    00d5: LNOT             Logical NOT (~TOS)
    00d6: FJP  $00db       Jump if TOS false
-   00d8: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00d8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 00db: SLDO 0b          Short load global BASE11
    00dc: FJP  $005a       Jump if TOS false
    00de: SLDO 0f          Short load global BASE15
    00df: SLDC 02          Short load constant 2
    00e0: EQUI             Integer TOS-1 = TOS
    00e1: FJP  $00e8       Jump if TOS false
-   00e3: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00e3: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00e6: UJP  $00ec       Unconditional jump
+    PASCALCOMPILER.ERROR(5) { ':' expected }
 -> 00e8: SLDC 05          Short load constant 5
-   00e9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00e9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00ec: LDA  01 0001     Load addr ????????:MP1
    00ef: LDM  04          Load 4 words from (TOS)
    00f1: SLDC 04          Short load constant 4
-   00f4: LDC  04          Load multiple-word constant
+   00f2: LDC  04          Load multiple-word constant
                             0008 0000 0000 0040 
    00fc: SLDC 04          Short load constant 4
    00fd: UNI              Set union (TOS OR TOS-1)
    00fe: ADJ  04          Adjust set to 4 words
-   0100: CXP  0b 01       Call external procedure STATEMEN.1
+   0100: CXP  0b 01       Call external procedure STATEMENT.STATEMENT
    0103: SLDO 0f          Short load global BASE15
    0104: LAO  0069        Load global BASE105 (STATBEGSYS)
    0106: LDM  04          Load 4 words from (TOS)
@@ -17786,7 +18396,7 @@ BEGIN
    011c: SLDO 0b          Short load global BASE11
    011d: LNOT             Logical NOT (~TOS)
    011e: FJP  $0123       Jump if TOS false
-   0120: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0120: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 0123: SLDO 0b          Short load global BASE11
    0124: SLDO 0f          Short load global BASE15
    0125: SLDC 09          Short load constant 9
@@ -17830,9 +18440,9 @@ BEGIN
    0157: SLDC 2c          Short load constant 44
    0158: CXP  09 03       Call external procedure BODYPART.PROC3
    015b: SLDL 0c          Short load local MP12
-   015c: CXP  01 17       Call external procedure PASCALCO.PROC23
+   015c: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    015f: SLDL 0b          Short load local MP11
-   0160: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0160: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0163: SLDO 09          Short load global BASE9 (IC)
    0164: STL  000d        Store TOS into MP13
    0166: SLDC 39          Short load constant 57
@@ -17848,8 +18458,9 @@ BEGIN
    0172: LDCI 07cf        Load word 1999
    0175: GEQI             Integer TOS-1 >= TOS
    0176: FJP  $0180       Jump if TOS false
+    PASCALCOMPILER.ERROR(302) { Not enough room for case jump table }
    0178: LDCI 012e        Load word 302
-   017b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   017b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    017e: UJP  $01ab       Unconditional jump
 -> 0180: SLDL 06          Short load local MP6
    0181: STL  000e        Store TOS into MP14
@@ -17861,7 +18472,7 @@ BEGIN
    0189: SLDO 09          Short load global BASE9 (IC)
    018a: SLDL 0d          Short load local MP13
    018b: SBI              Subtract integers (TOS-1 - TOS)
-   018c: CXP  01 17       Call external procedure PASCALCO.PROC23
+   018c: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    018f: SLDL 0c          Short load local MP12
    0190: SLDC 01          Short load constant 1
    0191: ADI              Add integers (TOS + TOS-1)
@@ -17871,7 +18482,7 @@ BEGIN
    0197: SLDL 0e          Short load local MP14
    0198: SIND 01          Short index load *TOS+1
    0199: SBI              Subtract integers (TOS-1 - TOS)
-   019a: CXP  01 17       Call external procedure PASCALCO.PROC23
+   019a: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    019d: SLDL 0e          Short load local MP14
    019e: SIND 00          Short index load *TOS+0
    019f: STL  0006        Store TOS into MP6
@@ -17889,7 +18500,7 @@ BEGIN
    01b0: SLDC 36          Short load constant 54
    01b1: EQUI             Integer TOS-1 = TOS
    01b2: FJP  $01cd       Jump if TOS false
-   01b4: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01b4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01b7: LDA  01 0001     Load addr ????????:MP1
    01ba: LDM  04          Load 4 words from (TOS)
    01bc: SLDC 04          Short load constant 4
@@ -17897,31 +18508,32 @@ BEGIN
    01be: SLDC 01          Short load constant 1
    01bf: UNI              Set union (TOS OR TOS-1)
    01c0: ADJ  04          Adjust set to 4 words
-   01c2: CXP  0b 01       Call external procedure STATEMEN.1
+   01c2: CXP  0b 01       Call external procedure STATEMENT.STATEMENT
    01c5: SLDO 0f          Short load global BASE15
    01c6: SLDC 03          Short load constant 3
    01c7: EQUI             Integer TOS-1 = TOS
    01c8: FJP  $01cd       Jump if TOS false
-   01ca: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01ca: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 01cd: SLDL 09          Short load local MP9
    01ce: CXP  09 13       Call external procedure BODYPART.PROC19
 -> 01d1: SLDO 0f          Short load global BASE15
    01d2: SLDC 09          Short load constant 9
    01d3: EQUI             Integer TOS-1 = TOS
    01d4: FJP  $01db       Jump if TOS false
-   01d6: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01d6: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01d9: UJP  $01df       Unconditional jump
+  PASCALCOMPILER.ERROR(13) { 'END' expected }
 -> 01db: SLDC 0d          Short load constant 13
-   01dc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01dc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01df: RNP  00          Return from nonbase procedure
 END
 
-## Segment FORSTATE (13)
+## Segment FORSTATEMENT (13)
 
-### PROCEDURE FORSTATE.FORSTATE (* P=1, LL=3, D=10 *)
+### PROCEDURE FORSTATEMENT.FORSTATEMENT (* P=1, LL=3, D=10 *)
   BASE3
   BASE10
-  BASE15
+  BASE15=SY:SYMBOL
   BASE52
   BASE64
   BASE80
@@ -17944,7 +18556,7 @@ BEGIN
    0003: FJP  $005b       Jump if TOS false
    0005: LDO  0085        Load global word BASE133 (VARS)
    0008: LDA  01 0005     Load addr ????????:MP5
-   000b: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   000b: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    000e: LOD  01 0005     Load word at ????????:MP5
    0011: STL  000a        Store TOS into MP10
    0013: SLDL 0a          Short load local MP10
@@ -17966,8 +18578,9 @@ BEGIN
    002a: IND  000a        Static index and load word (TOS+10)
    002c: STL  0005        Store TOS into MP5
    002e: UJP  $0039       Unconditional jump
+  PASCALCOMPILER.ERROR(155) { Control variable cannot be formal or non-local }
 -> 0030: LDCI 009b        Load word 155
-   0033: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0033: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0036: LDCN             Load constant NIL
    0037: STL  0001        Store TOS into MP1
 -> 0039: SLDL 01          Short load local MP1
@@ -17982,17 +18595,19 @@ BEGIN
    0044: SLDL 01          Short load local MP1
    0045: SLDC 00          Short load constant 0
    0046: SLDC 00          Short load constant 0
-   0047: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0047: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    004a: LOR              Logical OR (TOS | TOS-1)
    004b: FJP  $0056       Jump if TOS false
+  PASCALCOMPILER.ERROR(143) { Illegal type of loop control variable }
    004d: LDCI 008f        Load word 143
-   0050: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0050: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0053: LDCN             Load constant NIL
    0054: STL  0001        Store TOS into MP1
--> 0056: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 0056: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0059: UJP  $006f       Unconditional jump
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
 -> 005b: SLDC 02          Short load constant 2
-   005c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   005c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    005f: LDA  01 0001     Load addr ????????:MP1
    0062: LDM  04          Load 4 words from (TOS)
    0064: SLDC 04          Short load constant 4
@@ -18000,12 +18615,12 @@ BEGIN
    0068: SLDC 01          Short load constant 1
    0069: UNI              Set union (TOS OR TOS-1)
    006a: ADJ  04          Adjust set to 4 words
-   006c: CXP  01 10       Call external procedure PASCALCO.PROC16
+   006c: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 006f: SLDO 0f          Short load global BASE15
    0070: SLDC 0e          Short load constant 14
    0071: EQUI             Integer TOS-1 = TOS
    0072: FJP  $00d4       Jump if TOS false
-   0074: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0074: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0077: LDA  01 0001     Load addr ????????:MP1
    007a: LDM  04          Load 4 words from (TOS)
    007c: SLDC 04          Short load constant 4
@@ -18023,14 +18638,15 @@ BEGIN
    008e: SLDC 00          Short load constant 0
    008f: NEQI             Integer TOS-1 <> TOS
    0090: FJP  $009a       Jump if TOS false
+  PASCALCOMPILER.ERROR(144) { Illegal type of expression }
    0092: LDCI 0090        Load word 144
-   0095: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0095: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0098: UJP  $00d2       Unconditional jump
 -> 009a: SLDL 01          Short load local MP1
    009b: SLDO 03          Short load global BASE3
    009c: SLDC 00          Short load constant 0
    009d: SLDC 00          Short load constant 0
-   009e: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   009e: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    00a1: FJP  $00cc       Jump if TOS false
    00a3: CXP  09 08       Call external procedure BODYPART.PROC8
    00a6: CXP  09 0f       Call external procedure BODYPART.PROC15
@@ -18056,11 +18672,13 @@ BEGIN
 -> 00c5: LLA  0001        Load local address MP1
    00c7: CXP  09 14       Call external procedure BODYPART.PROC20
    00ca: UJP  $00d2       Unconditional jump
+  PASCALCOMPILER.ERROR(145) { Type conflict }
 -> 00cc: LDCI 0091        Load word 145
-   00cf: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00cf: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00d2: UJP  $00e8       Unconditional jump
+  PASCALCOMPILER.ERROR(51) { ':=' expected }
 -> 00d4: SLDC 33          Short load constant 51
-   00d5: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00d5: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    00d8: LDA  01 0001     Load addr ????????:MP1
    00db: LDM  04          Load 4 words from (TOS)
    00dd: SLDC 04          Short load constant 4
@@ -18068,7 +18686,7 @@ BEGIN
    00e1: SLDC 01          Short load constant 1
    00e2: UNI              Set union (TOS OR TOS-1)
    00e3: ADJ  04          Adjust set to 4 words
-   00e5: CXP  01 10       Call external procedure PASCALCO.PROC16
+   00e5: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 00e8: LLA  0008        Load local address MP8
    00ea: CXP  09 12       Call external procedure BODYPART.PROC18
    00ed: SLDO 0f          Short load global BASE15
@@ -18078,7 +18696,7 @@ BEGIN
    00f3: FJP  $0184       Jump if TOS false
    00f5: SLDO 0f          Short load global BASE15
    00f6: STL  0007        Store TOS into MP7
-   00f8: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00f8: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00fb: LDA  01 0001     Load addr ????????:MP1
    00fe: LDM  04          Load 4 words from (TOS)
    0100: SLDC 04          Short load constant 4
@@ -18096,14 +18714,15 @@ BEGIN
    0110: SLDC 00          Short load constant 0
    0111: NEQI             Integer TOS-1 <> TOS
    0112: FJP  $011c       Jump if TOS false
+  PASCALCOMPILER.ERROR(144) { Illegal type of expression }
    0114: LDCI 0090        Load word 144
-   0117: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0117: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    011a: UJP  $0182       Unconditional jump
 -> 011c: SLDL 01          Short load local MP1
    011d: SLDO 03          Short load global BASE3
    011e: SLDC 00          Short load constant 0
    011f: SLDC 00          Short load constant 0
-   0120: CXP  01 15       Call external procedure PASCALCO.FUNC21
+   0120: CXP  01 15       Call external procedure PASCALCOMPILER.FUNC21
    0123: FJP  $017c       Jump if TOS false
    0125: CXP  09 08       Call external procedure BODYPART.PROC8
    0128: CXP  09 0f       Call external procedure BODYPART.PROC15
@@ -18158,11 +18777,13 @@ BEGIN
    0176: SLDC 01          Short load constant 1
    0177: CXP  09 06       Call external procedure BODYPART.PROC6
 -> 017a: UJP  $0182       Unconditional jump
+  PASCALCOMPILER.ERROR(145) { Type conflict }
 -> 017c: LDCI 0091        Load word 145
-   017f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   017f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0182: UJP  $0196       Unconditional jump
+  PASCALCOMPILER.ERROR(55) { 'TO' or 'DOWNTO' expected in for statement }
 -> 0184: SLDC 37          Short load constant 55
-   0185: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0185: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0188: LDA  01 0001     Load addr ????????:MP1
    018b: LDM  04          Load 4 words from (TOS)
    018d: SLDC 04          Short load constant 4
@@ -18170,7 +18791,7 @@ BEGIN
    018f: SLDC 01          Short load constant 1
    0190: UNI              Set union (TOS OR TOS-1)
    0191: ADJ  04          Adjust set to 4 words
-   0193: CXP  01 10       Call external procedure PASCALCO.PROC16
+   0193: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 0196: LLA  0009        Load local address MP9
    0198: CXP  09 12       Call external procedure BODYPART.PROC18
    019b: SLDC 21          Short load constant 33
@@ -18180,13 +18801,14 @@ BEGIN
    01a1: SLDC 06          Short load constant 6
    01a2: EQUI             Integer TOS-1 = TOS
    01a3: FJP  $01aa       Jump if TOS false
-   01a5: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01a5: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01a8: UJP  $01ae       Unconditional jump
+  PASCALCOMPILER.ERROR(54) { 'DO' expected }
 -> 01aa: SLDC 36          Short load constant 54
-   01ab: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01ab: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01ae: LDA  01 0001     Load addr ????????:MP1
    01b1: LDM  04          Load 4 words from (TOS)
-   01b3: CXP  0b 01       Call external procedure STATEMEN.1
+   01b3: CXP  0b 01       Call external procedure STATEMENT.STATEMENT
    01b6: LAO  0003        Load global BASE3
    01b8: LLA  0001        Load local address MP1
    01ba: MOV  0005        Move 5 words (TOS to TOS-1)
@@ -18215,17 +18837,17 @@ END
 ## Segment BODY1 (14)
 
 ### PROCEDURE BODY1.BODY1 (* P=1, LL=3, D=2 *)
-  BASE8
-  BASE9=IC
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
   BASE10
   BASE25
   BASE28
   BASE33
   BASE65
   BASE80
-  BASE94=STARTDOTS
-  BASE95=SCREENDOTS
-  BASE134
+  BASE94=STARTDOTS:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   BASE627
   ????????:MP1
   ????????:MP2
@@ -18305,7 +18927,7 @@ BEGIN
    006d: SIND 06          Short index load *TOS+6
    006e: SLDC 00          Short load constant 0
    006f: SLDC 00          Short load constant 0
-   0070: CXP  01 11       Call external procedure PASCALCO.FUNC17
+   0070: CXP  01 11       Call external procedure PASCALCOMPILER.FUNC17
    0073: FJP  $00ac       Jump if TOS false
    0075: SLDL 01          Short load local MP1
    0076: SIND 06          Short index load *TOS+6
@@ -18327,7 +18949,7 @@ BEGIN
    008d: SIND 02          Short index load *TOS+2
    008e: LDA  01 000c     Load addr ????????:MP12
    0091: LDA  01 000b     Load addr ????????:MP11
-   0094: CXP  01 0b       Call external procedure PASCALCO.PROC11
+   0094: CXP  01 0b       Call external procedure PASCALCOMPILER.PROC11
    0097: SLDC 28          Short load constant 40
    0098: LOD  01 000b     Load word at ????????:MP11
    009b: LOD  01 000c     Load word at ????????:MP12
@@ -18398,9 +19020,9 @@ BEGIN
    0110: SLDO 09          Short load global BASE9 (IC)
    0111: STR  01 000e     Store TOS to ????????:MP14
    0114: LDCI 00d7        Load word 215
-   0117: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0117: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    011a: LDCI 00d7        Load word 215
-   011d: CXP  01 16       Call external procedure PASCALCO.PROC22
+   011d: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0120: LDA  01 0012     Load addr ????????:MP18
    0123: CXP  09 12       Call external procedure BODYPART.PROC18
    0126: LOD  01 0012     Load word at ????????:MP18
@@ -18411,10 +19033,10 @@ END
 ## Segment BODY3 (15)
 
 ### PROCEDURE BODY3.BODY3 (* P=1, LL=3, D=2 *)
-  BASE8
-  BASE9=IC
-  BASE13=SEG
-  BASE15
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE25
   BASE33
   BASE36
@@ -18422,10 +19044,10 @@ END
   BASE66
   BASE89
   BASE100
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   BASE186
   BASE190
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   BASE627
   BASE628
@@ -18447,10 +19069,11 @@ BEGIN
    01ef: SLDC 09          Short load constant 9
    01f0: EQUI             Integer TOS-1 = TOS
    01f1: FJP  $01f8       Jump if TOS false
-   01f3: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01f3: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01f6: UJP  $01fc       Unconditional jump
+  PASCALCOMPILER.ERROR(13) { 'END' expected }
 -> 01f8: SLDC 0d          Short load constant 13
-   01f9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01f9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01fc: SLDO 09          Short load global BASE9 (IC)
    01fd: STR  01 0001     Store TOS to ????????:MP1
    0200: LDO  0021        Load global word BASE33
@@ -18557,8 +19180,9 @@ BEGIN
    02b3: LDCI 6d60        Load word 28000
    02b6: NEQI             Integer TOS-1 <> TOS
    02b7: FJP  $02bf       Jump if TOS false
+  PASCALCOMPILER.ERROR(168) { Undefined label }
    02b9: LDCI 00a8        Load word 168
-   02bc: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02bc: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 02bf: SLDL 01          Short load local MP1
    02c0: SIND 01          Short index load *TOS+1
    02c1: STR  01 0009     Store TOS to ????????:MP9
@@ -18570,7 +19194,7 @@ BEGIN
    02ce: SLDO 09          Short load global BASE9 (IC)
    02cf: FJP  $02d5       Jump if TOS false
    02d1: SLDC 00          Short load constant 0
-   02d2: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02d2: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
 -> 02d5: LOD  01 000a     Load word at ????????:MP10
    02d8: SLDC 00          Short load constant 0
    02d9: GRTI             Integer TOS-1 > TOS
@@ -18581,7 +19205,7 @@ BEGIN
    02e3: IXA  0001        Index array (TOS-1 + TOS * 1)
    02e5: SIND 00          Short index load *TOS+0
    02e6: SBI              Subtract integers (TOS-1 - TOS)
-   02e7: CXP  01 17       Call external procedure PASCALCO.PROC23
+   02e7: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    02ea: LOD  01 000a     Load word at ????????:MP10
    02ed: SLDC 01          Short load constant 1
    02ee: SBI              Subtract integers (TOS-1 - TOS)
@@ -18596,9 +19220,9 @@ BEGIN
    02fe: SBI              Subtract integers (TOS-1 - TOS)
    02ff: SLDC 02          Short load constant 2
    0300: MPI              Multiply integers (TOS * TOS-1)
-   0301: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0301: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0304: SLDC 00          Short load constant 0
-   0305: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0305: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0308: UJP  $0324       Unconditional jump
 -> 030a: LOD  02 0001     Load word at ????????:MP1
    030d: STL  0001        Store TOS into MP1
@@ -18608,22 +19232,22 @@ BEGIN
    0314: SBI              Subtract integers (TOS-1 - TOS)
    0315: SLDC 02          Short load constant 2
    0316: MPI              Multiply integers (TOS * TOS-1)
-   0317: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0317: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    031a: SLDL 01          Short load local MP1
    031b: IND  000e        Static index and load word (TOS+14)
    031d: SLDC 01          Short load constant 1
    031e: SBI              Subtract integers (TOS-1 - TOS)
    031f: SLDC 02          Short load constant 2
    0320: MPI              Multiply integers (TOS * TOS-1)
-   0321: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0321: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
 -> 0324: SLDO 09          Short load global BASE9 (IC)
    0325: LOD  01 0001     Load word at ????????:MP1
    0328: SBI              Subtract integers (TOS-1 - TOS)
-   0329: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0329: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    032c: SLDO 09          Short load global BASE9 (IC)
-   032d: CXP  01 17       Call external procedure PASCALCO.PROC23
+   032d: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0330: LDO  0064        Load global word BASE100
-   0332: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0332: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0335: SLDL 06          Short load local MP6
    0336: SLDC 24          Short load constant 36
    0337: SLDC 75          Short load constant 117
@@ -18645,7 +19269,7 @@ BEGIN
    0353: LDO  0449        Load global word BASE1097
    0356: STO              Store indirect (TOS into TOS-1)
 -> 0357: SLDC 00          Short load constant 0
-   0358: CXP  01 18       Call external procedure PASCALCO.PROC24
+   0358: CXP  01 18       Call external procedure PASCALCOMPILER.PROC24
    035b: LDO  0059        Load global word BASE89
    035d: SLDO 09          Short load global BASE9 (IC)
    035e: ADI              Add integers (TOS + TOS-1)
@@ -18661,7 +19285,7 @@ BEGIN
 END
 
 ### PROCEDURE BODY3.PROC2 (* P=2, LL=4, D=1, Callers: BODY3 *)
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE36
   BASE66
   BASE186
@@ -18899,15 +19523,15 @@ END
 ## Segment WRITELINKERINFO (16)
 
 ### PROCEDURE WRITELINKERINFO.WRITELINKERINFO (* P=1, LL=1, D=7 *)
-  BASE9=IC
-  BASE22
+  BASE9=IC:ADDRRANGE
+  BASE22=LGTH:INTEGER
   BASE25
   BASE33=INMODULE:BOOLEAN
   BASE45
   BASE49=CODEINSEG:BOOLEAN
   BASE85
   BASE87
-  BASE134
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
   BASE705=REFBLK
   MP1=CURRENTBLOCK
   MP7
@@ -18919,9 +19543,9 @@ BEGIN
    02d3: LDO  0031        Load global word BASE49 (CODEINSEG)
    02d5: FJP  $02dd       Jump if TOS false
   BEGIN
-    PASCALCO.ERROR(399)
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    02d7: LDCI 018f        Load word 399
-   02da: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02da: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
   END
   IF INMODULE THEN
 -> 02dd: LDO  0021        Load global word BASE33 (INMODULE)
@@ -18945,29 +19569,29 @@ BEGIN
    02f9: LEQI             Integer TOS-1 <= TOS
    02fa: FJP  $0308       Jump if TOS false
    02fc: SLDC 20          Short load constant 32
-   02fd: CXP  01 16       Call external procedure PASCALCO.PROC22
+   02fd: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0300: LDO  0016        Load global word BASE22
    0302: SLDC 01          Short load constant 1
    0303: ADI              Add integers (TOS + TOS-1)
    0304: SRO  0016        Store global word BASE22
    0306: UJP  $02f6       Unconditional jump
 -> 0308: SLDC 00          Short load constant 0
-   0309: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0309: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    030c: LDO  0019        Load global word BASE25
-   030e: CXP  01 17       Call external procedure PASCALCO.PROC23
+   030e: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0311: LDO  0057        Load global word BASE87
-   0313: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0313: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0316: SLDC 00          Short load constant 0
-   0317: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0317: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    031a: SLDC 01          Short load constant 1
-   031b: CXP  01 18       Call external procedure PASCALCO.PROC24
+   031b: CXP  01 18       Call external procedure PASCALCOMPILER.PROC24
    031e: SLDC 00          Short load constant 0
    031f: SRO  002d        Store global word BASE45
 -> 0321: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE WRITELINKERINFO.PROC2(PARAM1) (* P=2, LL=2, D=9, Callers: PROC4 *)
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE705
   BASE706
   BASE707
@@ -19038,7 +19662,7 @@ BEGIN
    0092: SBI              Subtract integers (TOS-1 - TOS)
    0093: IXA  0002        Index array (TOS-1 + TOS * 2)
    0095: SIND 00          Short index load *TOS+0
-   0096: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0096: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0099: SLDL 04          Short load local MP4
    009a: SLDC 01          Short load constant 1
    009b: ADI              Add integers (TOS + TOS-1)
@@ -19072,7 +19696,7 @@ BEGIN
    00c4: SLDL 03          Short load local MP3
    00c5: SRO  0009        Store global word BASE9 (IC)
    00c7: SLDL 04          Short load local MP4
-   00c8: CXP  01 17       Call external procedure PASCALCO.PROC23
+   00c8: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    00cb: SLDL 02          Short load local MP2
    00cc: SRO  0009        Store global word BASE9 (IC)
 -> 00ce: SLDC 01          Short load constant 1
@@ -19090,7 +19714,7 @@ BEGIN
    00dc: LEQI             Integer TOS-1 <= TOS
    00dd: FJP  $00ea       Jump if TOS false
    00df: SLDC 00          Short load constant 0
-   00e0: CXP  01 17       Call external procedure PASCALCO.PROC23
+   00e0: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    00e3: SLDL 07          Short load local MP7
    00e4: SLDC 01          Short load constant 1
    00e5: ADI              Add integers (TOS + TOS-1)
@@ -19100,7 +19724,7 @@ BEGIN
 END
 
 ### PROCEDURE WRITELINKERINFO.PROC3 (* P=3, LL=3, D=0, Callers: PROC2 *)
-  BASE665
+  BASE665=:FIB
   BASE705
   BASE707
   ????????:MP1
@@ -19127,14 +19751,15 @@ BEGIN
    0026: SLDC 01          Short load constant 1
    0027: NEQI             Integer TOS-1 <> TOS
    0028: FJP  $0030       Jump if TOS false
+  PASCALCOMPILER.ERROR(404) { Bad open, read or write to Linker file SYSTEM.INFO }
    002a: LDCI 0194        Load word 404
-   002d: CXP  01 04       Call external procedure PASCALCO.ERROR
+   002d: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0030: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE WRITELINKERINFO.PROC4(PARAM1) (* P=4, LL=2, D=2, Callers: WRITELINKERINFO *)
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE33=INMODULE:BOOLEAN
   BASE42
   BASE87
@@ -19186,14 +19811,14 @@ BEGIN
    0132: LAND             Logical AND (TOS & TOS-1)
    0133: FJP  $0149       Jump if TOS false
    0135: SLDC 08          Short load constant 8
-   0136: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0136: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0139: SLDL 02          Short load local MP2
    013a: IND  0009        Static index and load word (TOS+9)
-   013c: CXP  01 17       Call external procedure PASCALCO.PROC23
+   013c: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    013f: SLDC 00          Short load constant 0
-   0140: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0140: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0143: SLDC 00          Short load constant 0
-   0144: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0144: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0147: UJP  $014e       Unconditional jump
 -> 0149: LOD  01 0004     Load word at WRITELINKERINFO:MP4
    014c: SRO  0009        Store global word BASE9 (IC)
@@ -19227,25 +19852,25 @@ BEGIN
    017b: SRO  0009        Store global word BASE9 (IC)
    017d: UJP  $0191       Unconditional jump
 -> 017f: SLDC 07          Short load constant 7
-   0180: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0180: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0183: SLDL 02          Short load local MP2
    0184: IND  000a        Static index and load word (TOS+10)
-   0186: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0186: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0189: SLDC 00          Short load constant 0
-   018a: CXP  01 17       Call external procedure PASCALCO.PROC23
+   018a: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    018d: SLDC 00          Short load constant 0
-   018e: CXP  01 17       Call external procedure PASCALCO.PROC23
+   018e: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
 -> 0191: UJP  $01d1       Unconditional jump
 -> 0193: SLDL 02          Short load local MP2
    0194: IND  000b        Static index and load word (TOS+11)
    0196: FJP  $01a2       Jump if TOS false
    0198: SLDC 03          Short load constant 3
-   0199: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0199: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    019c: SLDC 00          Short load constant 0
    019d: STR  01 0002     Store TOS to WRITELINKERINFO:MP2
    01a0: UJP  $01b9       Unconditional jump
 -> 01a2: SLDC 04          Short load constant 4
-   01a3: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01a3: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01a6: SLDL 02          Short load local MP2
    01a7: IND  0008        Static index and load word (TOS+8)
    01a9: SLDC 02          Short load constant 2
@@ -19259,11 +19884,11 @@ BEGIN
    01b5: SIND 00          Short index load *TOS+0
    01b6: STR  01 0002     Store TOS to WRITELINKERINFO:MP2
 -> 01b9: SLDC 02          Short load constant 2
-   01ba: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01ba: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01bd: SLDC 00          Short load constant 0
-   01be: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01be: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01c1: LOD  01 0002     Load word at WRITELINKERINFO:MP2
-   01c4: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01c4: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01c7: SLDL 02          Short load local MP2
    01c8: IND  000a        Static index and load word (TOS+10)
    01ca: SLDC 3f          Short load constant 63
@@ -19315,7 +19940,7 @@ BEGIN
    021c: NEQI             Integer TOS-1 <> TOS
    021d: FJP  $024f       Jump if TOS false
    021f: LOD  01 0005     Load word at WRITELINKERINFO:MP5
-   0222: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0222: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0225: SLDL 02          Short load local MP2
    0226: IND  000e        Static index and load word (TOS+14)
    0228: SLDC 01          Short load constant 1
@@ -19335,11 +19960,11 @@ BEGIN
    023d: FJP  $024f       Jump if TOS false
    023f: SLDL 02          Short load local MP2
    0240: IND  000b        Static index and load word (TOS+11)
-   0242: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0242: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0245: LOD  01 0002     Load word at WRITELINKERINFO:MP2
-   0248: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0248: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    024b: LDCN             Load constant NIL
-   024c: CXP  01 17       Call external procedure PASCALCO.PROC23
+   024c: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
 -> 024f: UJP  $0296       Unconditional jump
    0251: LDO  0021        Load global word BASE33 (INMODULE)
    0253: LDO  002a        Load global word BASE42
@@ -19353,13 +19978,13 @@ BEGIN
    025e: LAND             Logical AND (TOS & TOS-1)
    025f: FJP  $0279       Jump if TOS false
    0261: SLDC 01          Short load constant 1
-   0262: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0262: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0265: SLDC 01          Short load constant 1
-   0266: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0266: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0269: SLDC 00          Short load constant 0
-   026a: CXP  01 17       Call external procedure PASCALCO.PROC23
+   026a: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    026d: SLDC 00          Short load constant 0
-   026e: CXP  01 17       Call external procedure PASCALCO.PROC23
+   026e: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0271: SLDL 02          Short load local MP2
    0272: IND  0009        Static index and load word (TOS+9)
    0274: STR  01 0003     Store TOS to WRITELINKERINFO:MP3
@@ -19367,6 +19992,10 @@ BEGIN
 -> 0279: LOD  01 0004     Load word at WRITELINKERINFO:MP4
    027c: SRO  0009        Store global word BASE9 (IC)
 -> 027e: UJP  $0296       Unconditional jump
+-> 0280: XJP  0001 0007 0296 Case jump
+           0001 -> 012a   0002 -> 0150   0003 -> 0150   0004 -> 0286
+           0005 -> 01d3   0006 -> 01d3   0007 -> 0251
+       default -> 0296
 -> 0296: LOD  01 0003     Load word at WRITELINKERINFO:MP3
    0299: LDCI 270f        Load word 9999
    029c: NGI              Negate integer
@@ -19379,7 +20008,7 @@ BEGIN
    02a9: GEQI             Integer TOS-1 >= TOS
    02aa: FJP  $02b3       Jump if TOS false
    02ac: SLDC 00          Short load constant 0
-   02ad: CXP  01 18       Call external procedure PASCALCO.PROC24
+   02ad: CXP  01 18       Call external procedure PASCALCOMPILER.PROC24
    02b0: SLDC 00          Short load constant 0
    02b1: SRO  0009        Store global word BASE9 (IC)
 -> 02b3: SLDL 01          Short load local MP1
@@ -19394,14 +20023,14 @@ END
 ## Segment UNITPART (17)
 
 ### PROCEDURE UNITPART.UNITPART(PARAM1; PARAM2; PARAM3; PARAM4) (* P=1, LL=1, D=10 *)
-  BASE1
+  BASE1=SYMBUFP:^SYMBUFARRAY
   BASE2
-  BASE8
-  BASE9=IC
+  BASE8=TOP:DISPRANGE
+  BASE9=IC:ADDRRANGE
   BASE10
-  BASE13=SEG
-  BASE14
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
   BASE27
   BASE32
   BASE33
@@ -19414,11 +20043,11 @@ END
   BASE87
   BASE99=NEXTPROC
   BASE100
-  BASE105=STATBEGSYS
+  BASE105=STATBEGSYS:SETOFSYS
   BASE186
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
-  BASE665
+  BASE665=:FIB
   BASE705
   BASE706
   BASE707
@@ -19454,7 +20083,7 @@ BEGIN
    03da: LDM  04          Load 4 words from (TOS)
    03dc: LLA  0005        Load local address MP5
    03de: CLP  03          Call local procedure UNITPART.PROC3
-   03e0: SLDO 0e          Short load global BASE14
+   03e0: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    03e1: SRO  02c4        Store global word BASE708
    03e4: LDCI 0400        Load word 1024
    03e7: SRO  0009        Store global word BASE9 (IC)
@@ -19462,19 +20091,21 @@ BEGIN
    03ea: SRO  0020        Store global word BASE32
    03ec: LDO  0026        Load global word BASE38
    03ee: FJP  $03f6       Jump if TOS false
+  PASCALCOMPILER.ERROR(406) { Include file not legal in interface nor while including }
    03f0: LDCI 0196        Load word 406
-   03f3: CXP  01 04       Call external procedure PASCALCO.ERROR
+   03f3: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 03f6: SLDO 0f          Short load global BASE15
    03f7: SLDC 33          Short load constant 51
    03f8: EQUI             Integer TOS-1 = TOS
    03f9: FJP  $0400       Jump if TOS false
-   03fb: CXP  01 08       Call external procedure PASCALCO.PROC8
+   03fb: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    03fe: UJP  $0404       Unconditional jump
+  PASCALCOMPILER.ERROR(22) { 'Interface' expected }
 -> 0400: SLDC 16          Short load constant 22
-   0401: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0401: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0404: LLA  0001        Load local address MP1
    0406: LDM  04          Load 4 words from (TOS)
-   0408: CXP  08 01       Call external procedure DECLARAT.1
+   0408: CXP  08 01       Call external procedure DECLARATIONPART.DECLARATIONPART
    040b: LDO  002a        Load global word BASE42
    040d: FJP  $041d       Jump if TOS false
    040f: SLDL 06          Short load local MP6
@@ -19484,9 +20115,10 @@ BEGIN
    0413: GRTI             Integer TOS-1 > TOS
    0414: LAND             Logical AND (TOS & TOS-1)
    0415: FJP  $041d       Jump if TOS false
+    PASCALCOMPILER.ERROR(350) { No data segment allocated }
    0417: LDCI 015e        Load word 350
-   041a: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 041d: SLDO 0e          Short load global BASE14
+   041a: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 041d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    041e: LDO  02c4        Load global word BASE708
    0421: SBI              Subtract integers (TOS-1 - TOS)
    0422: SLDC 0a          Short load constant 10
@@ -19517,7 +20149,7 @@ BEGIN
    044c: ADI              Add integers (TOS + TOS-1)
    044d: STL  0008        Store TOS into MP8
    044f: UJP  $043c       Unconditional jump
--> 0451: SLDO 01          Short load global BASE1
+-> 0451: SLDO 01          Short load global BASE1 (SYMBUFP)
    0452: LDO  02c4        Load global word BASE708
    0455: SLDO 02          Short load global BASE2
    0456: SLDC 00          Short load constant 0
@@ -19541,13 +20173,13 @@ BEGIN
    046c: GRTI             Integer TOS-1 > TOS
    046d: FJP  $0481       Jump if TOS false
    046f: SLDO 02          Short load global BASE2
-   0470: SLDO 0e          Short load global BASE14
+   0470: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0471: LDO  02c4        Load global word BASE708
    0474: SBI              Subtract integers (TOS-1 - TOS)
    0475: SLDC 0d          Short load constant 13
    0476: STB              Store byte at TOS to byte ptr TOS-2 + TOS-1
    0477: SLDO 02          Short load global BASE2
-   0478: SLDO 0e          Short load global BASE14
+   0478: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0479: LDO  02c4        Load global word BASE708
    047c: SBI              Subtract integers (TOS-1 - TOS)
    047d: SLDC 01          Short load constant 1
@@ -19555,7 +20187,7 @@ BEGIN
    047f: SLDC 00          Short load constant 0
    0480: STB              Store byte at TOS to byte ptr TOS-2 + TOS-1
 -> 0481: SLDC 01          Short load constant 1
-   0482: CXP  01 18       Call external procedure PASCALCO.PROC24
+   0482: CXP  01 18       Call external procedure PASCALCOMPILER.PROC24
    0485: LDO  001b        Load global word BASE27
    0487: LDO  001b        Load global word BASE27
    0489: LNOT             Logical NOT (~TOS)
@@ -19573,15 +20205,16 @@ BEGIN
    0498: LAND             Logical AND (TOS & TOS-1)
    0499: FJP  $04a1       Jump if TOS false
    049b: LDCI 0160        Load word 352
-   049e: CXP  01 04       Call external procedure PASCALCO.ERROR
+   049e: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 04a1: LDO  001b        Load global word BASE27
    04a3: FJP  $04c3       Jump if TOS false
    04a5: SLDO 0f          Short load global BASE15
    04a6: SLDC 34          Short load constant 52
    04a7: NEQI             Integer TOS-1 <> TOS
    04a8: FJP  $04c0       Jump if TOS false
+  PASCALCOMPILER.ERROR(23) { 'Implementation' expected }
    04aa: SLDC 17          Short load constant 23
-   04ab: CXP  01 04       Call external procedure PASCALCO.ERROR
+   04ab: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    04ae: LLA  0001        Load local address MP1
    04b0: LDM  04          Load 4 words from (TOS)
    04b2: SLDC 04          Short load constant 4
@@ -19590,21 +20223,21 @@ BEGIN
    04b7: SLDC 04          Short load constant 4
    04b8: DIF              Set difference (TOS-1 AND NOT TOS)
    04b9: ADJ  04          Adjust set to 4 words
-   04bb: CXP  01 10       Call external procedure PASCALCO.PROC16
+   04bb: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
    04be: UJP  $04c3       Unconditional jump
--> 04c0: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 04c0: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 04c3: LLA  0001        Load local address MP1
    04c5: LDM  04          Load 4 words from (TOS)
    04c7: SLDC 04          Short load constant 4
-   04ca: LDC  04          Load multiple-word constant
+   04c8: LDC  04          Load multiple-word constant
                             0000 0000 0000 001c 
    04d2: SLDC 04          Short load constant 4
    04d3: DIF              Set difference (TOS-1 AND NOT TOS)
    04d4: ADJ  04          Adjust set to 4 words
-   04d6: CXP  01 1a       Call external procedure PASCALCO.PROC26
+   04d6: CXP  01 1a       Call external procedure PASCALCOMPILER.PROC26
    04d9: CLP  04          Call local procedure UNITPART.PROC4
-   04db: CXP  01 19       Call external procedure PASCALCO.PROC25
-   04e0: LDC  02          Load multiple-word constant
+   04db: CXP  01 19       Call external procedure PASCALCOMPILER.PROC25
+   04de: LDC  02          Load multiple-word constant
                             0000 c000 
    04e4: SLDC 02          Short load constant 2
    04e5: LAO  00ba        Load global BASE186
@@ -19626,8 +20259,9 @@ BEGIN
    0500: SLDC 01          Short load constant 1
    0501: NEQI             Integer TOS-1 <> TOS
    0502: FJP  $050a       Jump if TOS false
+  PASCALCOMPILER.ERROR(402) { Error in writing code file, not enough room }
    0504: LDCI 0192        Load word 402
-   0507: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0507: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 050a: SLDC 1f          Short load constant 31
    050b: LAO  00ba        Load global BASE186
    050e: LDM  04          Load 4 words from (TOS)
@@ -19664,13 +20298,14 @@ BEGIN
    053d: SLDC 01          Short load constant 1
    053e: NEQI             Integer TOS-1 <> TOS
    053f: FJP  $0547       Jump if TOS false
+  PASCALCOMPILER.ERROR(402) { Error in writing code file, not enough room }
    0541: LDCI 0192        Load word 402
-   0544: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0544: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0547: LAO  00ba        Load global BASE186
    054a: LAO  00ba        Load global BASE186
    054d: LDM  04          Load 4 words from (TOS)
    054f: SLDC 04          Short load constant 4
-   0552: LDC  02          Load multiple-word constant
+   0550: LDC  02          Load multiple-word constant
                             0000 c000 
    0556: SLDC 02          Short load constant 2
    0557: DIF              Set difference (TOS-1 AND NOT TOS)
@@ -19710,21 +20345,23 @@ BEGIN
    0595: SLDC 01          Short load constant 1
    0596: NEQI             Integer TOS-1 <> TOS
    0597: FJP  $059f       Jump if TOS false
+  PASCALCOMPILER.ERROR(404) { Bad open, read or write to Linker file SYSTEM.INFO }
    0599: LDCI 0194        Load word 404
-   059c: CXP  01 04       Call external procedure PASCALCO.ERROR
+   059c: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 059f: CXP  10 01       Call external procedure WRITELINKERINFO.WRITELINKERINFO
 -> 05a2: UJP  $05dd       Unconditional jump
 -> 05a4: SLDO 0f          Short load global BASE15
    05a5: SLDC 09          Short load constant 9
    05a6: EQUI             Integer TOS-1 = TOS
    05a7: FJP  $05ae       Jump if TOS false
-   05a9: CXP  01 08       Call external procedure PASCALCO.PROC8
+   05a9: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    05ac: UJP  $05b9       Unconditional jump
+  PASCALCOMPILER.ERROR(13) { 'END' expected }
 -> 05ae: SLDC 0d          Short load constant 13
-   05af: CXP  01 04       Call external procedure PASCALCO.ERROR
+   05af: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    05b2: LLA  0001        Load local address MP1
    05b4: LDM  04          Load 4 words from (TOS)
-   05b6: CXP  01 10       Call external procedure PASCALCO.PROC16
+   05b6: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
 -> 05b9: LDO  0047        Load global word BASE71 (MODPTR)
    05bb: IND  000a        Static index and load word (TOS+10)
    05bd: FJP  $05dd       Jump if TOS false
@@ -19773,15 +20410,17 @@ BEGIN
    0602: SLDC 00          Short load constant 0
    0603: EQUI             Integer TOS-1 = TOS
    0604: FJP  $060c       Jump if TOS false
+    PASCALCOMPILER.ERROR(355) { Data segment empty }
    0606: LDCI 0163        Load word 355
-   0609: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0609: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 060c: UJP  $0619       Unconditional jump
 -> 060e: SLDO 0a          Short load global BASE10
    060f: SLDC 01          Short load constant 1
    0610: GRTI             Integer TOS-1 > TOS
    0611: FJP  $0619       Jump if TOS false
+    PASCALCOMPILER.ERROR(350) { No data segment allocated }
    0613: LDCI 015e        Load word 350
-   0616: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0616: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0619: SLDC 00          Short load constant 0
    061a: SRO  002a        Store global word BASE42
    061c: SLDC 00          Short load constant 0
@@ -19794,10 +20433,11 @@ BEGIN
    0625: SLDC 03          Short load constant 3
    0626: EQUI             Integer TOS-1 = TOS
    0627: FJP  $062e       Jump if TOS false
-   0629: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0629: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    062c: UJP  $0632       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 062e: SLDC 0e          Short load constant 14
-   062f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   062f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0632: LDO  0054        Load global word BASE84
    0634: STL  000a        Store TOS into MP10
    0636: SLDL 0a          Short load local MP10
@@ -19834,7 +20474,7 @@ BEGIN
 END
 
 ### PROCEDURE UNITPART.PROC2 (* P=2, LL=2, D=0, Callers: UNITPART *)
-  BASE665
+  BASE665=:FIB
 BEGIN
 -> 0000: LAO  0299        Load global BASE665
    0003: LSA  0f          Load string address: '%SYSTEM.INFO[*]'
@@ -19846,17 +20486,18 @@ BEGIN
    001c: SLDC 00          Short load constant 0
    001d: NEQI             Integer TOS-1 <> TOS
    001e: FJP  $0026       Jump if TOS false
+  PASCALCOMPILER.ERROR(404) { Bad open, read or write to Linker file SYSTEM.INFO }
    0020: LDCI 0194        Load word 404
-   0023: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0023: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0026: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE UNITPART.PROC3(PARAM1; PARAM2; PARAM3; PARAM4; PARAM5) (* P=3, LL=2, D=23, Callers: UNITPART *)
-  BASE8
+  BASE8=TOP:DISPRANGE
   BASE10
   BASE12
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE17
   BASE21
   BASE27
@@ -19872,8 +20513,8 @@ END
   BASE89
   BASE99=NEXTPROC
   BASE100
-  BASE134
-  BASE445=SEGTABLE
+  BASE134=DISPLAY:ARRAY[0..12] OF RECORD FNAME:CTP; CASE OCCUR: WHERE OF BLCK:(FFILE:CTP;FLABEL:LABELP); CREC:(CLEV:LEVRANGE; CDSPL:ADDRRANGE); VREC:(VDSPL:ADDRRANGE) END;
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   BASE707
   BASE1097
@@ -19885,7 +20526,7 @@ END
   MP3=PARAM3
   MP4=PARAM2
   MP5=PARAM1
-  MP6
+  MP6=:CTP
   MP7
   MP8
   MP9
@@ -19902,12 +20543,14 @@ END
 BEGIN
 -> 0032: LDO  0021        Load global word BASE33
    0034: FJP  $003c       Jump if TOS false
+  PASCALCOMPILER.ERROR(182) { Nested units not allowed }
    0036: LDCI 00b6        Load word 182
-   0039: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0039: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 003c: LDO  0031        Load global word BASE49
    003e: FJP  $004d       Jump if TOS false
+    PASCALCOMPILER.ERROR(399) { Implementation restriction }
    0040: LDCI 018f        Load word 399
-   0043: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0043: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0046: SLDC 00          Short load constant 0
    0047: SRO  0059        Store global word BASE89
    0049: SLDC 00          Short load constant 0
@@ -19938,13 +20581,14 @@ BEGIN
    0073: SRO  0021        Store global word BASE33
    0075: SLDC 00          Short load constant 0
    0076: SRO  0020        Store global word BASE32
-   0078: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0078: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    007b: SLDO 0f          Short load global BASE15
    007c: SLDC 00          Short load constant 0
    007d: NEQI             Integer TOS-1 <> TOS
    007e: FJP  $0093       Jump if TOS false
+    PASCALCOMPILER.ERROR(2) { Identifier expected }
    0080: SLDC 02          Short load constant 2
-   0081: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0081: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0084: LLA  0002        Load local address MP2
    0086: LDM  04          Load 4 words from (TOS)
    0088: SLDC 04          Short load constant 4
@@ -19952,7 +20596,7 @@ BEGIN
    008a: SLDC 01          Short load constant 1
    008b: UNI              Set union (TOS OR TOS-1)
    008c: ADJ  04          Adjust set to 4 words
-   008e: CXP  01 10       Call external procedure PASCALCO.PROC16
+   008e: CXP  01 10       Call external procedure PASCALCOMPILER.PROC16
    0091: UJP  $02a8       Unconditional jump
 -> 0093: SLDC 00          Short load constant 0
    0094: STL  0008        Store TOS into MP8
@@ -19976,7 +20620,7 @@ BEGIN
 -> 00b0: SLDC 01          Short load constant 1
    00b1: STL  0008        Store TOS into MP8
    00b3: SLDC 65          Short load constant 101
-   00b4: CXP  01 04       Call external procedure PASCALCO.ERROR
+   00b4: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 00b7: UJP  $009a       Unconditional jump
 -> 00b9: SLDL 08          Short load local MP8
    00ba: LNOT             Logical NOT (~TOS)
@@ -20015,15 +20659,16 @@ BEGIN
    00ef: STO              Store indirect (TOS into TOS-1)
    00f0: SLDL 06          Short load local MP6
    00f1: SRO  0047        Store global word BASE71 (MODPTR)
--> 00f3: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 00f3: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00f6: SLDO 0f          Short load global BASE15
    00f7: SLDC 03          Short load constant 3
    00f8: EQUI             Integer TOS-1 = TOS
    00f9: FJP  $0100       Jump if TOS false
-   00fb: CXP  01 08       Call external procedure PASCALCO.PROC8
+   00fb: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00fe: UJP  $0104       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 0100: SLDC 0e          Short load constant 14
-   0101: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0101: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0104: SLDO 0f          Short load global BASE15
    0105: SLDC 00          Short load constant 0
    0106: EQUI             Integer TOS-1 = TOS
@@ -20042,7 +20687,7 @@ BEGIN
    0123: STR  01 0006     Store TOS to UNITPART:MP6
    0126: SLDC 01          Short load constant 1
    0127: SRO  0057        Store global word BASE87
-   0129: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0129: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    012c: SLDO 0f          Short load global BASE15
    012d: SLDC 00          Short load constant 0
    012e: EQUI             Integer TOS-1 = TOS
@@ -20053,7 +20698,7 @@ BEGIN
                             43 4f 44 45 20 20 20 20  | CODE    
    013e: EQLBYTE          Byte array (8 long) TOS-1 = TOS
    0141: FJP  $019b       Jump if TOS false
-   0143: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0143: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0146: LLA  0002        Load local address MP2
    0148: LDM  04          Load 4 words from (TOS)
    014a: SLDC 04          Short load constant 4
@@ -20063,7 +20708,7 @@ BEGIN
    014e: ADJ  04          Adjust set to 4 words
    0150: LLA  0007        Load local address MP7
    0152: LLA  000a        Load local address MP10
-   0154: CXP  01 14       Call external procedure PASCALCO.PROC20
+   0154: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    0157: SLDL 07          Short load local MP7
    0158: SLDO 0c          Short load global BASE12
    0159: EQUI             Integer TOS-1 = TOS
@@ -20071,18 +20716,19 @@ BEGIN
    015c: SLDL 0a          Short load local MP10
    015d: SRO  000d        Store global word BASE13 (SEG)
    015f: SLDO 0d          Short load global BASE13 (SEG)
-   0162: LDC  04          Load multiple-word constant
+   0160: LDC  04          Load multiple-word constant
                             ffff ffff ffff ffff 
    016a: SLDC 04          Short load constant 4
    016b: INN              Set membership (TOS-1 in set TOS)
    016c: LNOT             Logical NOT (~TOS)
    016d: FJP  $0178       Jump if TOS false
+  PASCALCOMPILER.ERROR(203) { Integer constant exceeds range }
    016f: LDCI 00cb        Load word 203
-   0172: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0172: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0175: SLDC 01          Short load constant 1
    0176: SRO  000d        Store global word BASE13 (SEG)
 -> 0178: SLDC 00          Short load constant 0
-   0179: CXP  01 0d       Call external procedure PASCALCO.PROC13
+   0179: CXP  01 0d       Call external procedure PASCALCOMPILER.PROC13
    017c: LAO  01bd        Load global BASE445 (SEGTABLE)
    017f: LDO  0015        Load global word BASE21
    0181: IXA  0009        Index array (TOS-1 + TOS * 9)
@@ -20098,8 +20744,9 @@ BEGIN
    0191: SLDC 01          Short load constant 1
    0192: STR  01 0007     Store TOS to UNITPART:MP7
    0195: UJP  $019b       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 0197: SLDC 0f          Short load constant 15
-   0198: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0198: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 019b: SLDO 0f          Short load global BASE15
    019c: SLDC 00          Short load constant 0
    019d: EQUI             Integer TOS-1 = TOS
@@ -20110,7 +20757,7 @@ BEGIN
    01ab: EQLBYTE          Byte array (8 long) TOS-1 = TOS
    01ae: LAND             Logical AND (TOS & TOS-1)
    01af: FJP  $0236       Jump if TOS false
-   01b1: CXP  01 08       Call external procedure PASCALCO.PROC8
+   01b1: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    01b4: LLA  0002        Load local address MP2
    01b6: LDM  04          Load 4 words from (TOS)
    01b8: SLDC 04          Short load constant 4
@@ -20120,7 +20767,7 @@ BEGIN
    01bc: ADJ  04          Adjust set to 4 words
    01be: LLA  0007        Load local address MP7
    01c0: LLA  0009        Load local address MP9
-   01c2: CXP  01 14       Call external procedure PASCALCO.PROC20
+   01c2: CXP  01 14       Call external procedure PASCALCOMPILER.PROC20
    01c5: SLDL 07          Short load local MP7
    01c6: SLDO 0c          Short load global BASE12
    01c7: EQUI             Integer TOS-1 = TOS
@@ -20143,19 +20790,22 @@ BEGIN
    01df: SLDO 0d          Short load global BASE13 (SEG)
    01e0: EQUI             Integer TOS-1 = TOS
    01e1: FJP  $01eb       Jump if TOS false
+  PASCALCOMPILER.ERROR(350) { No data segment allocated }
    01e3: LDCI 015e        Load word 350
-   01e6: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01e6: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    01e9: UJP  $01f1       Unconditional jump
+  PASCALCOMPILER.ERROR(203) { Integer constant exceeds range }
 -> 01eb: LDCI 00cb        Load word 203
-   01ee: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01ee: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01f1: SLDO 0d          Short load global BASE13 (SEG)
    01f2: SLDC 01          Short load constant 1
    01f3: ADI              Add integers (TOS + TOS-1)
    01f4: SRO  0057        Store global word BASE87
+  PASCALCOMPILER.PROC12(BASE21,15,354) { Too many segments for seg dictionary }
 -> 01f6: LAO  0015        Load global BASE21
    01f8: SLDC 0f          Short load constant 15
    01f9: LDCI 0162        Load word 354
-   01fc: CXP  01 0c       Call external procedure PASCALCO.PROC12
+   01fc: CXP  01 0c       Call external procedure PASCALCOMPILER.PROC12
    01ff: LAO  024d        Load global BASE589
    0202: LDO  0057        Load global word BASE87
    0204: IXP  04 04       Index packed array TOS-1[TOS], 4 elts/word, 4 field width
@@ -20184,13 +20834,15 @@ BEGIN
    022e: SLDC 01          Short load constant 1
    022f: STO              Store indirect (TOS into TOS-1)
    0230: UJP  $0236       Unconditional jump
+  PASCALCOMPILER.ERROR(15) { Integer expected }
 -> 0232: SLDC 0f          Short load constant 15
-   0233: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0233: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0236: LOD  01 0007     Load word at UNITPART:MP7
    0239: LNOT             Logical NOT (~TOS)
    023a: FJP  $0247       Jump if TOS false
+  PASCALCOMPILER.ERROR(352) { No code segment allocated }
    023c: LDCI 0160        Load word 352
-   023f: CXP  01 04       Call external procedure PASCALCO.ERROR
+   023f: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    0242: SLDL 06          Short load local MP6
    0243: INC  000a        Inc field ptr (TOS+10)
    0245: SLDC 00          Short load constant 0
@@ -20199,18 +20851,20 @@ BEGIN
    0248: SLDC 03          Short load constant 3
    0249: EQUI             Integer TOS-1 = TOS
    024a: FJP  $0251       Jump if TOS false
-   024c: CXP  01 08       Call external procedure PASCALCO.PROC8
+   024c: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    024f: UJP  $0255       Unconditional jump
+  PASCALCOMPILER.ERROR(14) { ';' expected (possibly on line above) }
 -> 0251: SLDC 0e          Short load constant 14
-   0252: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0252: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0255: UJP  $025b       Unconditional jump
--> 0257: SLDC 16          Short load constant 22
-   0258: CXP  01 04       Call external procedure PASCALCO.ERROR
+  PASCALCOMPILER.ERROR(22) { 'Interface' expected }
+  -> 0257: SLDC 16          Short load constant 22
+   0258: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 025b: UJP  $027a       Unconditional jump
 -> 025d: LDO  0058        Load global word BASE88
    025f: SRO  000d        Store global word BASE13 (SEG)
    0261: SLDC 01          Short load constant 1
-   0262: CXP  01 0d       Call external procedure PASCALCO.PROC13
+   0262: CXP  01 0d       Call external procedure PASCALCOMPILER.PROC13
    0265: LAO  01bd        Load global BASE445 (SEGTABLE)
    0268: LDO  0015        Load global word BASE21
    026a: IXA  0009        Index array (TOS-1 + TOS * 9)
@@ -20291,18 +20945,20 @@ BEGIN
    02ea: LDCN             Load constant NIL
    02eb: NEQI             Integer TOS-1 <> TOS
    02ec: FJP  $02f2       Jump if TOS false
+   PASCALCOMPILER.ENTERID(MP6)
    02ee: SLDL 06          Short load local MP6
-   02ef: CXP  01 07       Call external procedure PASCALCO.PROC7
+   02ef: CXP  01 07       Call external procedure PASCALCOMPILER.ENTERID
 -> 02f2: UJP  $02fa       Unconditional jump
+  PASCALCOMPILER.ERROR(250) { Too many scopes of nested identifiers }
 -> 02f4: LDCI 00fa        Load word 250
-   02f7: CXP  01 04       Call external procedure PASCALCO.ERROR
+   02f7: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 02fa: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE UNITPART.PROC4 (* P=4, LL=2, D=3, Callers: UNITPART *)
   BASE10
-  BASE13=SEG
-  BASE15
+  BASE13=SEG:SEGRANGE
+  BASE15=SY:SYMBOL
   BASE65
   BASE71:MODPTR
   BASE80
@@ -20399,21 +21055,21 @@ BEGIN
    0383: SLDC 13          Short load constant 19
    0384: EQUI             Integer TOS-1 = TOS
    0385: FJP  $038a       Jump if TOS false
-   0387: CXP  01 08       Call external procedure PASCALCO.PROC8
+   0387: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
 -> 038a: LDA  01 0001     Load addr UNITPART:MP1
    038d: LDM  04          Load 4 words from (TOS)
    038f: SLDC 04          Short load constant 4
-   0392: LDC  02          Load multiple-word constant
-                            0000 0020 
+   0390: LDC  02          Load multiple-word constant
+                            0000 0020 [5]
    0396: SLDC 02          Short load constant 2
    0397: UNI              Set union (TOS OR TOS-1)
-   0398: LDCI 0200        Load word 512
+   0398: LDCI 0200        Load word 512 [9]
    039b: SLDC 01          Short load constant 1
    039c: DIF              Set difference (TOS-1 AND NOT TOS)
    039d: ADJ  04          Adjust set to 4 words
    039f: LDO  0054        Load global word BASE84
    03a1: SIND 07          Short index load *TOS+7
-   03a2: CXP  09 01       Call external procedure BODYPART.1
+   03a2: CXP  09 01       Call external procedure BODYPART.BODYPART
    03a5: LDO  0054        Load global word BASE84
    03a7: SIND 05          Short index load *TOS+5
    03a8: SRO  000a        Store global word BASE10
@@ -20426,8 +21082,8 @@ END
 ## Segment COMPOPTI (18)
 
 ### FUNCTION COMPOPTI.COMPOPTI(PARAM1): RETVAL (* P=1, LL=1, D=33 *)
-  BASE1
-  BASE14
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
   BASE28
   BASE29
   BASE30
@@ -20449,16 +21105,16 @@ END
   BASE53
   BASE80
   BASE88
-  BASE93=SYMBLK
-  BASE98=LINESTART
+  BASE93=SYMBLK:INTEGER
+  BASE98=LINESTART:CURSRANGE
   BASE605
   BASE606
   BASE710
   BASE713
   BASE714
-  BASE716
-  BASE756
-  BASE796
+  BASE716=:FIB
+  BASE756=:FIB
+  BASE796=:FIB
   BASE1356
   BASE1357
   MP1=RETVAL1
@@ -20476,28 +21132,28 @@ END
 BEGIN
 -> 0174: SLDC 01          Short load constant 1
    0175: STL  0001        Store TOS into MP1
-   0177: SLDO 01          Short load global BASE1
-   0178: SLDO 0e          Short load global BASE14
+   0177: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0178: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0179: SLDC 01          Short load constant 1
    017a: ADI              Add integers (TOS + TOS-1)
    017b: LDB              Load byte at byte ptr TOS-1 + TOS
    017c: SLDL 03          Short load local MP3
    017d: NEQI             Integer TOS-1 <> TOS
    017e: FJP  $0428       Jump if TOS false
--> 0180: SLDO 01          Short load global BASE1
-   0181: SLDO 0e          Short load global BASE14
+-> 0180: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0181: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0182: SLDC 01          Short load constant 1
    0183: ADI              Add integers (TOS + TOS-1)
    0184: LDB              Load byte at byte ptr TOS-1 + TOS
    0185: STL  0006        Store TOS into MP6
-   0187: SLDO 01          Short load global BASE1
-   0188: SLDO 0e          Short load global BASE14
+   0187: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0188: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0189: SLDC 02          Short load constant 2
    018a: ADI              Add integers (TOS + TOS-1)
    018b: LDB              Load byte at byte ptr TOS-1 + TOS
    018c: STL  0005        Store TOS into MP5
-   018e: SLDO 01          Short load global BASE1
-   018f: SLDO 0e          Short load global BASE14
+   018e: SLDO 01          Short load global BASE1 (SYMBUFP)
+   018f: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0190: SLDC 03          Short load constant 3
    0191: ADI              Add integers (TOS + TOS-1)
    0192: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -20527,10 +21183,10 @@ BEGIN
    01ad: STL  0004        Store TOS into MP4
    01af: SLDC 2b          Short load constant 43
    01b0: STL  0005        Store TOS into MP5
-   01b2: SLDO 0e          Short load global BASE14
+   01b2: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    01b3: SLDC 01          Short load constant 1
    01b4: SBI              Subtract integers (TOS-1 - TOS)
-   01b5: SRO  000e        Store global word BASE14
+   01b5: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 01b7: SLDL 06          Short load local MP6
    01b8: SLDC 60          Short load constant 96
    01b9: GRTI             Integer TOS-1 > TOS
@@ -20545,8 +21201,9 @@ BEGIN
    01c6: SLDC 01          Short load constant 1
    01c7: GRTI             Integer TOS-1 > TOS
    01c8: FJP  $01d0       Jump if TOS false
+  PASCALCOMPILER.ERROR(194) { Comment must appear at top of program }
    01ca: LDCI 00c2        Load word 194
-   01cd: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01cd: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 01d0: LAO  025d        Load global BASE605
    01d3: SLDC 29          Short load constant 41
    01d4: CSP  01          Call standard procedure NEW
@@ -20595,29 +21252,30 @@ BEGIN
    0212: SLDC 2a          Short load constant 42
    0213: EQUI             Integer TOS-1 = TOS
    0214: FJP  $021b       Jump if TOS false
-   0216: SLDO 0e          Short load global BASE14
+   0216: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0217: SLDC 01          Short load constant 1
    0218: ADI              Add integers (TOS + TOS-1)
-   0219: SRO  000e        Store global word BASE14
+   0219: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 021b: LDO  002c        Load global word BASE44 (LIST)
    021d: FJP  $022c       Jump if TOS false
-   021f: SLDO 0e          Short load global BASE14
+   021f: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0220: SLDC 01          Short load constant 1
    0221: ADI              Add integers (TOS + TOS-1)
-   0222: SRO  000e        Store global word BASE14
-   0224: CXP  01 06       Call external procedure PASCALCO.PROC6
-   0227: SLDO 0e          Short load global BASE14
+   0222: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   0224: CXP  01 06       Call external procedure PASCALCOMPILER.PRINTLINE
+   0227: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0228: SLDC 01          Short load constant 1
    0229: SBI              Subtract integers (TOS-1 - TOS)
-   022a: SRO  000e        Store global word BASE14
+   022a: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 022c: LDO  0026        Load global word BASE38
    022e: LDO  0021        Load global word BASE33
    0230: LDO  0020        Load global word BASE32
    0232: LAND             Logical AND (TOS & TOS-1)
    0233: LOR              Logical OR (TOS | TOS-1)
    0234: FJP  $023c       Jump if TOS false
+  PASCALCOMPILER.ERROR(406) { Include file not legal in interface nor while including }
    0236: LDCI 0196        Load word 406
-   0239: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0239: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 023c: LLA  0007        Load local address MP7
    023e: SLDC 01          Short load constant 1
    023f: SLDC 28          Short load constant 40
@@ -20631,11 +21289,12 @@ BEGIN
    024f: SLDC 00          Short load constant 0
    0250: NEQI             Integer TOS-1 <> TOS
    0251: FJP  $0259       Jump if TOS false
+  PASCALCOMPILER.ERROR(403) { Error in reading include file }
    0253: LDCI 0193        Load word 403
-   0256: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0256: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0259: SLDC 01          Short load constant 1
    025a: SRO  0026        Store global word BASE38
-   025c: SLDO 0e          Short load global BASE14
+   025c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    025d: SRO  02ca        Store global word BASE714
    0260: LDO  0062        Load global word BASE98 (LINESTART)
    0262: SRO  02c9        Store global word BASE713
@@ -20645,8 +21304,8 @@ BEGIN
    0269: SRO  02c6        Store global word BASE710
    026c: SLDC 02          Short load constant 2
    026d: SRO  005d        Store global word BASE93 (SYMBLK)
-   026f: CXP  01 05       Call external procedure PASCALCO.PROC5
-   0272: CXP  01 08       Call external procedure PASCALCO.PROC8
+   026f: CXP  01 05       Call external procedure PASCALCOMPILER.PROC5
+   0272: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    0275: SLDC 01          Short load constant 1
    0276: SLDC 08          Short load constant 8
    0277: CSP  04          Call standard procedure EXIT
@@ -20704,10 +21363,10 @@ BEGIN
    02dd: EQUI             Integer TOS-1 = TOS
    02de: LOR              Logical OR (TOS | TOS-1)
    02df: FJP  $0335       Jump if TOS false
-   02e1: SLDO 0e          Short load global BASE14
+   02e1: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    02e2: SLDC 01          Short load constant 1
    02e3: ADI              Add integers (TOS + TOS-1)
-   02e4: SRO  000e        Store global word BASE14
+   02e4: SRO  000e        Store global word BASE14 (SYMCURSOR)
    02e6: LLA  0007        Load local address MP7
    02e8: SLDC 28          Short load constant 40
    02e9: CLP  03          Call local procedure COMPOPTI.PROC3
@@ -20802,17 +21461,17 @@ BEGIN
    0371: EQUI             Integer TOS-1 = TOS
    0372: SRO  0022        Store global word BASE34
    0374: SLDL 04          Short load local MP4
-   0378: LDC  03          Load multiple-word constant
-                            0000 0000 2800 
+   0375: LDC  03          Load multiple-word constant
+                            0000 0000 2800 [11,13]
    037e: SLDC 03          Short load constant 3
    037f: INN              Set membership (TOS-1 in set TOS)
    0380: FJP  $038e       Jump if TOS false
-   0382: SLDO 0e          Short load global BASE14
+   0382: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0383: SLDC 01          Short load constant 1
    0384: ADI              Add integers (TOS + TOS-1)
-   0385: SRO  000e        Store global word BASE14
-   0387: SLDO 01          Short load global BASE1
-   0388: SLDO 0e          Short load global BASE14
+   0385: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   0387: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0388: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0389: SLDC 03          Short load constant 3
    038a: ADI              Add integers (TOS + TOS-1)
    038b: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -20865,8 +21524,9 @@ BEGIN
    03da: SLDC 00          Short load constant 0
    03db: NEQI             Integer TOS-1 <> TOS
    03dc: FJP  $03e4       Jump if TOS false
+  PASCALCOMPILER.ERROR(187) { Attempt to open library unsuccessful }
    03de: LDCI 00bb        Load word 187
-   03e1: CXP  01 04       Call external procedure PASCALCO.ERROR
+   03e1: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 03e4: CLP  02          Call local procedure COMPOPTI.PROC2
 -> 03e6: UJP  $041e       Unconditional jump
    03e8: SLDL 05          Short load local MP5
@@ -20874,10 +21534,17 @@ BEGIN
    03ea: EQUI             Integer TOS-1 = TOS
    03eb: SRO  0028        Store global word BASE40
    03ed: UJP  $041e       Unconditional jump
--> 041e: SLDO 0e          Short load global BASE14
+-> 03ef: XJP  0043 0056 041e Case jump
+           0043 -> 01c4   0044 -> 01e0   0045 -> 01e7   0046 -> 01ee
+           0047 -> 01f5   0048 -> 03f4   0049 -> 01fc   004a -> 03f4
+           004b -> 03f4   004c -> 027b   004d -> 03f4   004e -> 02d8
+           004f -> 03f4   0050 -> 0348   0051 -> 033c   0052 -> 0356
+           0053 -> 036a   0054 -> 0390   0055 -> 0397   0056 -> 03e8
+       default -> 041e
+-> 041e: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    041f: SLDC 03          Short load constant 3
    0420: ADI              Add integers (TOS + TOS-1)
-   0421: SRO  000e        Store global word BASE14
+   0421: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0423: SLDL 04          Short load local MP4
    0424: SLDC 2c          Short load constant 44
    0425: NEQI             Integer TOS-1 <> TOS
@@ -20897,8 +21564,8 @@ BEGIN
 END
 
 ### PROCEDURE COMPOPTI.PROC3(PARAM1; PARAM2) (* P=3, LL=2, D=5, Callers: COMPOPTI *)
-  BASE1
-  BASE14
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
   COMPOPTI:MP3
   MP1=PARAM2
   MP2=PARAM1
@@ -20906,15 +21573,15 @@ END
   MP4
   MP5
 BEGIN
--> 0014: SLDO 0e          Short load global BASE14
+-> 0014: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0015: SLDC 02          Short load constant 2
    0016: ADI              Add integers (TOS + TOS-1)
-   0017: SRO  000e        Store global word BASE14
+   0017: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0019: SLDL 01          Short load local MP1
    001a: SLDC 01          Short load constant 1
    001b: SLDC 20          Short load constant 32
-   001c: SLDO 01          Short load global BASE1
-   001d: SLDO 0e          Short load global BASE14
+   001c: SLDO 01          Short load global BASE1 (SYMBUFP)
+   001d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    001e: SLDC 00          Short load constant 0
    001f: CSP  0b          Call standard procedure SCAN
    0021: STL  0004        Store TOS into MP4
@@ -20924,8 +21591,8 @@ BEGIN
    0026: SBI              Subtract integers (TOS-1 - TOS)
    0027: SLDC 00          Short load constant 0
    0028: LOD  01 0003     Load word at COMPOPTI:MP3
-   002b: SLDO 01          Short load global BASE1
-   002c: SLDO 0e          Short load global BASE14
+   002b: SLDO 01          Short load global BASE1 (SYMBUFP)
+   002c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    002d: SLDL 04          Short load local MP4
    002e: ADI              Add integers (TOS + TOS-1)
    002f: SLDC 00          Short load constant 0
@@ -20936,8 +21603,8 @@ BEGIN
    0038: SLDC 2a          Short load constant 42
    0039: EQUI             Integer TOS-1 = TOS
    003a: FJP  $0066       Jump if TOS false
--> 003c: SLDO 01          Short load global BASE1
-   003d: SLDO 0e          Short load global BASE14
+-> 003c: SLDO 01          Short load global BASE1 (SYMBUFP)
+   003d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    003e: SLDL 05          Short load local MP5
    003f: ADI              Add integers (TOS + TOS-1)
    0040: SLDC 01          Short load constant 1
@@ -20962,8 +21629,8 @@ BEGIN
    0055: SBI              Subtract integers (TOS-1 - TOS)
    0056: SLDC 00          Short load constant 0
    0057: LOD  01 0003     Load word at COMPOPTI:MP3
-   005a: SLDO 01          Short load global BASE1
-   005b: SLDO 0e          Short load global BASE14
+   005a: SLDO 01          Short load global BASE1 (SYMBUFP)
+   005b: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    005c: SLDL 05          Short load local MP5
    005d: ADI              Add integers (TOS + TOS-1)
    005e: SLDC 00          Short load constant 0
@@ -20975,8 +21642,8 @@ BEGIN
    0067: NGI              Negate integer
    0068: SLDC 01          Short load constant 1
    0069: SLDC 20          Short load constant 32
-   006a: SLDO 01          Short load global BASE1
-   006b: SLDO 0e          Short load global BASE14
+   006a: SLDO 01          Short load global BASE1 (SYMBUFP)
+   006b: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    006c: SLDL 05          Short load local MP5
    006d: ADI              Add integers (TOS + TOS-1)
    006e: SLDC 00          Short load constant 0
@@ -20993,15 +21660,15 @@ BEGIN
    007c: SLDC 00          Short load constant 0
    007d: SLDL 05          Short load local MP5
    007e: STB              Store byte at TOS to byte ptr TOS-2 + TOS-1
-   007f: SLDO 01          Short load global BASE1
-   0080: SLDO 0e          Short load global BASE14
+   007f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0080: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0081: SLDL 04          Short load local MP4
    0082: ADI              Add integers (TOS + TOS-1)
    0083: SLDL 02          Short load local MP2
    0084: SLDC 01          Short load constant 1
    0085: SLDL 05          Short load local MP5
    0086: CSP  02          Call standard procedure MOVL
-   0088: SLDO 0e          Short load global BASE14
+   0088: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0089: SLDL 05          Short load local MP5
    008a: ADI              Add integers (TOS + TOS-1)
    008b: SLDL 04          Short load local MP4
@@ -21010,14 +21677,14 @@ BEGIN
    008e: ADI              Add integers (TOS + TOS-1)
    008f: SLDC 01          Short load constant 1
    0090: ADI              Add integers (TOS + TOS-1)
-   0091: SRO  000e        Store global word BASE14
+   0091: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0093: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE COMPOPTI.PROC4 (* P=4, LL=2, D=4, Callers: COMPOPTI *)
-  BASE1
-  BASE14
-  BASE15
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
   BASE23
   BASE54
   COMPOPTI:MP3
@@ -21025,24 +21692,24 @@ END
   MP3
   MP4
 BEGIN
--> 00d2: SLDO 0e          Short load global BASE14
+-> 00d2: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00d3: SLDC 02          Short load constant 2
    00d4: ADI              Add integers (TOS + TOS-1)
-   00d5: SRO  000e        Store global word BASE14
+   00d5: SRO  000e        Store global word BASE14 (SYMCURSOR)
    00d7: SLDC 00          Short load constant 0
    00d8: STL  0003        Store TOS into MP3
--> 00da: SLDO 0e          Short load global BASE14
+-> 00da: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00db: SLDC 50          Short load constant 80
    00dc: SLDC 01          Short load constant 1
    00dd: SLDC 20          Short load constant 32
-   00de: SLDO 01          Short load global BASE1
-   00df: SLDO 0e          Short load global BASE14
+   00de: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00df: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00e0: SLDC 00          Short load constant 0
    00e1: CSP  0b          Call standard procedure SCAN
    00e3: ADI              Add integers (TOS + TOS-1)
-   00e4: SRO  000e        Store global word BASE14
-   00e6: SLDO 01          Short load global BASE1
-   00e7: SLDO 0e          Short load global BASE14
+   00e4: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   00e6: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00e7: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00e8: LDB              Load byte at byte ptr TOS-1 + TOS
    00e9: LOD  01 0003     Load word at COMPOPTI:MP3
    00ec: EQUI             Integer TOS-1 = TOS
@@ -21050,7 +21717,7 @@ BEGIN
    00ef: SLDC 01          Short load constant 1
    00f0: STL  0003        Store TOS into MP3
    00f2: UJP  $0151       Unconditional jump
--> 00f4: CXP  01 08       Call external procedure PASCALCO.PROC8
+-> 00f4: CXP  01 08       Call external procedure PASCALCOMPILER.PROC8
    00f7: SLDO 0f          Short load global BASE15
    00f8: SLDC 23          Short load constant 35
    00f9: EQUI             Integer TOS-1 = TOS
@@ -21071,7 +21738,7 @@ BEGIN
    0112: SLDC 01          Short load constant 1
    0113: ADJ  01          Adjust set to 1 words
    0115: LLA  0002        Load local address MP2
-   0117: CXP  01 0a       Call external procedure PASCALCO.PROC10
+   0117: CXP  01 0a       Call external procedure PASCALCOMPILER.PROC10
    011a: SLDC 01          Short load constant 1
    011b: SRO  0036        Store global word BASE54
    011d: SLDL 02          Short load local MP2
@@ -21096,38 +21763,39 @@ BEGIN
    0139: IND  000c        Static index and load word (TOS+12)
    013b: CLP  05          Call local procedure COMPOPTI.PROC5
 -> 013d: UJP  $0145       Unconditional jump
+  PASCALCOMPILER.ERROR(273) { No such unit or segment }
 -> 013f: LDCI 0111        Load word 273
-   0142: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0145: SLDO 01          Short load global BASE1
-   0146: SLDO 0e          Short load global BASE14
+   0142: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0145: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0146: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0147: LDB              Load byte at byte ptr TOS-1 + TOS
    0148: SLDC 2c          Short load constant 44
    0149: EQUI             Integer TOS-1 = TOS
    014a: FJP  $0151       Jump if TOS false
-   014c: SLDO 0e          Short load global BASE14
+   014c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    014d: SLDC 01          Short load constant 1
    014e: ADI              Add integers (TOS + TOS-1)
-   014f: SRO  000e        Store global word BASE14
+   014f: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0151: SLDL 03          Short load local MP3
    0152: FJP  $00da       Jump if TOS false
-   0154: SLDO 0e          Short load global BASE14
+   0154: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0155: SLDC 50          Short load constant 80
    0156: SLDC 00          Short load constant 0
    0157: LOD  01 0003     Load word at COMPOPTI:MP3
-   015a: SLDO 01          Short load global BASE1
-   015b: SLDO 0e          Short load global BASE14
+   015a: SLDO 01          Short load global BASE1 (SYMBUFP)
+   015b: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    015c: SLDC 00          Short load constant 0
    015d: CSP  0b          Call standard procedure SCAN
    015f: ADI              Add integers (TOS + TOS-1)
    0160: SLDC 01          Short load constant 1
    0161: ADI              Add integers (TOS + TOS-1)
-   0162: SRO  000e        Store global word BASE14
+   0162: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0164: CIP  02          Call intermediate procedure 2 COMPOPTI.PROC2
 -> 0166: RNP  00          Return from nonbase procedure
 END
 
 ### PROCEDURE COMPOPTI.PROC5(PARAM1) (* P=5, LL=3, D=3, Callers: PROC4 *)
-  BASE15
+  BASE15=SY:SYMBOL
   BASE33
   BASE42
   BASE65
@@ -21179,11 +21847,11 @@ BEGIN
 END
 
 ### PROCEDURE NUMSTRIN.PROC2 (* P=2, LL=2, D=46, Callers: NUMSTRIN *)
-  BASE1
-  BASE14
-  BASE15
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
   BASE16
-  BASE22
+  BASE22=LGTH:INTEGER
   BASE23
   BASE90
   MP1
@@ -21200,27 +21868,28 @@ BEGIN
    0007: STL  002b        Store TOS into MP43
 -> 0009: LDL  002c        Load local word MP44
    000b: FJP  $0012       Jump if TOS false
-   000d: SLDO 0e          Short load global BASE14
+   000d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    000e: SLDC 01          Short load constant 1
    000f: ADI              Add integers (TOS + TOS-1)
-   0010: SRO  000e        Store global word BASE14
--> 0012: SLDO 0e          Short load global BASE14
+   0010: SRO  000e        Store global word BASE14 (SYMCURSOR)
+-> 0012: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0013: SLDC 01          Short load constant 1
    0014: ADI              Add integers (TOS + TOS-1)
-   0015: SRO  000e        Store global word BASE14
+   0015: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0017: LDL  002b        Load local word MP43
    0019: SLDC 01          Short load constant 1
    001a: ADI              Add integers (TOS + TOS-1)
    001b: STL  002b        Store TOS into MP43
-   001d: SLDO 01          Short load global BASE1
-   001e: SLDO 0e          Short load global BASE14
+   001d: SLDO 01          Short load global BASE1 (SYMBUFP)
+   001e: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    001f: LDB              Load byte at byte ptr TOS-1 + TOS
    0020: SLDC 0d          Short load constant 13
    0021: EQUI             Integer TOS-1 = TOS
    0022: FJP  $002f       Jump if TOS false
+  PASCALCOMPILER.ERROR(202) { String constant must not exceed source line }
    0024: LDCI 00ca        Load word 202
-   0027: CXP  01 04       Call external procedure PASCALCO.ERROR
-   002a: CXP  01 0e       Call external procedure PASCALCO.PROC14
+   0027: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+   002a: CXP  01 0e       Call external procedure PASCALCOMPILER.CHECKEND
    002d: UJP  $0062       Unconditional jump
 -> 002f: LDL  002b        Load local word MP43
    0031: SLDC 50          Short load constant 80
@@ -21230,28 +21899,29 @@ BEGIN
    0037: LDL  002b        Load local word MP43
    0039: SLDC 01          Short load constant 1
    003a: SBI              Subtract integers (TOS-1 - TOS)
-   003b: SLDO 01          Short load global BASE1
-   003c: SLDO 0e          Short load global BASE14
+   003b: SLDO 01          Short load global BASE1 (SYMBUFP)
+   003c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    003d: LDB              Load byte at byte ptr TOS-1 + TOS
    003e: STB              Store byte at TOS to byte ptr TOS-2 + TOS-1
    003f: UJP  $004f       Unconditional jump
 -> 0041: LDL  002d        Load local word MP45
    0043: LNOT             Logical NOT (~TOS)
    0044: FJP  $004c       Jump if TOS false
+  PASCALCOMPILER.ERROR(277) { String too long }
    0046: LDCI 0115        Load word 277
-   0049: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0049: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 004c: SLDC 01          Short load constant 1
    004d: STL  002d        Store TOS into MP45
--> 004f: SLDO 01          Short load global BASE1
-   0050: SLDO 0e          Short load global BASE14
+-> 004f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0050: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0051: LDB              Load byte at byte ptr TOS-1 + TOS
    0052: SLDC 27          Short load constant 39
    0053: EQUI             Integer TOS-1 = TOS
    0054: FJP  $0012       Jump if TOS false
    0056: SLDC 01          Short load constant 1
    0057: STL  002c        Store TOS into MP44
-   0059: SLDO 01          Short load global BASE1
-   005a: SLDO 0e          Short load global BASE14
+   0059: SLDO 01          Short load global BASE1 (SYMBUFP)
+   005a: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    005b: SLDC 01          Short load constant 1
    005c: ADI              Add integers (TOS + TOS-1)
    005d: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -21307,11 +21977,11 @@ BEGIN
 END
 
 ### PROCEDURE NUMSTRIN.PROC3 (* P=3, LL=2, D=16, Callers: NUMSTRIN *)
-  BASE1
-  BASE14
-  BASE15
+  BASE1=SYMBUFP:^SYMBUFARRAY
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
   BASE16
-  BASE22
+  BASE22=LGTH:INTEGER
   BASE23
   NUMSTRIN:MP1
   MP1
@@ -21344,36 +22014,36 @@ BEGIN
    00ca: STL  0002        Store TOS into MP2
    00cc: LDCI 270f        Load word 9999
    00cf: STL  0003        Store TOS into MP3
-   00d1: SLDO 0e          Short load global BASE14
+   00d1: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00d2: STL  0004        Store TOS into MP4
--> 00d4: SLDO 0e          Short load global BASE14
+-> 00d4: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00d5: SLDC 01          Short load constant 1
    00d6: ADI              Add integers (TOS + TOS-1)
-   00d7: SRO  000e        Store global word BASE14
-   00d9: SLDO 01          Short load global BASE1
-   00da: SLDO 0e          Short load global BASE14
+   00d7: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   00d9: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00da: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00db: LDB              Load byte at byte ptr TOS-1 + TOS
    00dc: SLDC 30          Short load constant 48
    00dd: LESI             Integer TOS-1 < TOS
-   00de: SLDO 01          Short load global BASE1
-   00df: SLDO 0e          Short load global BASE14
+   00de: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00df: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00e0: LDB              Load byte at byte ptr TOS-1 + TOS
    00e1: SLDC 39          Short load constant 57
    00e2: GRTI             Integer TOS-1 > TOS
    00e3: LOR              Logical OR (TOS | TOS-1)
    00e4: FJP  $00d4       Jump if TOS false
-   00e6: SLDO 0e          Short load global BASE14
+   00e6: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00e7: SLDC 01          Short load constant 1
    00e8: SBI              Subtract integers (TOS-1 - TOS)
    00e9: STL  0008        Store TOS into MP8
-   00eb: SLDO 01          Short load global BASE1
-   00ec: SLDO 0e          Short load global BASE14
+   00eb: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00ec: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00ed: LDB              Load byte at byte ptr TOS-1 + TOS
    00ee: SLDC 2e          Short load constant 46
    00ef: EQUI             Integer TOS-1 = TOS
    00f0: FJP  $012a       Jump if TOS false
-   00f2: SLDO 01          Short load global BASE1
-   00f3: SLDO 0e          Short load global BASE14
+   00f2: SLDO 01          Short load global BASE1 (SYMBUFP)
+   00f3: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00f4: SLDC 01          Short load constant 1
    00f5: ADI              Add integers (TOS + TOS-1)
    00f6: LDB              Load byte at byte ptr TOS-1 + TOS
@@ -21382,46 +22052,47 @@ BEGIN
    00f9: FJP  $012a       Jump if TOS false
    00fb: SLDC 00          Short load constant 0
    00fc: STL  000a        Store TOS into MP10
-   00fe: SLDO 0e          Short load global BASE14
+   00fe: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    00ff: SLDC 01          Short load constant 1
    0100: ADI              Add integers (TOS + TOS-1)
-   0101: SRO  000e        Store global word BASE14
-   0103: SLDO 0e          Short load global BASE14
+   0101: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   0103: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0104: STL  0003        Store TOS into MP3
--> 0106: SLDO 01          Short load global BASE1
-   0107: SLDO 0e          Short load global BASE14
+-> 0106: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0107: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0108: LDB              Load byte at byte ptr TOS-1 + TOS
    0109: SLDC 30          Short load constant 48
    010a: GEQI             Integer TOS-1 >= TOS
-   010b: SLDO 01          Short load global BASE1
-   010c: SLDO 0e          Short load global BASE14
+   010b: SLDO 01          Short load global BASE1 (SYMBUFP)
+   010c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    010d: LDB              Load byte at byte ptr TOS-1 + TOS
    010e: SLDC 39          Short load constant 57
    010f: LEQI             Integer TOS-1 <= TOS
    0110: LAND             Logical AND (TOS & TOS-1)
    0111: FJP  $011a       Jump if TOS false
-   0113: SLDO 0e          Short load global BASE14
+   0113: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0114: SLDC 01          Short load constant 1
    0115: ADI              Add integers (TOS + TOS-1)
-   0116: SRO  000e        Store global word BASE14
+   0116: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0118: UJP  $0106       Unconditional jump
--> 011a: SLDO 0e          Short load global BASE14
+-> 011a: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    011b: SLDL 03          Short load local MP3
    011c: EQUI             Integer TOS-1 = TOS
    011d: FJP  $0125       Jump if TOS false
+  PASCALCOMPILER.ERROR(201) { Error in real number - digit expected }
    011f: LDCI 00c9        Load word 201
-   0122: CXP  01 04       Call external procedure PASCALCO.ERROR
--> 0125: SLDO 0e          Short load global BASE14
+   0122: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+-> 0125: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0126: SLDC 01          Short load constant 1
    0127: SBI              Subtract integers (TOS-1 - TOS)
    0128: STL  0007        Store TOS into MP7
--> 012a: SLDO 01          Short load global BASE1
-   012b: SLDO 0e          Short load global BASE14
+-> 012a: SLDO 01          Short load global BASE1 (SYMBUFP)
+   012b: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    012c: LDB              Load byte at byte ptr TOS-1 + TOS
    012d: SLDC 45          Short load constant 69
    012e: EQUI             Integer TOS-1 = TOS
-   012f: SLDO 01          Short load global BASE1
-   0130: SLDO 0e          Short load global BASE14
+   012f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0130: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0131: LDB              Load byte at byte ptr TOS-1 + TOS
    0132: SLDC 65          Short load constant 101
    0133: EQUI             Integer TOS-1 = TOS
@@ -21429,54 +22100,54 @@ BEGIN
    0135: FJP  $0184       Jump if TOS false
    0137: SLDC 00          Short load constant 0
    0138: STL  000a        Store TOS into MP10
-   013a: SLDO 0e          Short load global BASE14
+   013a: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    013b: SLDC 01          Short load constant 1
    013c: ADI              Add integers (TOS + TOS-1)
-   013d: SRO  000e        Store global word BASE14
-   013f: SLDO 01          Short load global BASE1
-   0140: SLDO 0e          Short load global BASE14
+   013d: SRO  000e        Store global word BASE14 (SYMCURSOR)
+   013f: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0140: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0141: LDB              Load byte at byte ptr TOS-1 + TOS
    0142: SLDC 2d          Short load constant 45
    0143: EQUI             Integer TOS-1 = TOS
    0144: FJP  $0151       Jump if TOS false
-   0146: SLDO 0e          Short load global BASE14
+   0146: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0147: SLDC 01          Short load constant 1
    0148: ADI              Add integers (TOS + TOS-1)
-   0149: SRO  000e        Store global word BASE14
+   0149: SRO  000e        Store global word BASE14 (SYMCURSOR)
    014b: SLDC 01          Short load constant 1
    014c: NGI              Negate integer
    014d: STL  0005        Store TOS into MP5
    014f: UJP  $015d       Unconditional jump
--> 0151: SLDO 01          Short load global BASE1
-   0152: SLDO 0e          Short load global BASE14
+-> 0151: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0152: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0153: LDB              Load byte at byte ptr TOS-1 + TOS
    0154: SLDC 2b          Short load constant 43
    0155: EQUI             Integer TOS-1 = TOS
    0156: FJP  $015d       Jump if TOS false
-   0158: SLDO 0e          Short load global BASE14
+   0158: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0159: SLDC 01          Short load constant 1
    015a: ADI              Add integers (TOS + TOS-1)
-   015b: SRO  000e        Store global word BASE14
--> 015d: SLDO 0e          Short load global BASE14
+   015b: SRO  000e        Store global word BASE14 (SYMCURSOR)
+-> 015d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    015e: STL  0002        Store TOS into MP2
--> 0160: SLDO 01          Short load global BASE1
-   0161: SLDO 0e          Short load global BASE14
+-> 0160: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0161: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0162: LDB              Load byte at byte ptr TOS-1 + TOS
    0163: SLDC 30          Short load constant 48
    0164: GEQI             Integer TOS-1 >= TOS
-   0165: SLDO 01          Short load global BASE1
-   0166: SLDO 0e          Short load global BASE14
+   0165: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0166: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0167: LDB              Load byte at byte ptr TOS-1 + TOS
    0168: SLDC 39          Short load constant 57
    0169: LEQI             Integer TOS-1 <= TOS
    016a: LAND             Logical AND (TOS & TOS-1)
    016b: FJP  $0174       Jump if TOS false
-   016d: SLDO 0e          Short load global BASE14
+   016d: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    016e: SLDC 01          Short load constant 1
    016f: ADI              Add integers (TOS + TOS-1)
-   0170: SRO  000e        Store global word BASE14
+   0170: SRO  000e        Store global word BASE14 (SYMCURSOR)
    0172: UJP  $0160       Unconditional jump
--> 0174: SLDO 0e          Short load global BASE14
+-> 0174: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0175: SLDC 01          Short load constant 1
    0176: SBI              Subtract integers (TOS-1 - TOS)
    0177: STL  0006        Store TOS into MP6
@@ -21484,8 +22155,9 @@ BEGIN
    017a: SLDL 02          Short load local MP2
    017b: LESI             Integer TOS-1 < TOS
    017c: FJP  $0184       Jump if TOS false
+  PASCALCOMPILER.ERROR(201) { Error in real number - digit expected }
    017e: LDCI 00c9        Load word 201
-   0181: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0181: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 0184: SLDL 0a          Short load local MP10
    0185: SLDC 01          Short load constant 1
    0186: EQUI             Integer TOS-1 = TOS
@@ -21510,7 +22182,7 @@ BEGIN
    01a2: SLDC 0a          Short load constant 10
    01a3: DVI              Divide integers (TOS-1 / TOS)
    01a4: EQUI             Integer TOS-1 = TOS
-   01a5: SLDO 01          Short load global BASE1
+   01a5: SLDO 01          Short load global BASE1 (SYMBUFP)
    01a6: SLDL 0e          Short load local MP14
    01a7: LDB              Load byte at byte ptr TOS-1 + TOS
    01a8: SLDC 30          Short load constant 48
@@ -21532,7 +22204,7 @@ BEGIN
 -> 01bf: SLDL 01          Short load local MP1
    01c0: SLDC 0a          Short load constant 10
    01c1: MPI              Multiply integers (TOS * TOS-1)
-   01c2: SLDO 01          Short load global BASE1
+   01c2: SLDO 01          Short load global BASE1 (SYMBUFP)
    01c3: SLDL 0e          Short load local MP14
    01c4: LDB              Load byte at byte ptr TOS-1 + TOS
    01c5: SLDC 30          Short load constant 48
@@ -21559,8 +22231,9 @@ BEGIN
    01e2: SLDC 24          Short load constant 36
    01e3: GEQI             Integer TOS-1 >= TOS
    01e4: FJP  $01f2       Jump if TOS false
+  PASCALCOMPILER.ERROR(203) { Integer constant exceeds range }
    01e6: LDCI 00cb        Load word 203
-   01e9: CXP  01 04       Call external procedure PASCALCO.ERROR
+   01e9: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
    01ec: SLDL 08          Short load local MP8
    01ed: STL  0004        Store TOS into MP4
    01ef: SLDL 08          Short load local MP8
@@ -21611,7 +22284,7 @@ BEGIN
 -> 022c: SLDL 01          Short load local MP1
    022d: SLDC 0a          Short load constant 10
    022e: MPI              Multiply integers (TOS * TOS-1)
-   022f: SLDO 01          Short load global BASE1
+   022f: SLDO 01          Short load global BASE1 (SYMBUFP)
    0230: SLDL 0f          Short load local MP15
    0231: LDB              Load byte at byte ptr TOS-1 + TOS
    0232: ADI              Add integers (TOS + TOS-1)
@@ -21683,7 +22356,7 @@ BEGIN
    028c: SLDC 0a          Short load constant 10
    028d: FLT              Float TOS (int TOS to real TOS)
    028e: MPR              Multiply reals (TOS * TOS-1)
-   028f: SLDO 01          Short load global BASE1
+   028f: SLDO 01          Short load global BASE1 (SYMBUFP)
    0290: SLDL 0e          Short load local MP14
    0291: LDB              Load byte at byte ptr TOS-1 + TOS
    0292: SLDC 30          Short load constant 48
@@ -21710,7 +22383,7 @@ BEGIN
    02b0: SLDC 0a          Short load constant 10
    02b1: FLT              Float TOS (int TOS to real TOS)
    02b2: MPR              Multiply reals (TOS * TOS-1)
-   02b3: SLDO 01          Short load global BASE1
+   02b3: SLDO 01          Short load global BASE1 (SYMBUFP)
    02b4: SLDL 0e          Short load local MP14
    02b5: LDB              Load byte at byte ptr TOS-1 + TOS
    02b6: SLDC 30          Short load constant 48
@@ -21736,7 +22409,7 @@ BEGIN
    02d1: SLDL 09          Short load local MP9
    02d2: SLDC 0a          Short load constant 10
    02d3: MPI              Multiply integers (TOS * TOS-1)
-   02d4: SLDO 01          Short load global BASE1
+   02d4: SLDO 01          Short load global BASE1 (SYMBUFP)
    02d5: SLDL 0e          Short load local MP14
    02d6: LDB              Load byte at byte ptr TOS-1 + TOS
    02d7: ADI              Add integers (TOS + TOS-1)
@@ -21804,77 +22477,95 @@ BEGIN
    0336: LOD  01 0001     Load word at NUMSTRIN:MP1
    0339: SIND 00          Short index load *TOS+0
    033a: SRO  0017        Store global word BASE23
--> 033c: SLDO 0e          Short load global BASE14
+-> 033c: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    033d: SLDC 01          Short load constant 1
    033e: SBI              Subtract integers (TOS-1 - TOS)
-   033f: SRO  000e        Store global word BASE14
+   033f: SRO  000e        Store global word BASE14 (SYMCURSOR)
 -> 0341: RNP  00          Return from nonbase procedure
 END
 
 ## Segment FINISHUP (20)
 
 ### PROCEDURE FINISHUP.FINISHUP (* P=1, LL=1, D=2 *)
-  BASE1
+```
+  BASE1=SYMBUFP:^SYMBUFARRAY
   BASE2
-  BASE9=IC
+  BASE9=IC:ADDRRANGE
   BASE11
-  BASE13=SEG
-  BASE14
-  BASE15
-  BASE22
+  BASE13=SEG:SEGRANGE
+  BASE14=SYMCURSOR:CURSRANGE
+  BASE15=SY:SYMBOL
+  BASE22=LGTH:INTEGER
   BASE31
   BASE44=LIST:BOOLEAN
   BASE45
   BASE50=NOISY:BOOLEAN
   BASE83
   BASE92
-  BASE94=STARTDOTS
-  BASE95=SCREENDOTS
-  BASE97
+  BASE94=STARTDOTS:INTEGER
+  BASE95=SCREENDOTS:INTEGER
+  BASE97=LOWTIME:INTEGER
   BASE186
   BASE190
-  BASE445=SEGTABLE
+  BASE445=SEGTABLE:ARRAY [SEGRANGE] OF RECORD DISKADDR,CODELENG:INTEGER;SEGNAME:ALPHA;SEGKIND,TEXTADDR:INTEGER END
   BASE589
   BASE605
-  BASE716
-  BASE796
+  BASE716=:FIB
+  BASE796=:FIB
   BASE1097
   BASE1098
   MP1
   MP2
 BEGIN
--> 0000: SLDO 0f          Short load global BASE15
+  IF SY <> 18 {PERIOD} THEN
+-> 0000: SLDO 0f          Short load global BASE15 (SY)
    0001: SLDC 12          Short load constant 18
    0002: NEQI             Integer TOS-1 <> TOS
    0003: FJP  $0009       Jump if TOS false
+  BEGIN
+    PASCALCOMPILER.ERROR(21) { '.' expected }
    0005: SLDC 15          Short load constant 21
-   0006: CXP  01 04       Call external procedure PASCALCO.ERROR
+   0006: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
+  END
+  IF LIST THEN
 -> 0009: LDO  002c        Load global word BASE44 (LIST)
    000b: FJP  $001f       Jump if TOS false
+  BEGIN
+    SCREENDOTS := SCREENDOTS + 1
    000d: LDO  005f        Load global word BASE95 (SCREENDOTS)
    000f: SLDC 01          Short load constant 1
    0010: ADI              Add integers (TOS + TOS-1)
    0011: SRO  005f        Store global word BASE95 (SCREENDOTS)
-   0013: SLDO 01          Short load global BASE1
-   0014: SLDO 0e          Short load global BASE14
+    SYMBUFP[SYMCURSOR] = 13
+   0013: SLDO 01          Short load global BASE1 (SYMBUFP)
+   0014: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0015: SLDC 0d          Short load constant 13
    0016: STB              Store byte at TOS to byte ptr TOS-2 + TOS-1
-   0017: SLDO 0e          Short load global BASE14
+    SYMCURSOR := SYMCURSOR + 1
+   0017: SLDO 0e          Short load global BASE14 (SYMCURSOR)
    0018: SLDC 01          Short load constant 1
    0019: ADI              Add integers (TOS + TOS-1)
-   001a: SRO  000e        Store global word BASE14
-   001c: CXP  01 06       Call external procedure PASCALCO.PROC6
+   001a: SRO  000e        Store global word BASE14 (SYMCURSOR)
+    PASCALCOMPILER.PRINTLINE
+   001c: CXP  01 06       Call external procedure PASCALCOMPILER.PRINTLINE
+  END
+  USERINFO.ERRBLK := 0
 -> 001f: SLDC 00          Short load constant 0
    0020: STR  02 000b     Store TOS to G11 (USERINFO.ERRBLK)
-   0023: LAO  0016        Load global BASE22
+  TIME(LGTH,STARTDOTS)
+   0023: LAO  0016        Load global BASE22 (LGTH)
    0025: LAO  005e        Load global BASE94 (STARTDOTS)
    0027: CSP  09          Call standard procedure TIME
+  LOWTIME := STARTDOTS - LOWTIME
    0029: LDO  005e        Load global word BASE94 (STARTDOTS)
-   002b: LDO  0061        Load global word BASE97
+   002b: LDO  0061        Load global word BASE97 (LOWTIME)
    002d: SBI              Subtract integers (TOS-1 - TOS)
-   002e: SRO  0061        Store global word BASE97
+   002e: SRO  0061        Store global word BASE97 (LOWTIME)
+  IF BASE45 THEN
    0030: LDO  002d        Load global word BASE45
    0032: FJP  $0048       Jump if TOS false
+  BEGIN
+    SEGTABLE[]
    0034: LAO  01bd        Load global BASE445 (SEGTABLE)
    0037: LAO  024d        Load global BASE589
    003a: SLDO 0d          Short load global BASE13 (SEG)
@@ -21885,6 +22576,7 @@ BEGIN
    0043: SLDC 01          Short load constant 1
    0044: STO              Store indirect (TOS into TOS-1)
    0045: CXP  10 01       Call external procedure WRITELINKERINFO.WRITELINKERINFO
+  END
 -> 0048: LAO  0053        Load global BASE83
    004a: CSP  21          Call standard procedure RELEASE
    004c: LAO  02cc        Load global BASE716
@@ -21906,7 +22598,7 @@ BEGIN
    0071: LSA  06          Load string address: ' lines'
    0079: SLDC 00          Short load constant 0
    007a: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
-   007d: LDO  0061        Load global word BASE97
+   007d: LDO  0061        Load global word BASE97 (LOWTIME)
    007f: SLDC 00          Short load constant 0
    0080: GRTI             Integer TOS-1 > TOS
    0081: FJP  $00d6       Jump if TOS false
@@ -21916,7 +22608,7 @@ BEGIN
    008b: SLDC 00          Short load constant 0
    008c: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
    008f: LOD  02 0003     Load word at G3 (OUTPUT)
-   0092: LDO  0061        Load global word BASE97
+   0092: LDO  0061        Load global word BASE97 (LOWTIME)
    0094: SLDC 1e          Short load constant 30
    0095: ADI              Add integers (TOS + TOS-1)
    0096: SLDC 3c          Short load constant 60
@@ -21930,7 +22622,7 @@ BEGIN
    00aa: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
    00ad: LOD  02 0003     Load word at G3 (OUTPUT)
    00b0: LDCI 0e10        Load word 3600
-   00b3: LDO  0061        Load global word BASE97
+   00b3: LDO  0061        Load global word BASE97 (LOWTIME)
    00b5: FLT              Float TOS (int TOS to real TOS)
    00b6: FLO              Float next to TOS (int TOS-1 to real TOS)
    00b7: DVR              Divide reals (TOS-1 / TOS)
@@ -21982,10 +22674,10 @@ BEGIN
    0139: STL  0002        Store TOS into MP2
    013b: SLDL 02          Short load local MP2
    013c: SIND 01          Short index load *TOS+1
-   013d: CXP  01 17       Call external procedure PASCALCO.PROC23
+   013d: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0140: SLDL 02          Short load local MP2
    0141: SIND 00          Short index load *TOS+0
-   0142: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0142: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0145: SLDO 0d          Short load global BASE13 (SEG)
    0146: SLDC 01          Short load constant 1
    0147: ADI              Add integers (TOS + TOS-1)
@@ -22029,7 +22721,7 @@ BEGIN
    017f: SLDO 0d          Short load global BASE13 (SEG)
    0180: IXA  0009        Index array (TOS-1 + TOS * 9)
    0182: IND  0008        Static index and load word (TOS+8)
-   0184: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0184: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0187: SLDO 0d          Short load global BASE13 (SEG)
    0188: SLDC 01          Short load constant 1
    0189: ADI              Add integers (TOS + TOS-1)
@@ -22047,7 +22739,7 @@ BEGIN
    019c: SLDO 0d          Short load global BASE13 (SEG)
    019d: IXA  0009        Index array (TOS-1 + TOS * 9)
    019f: SIND 07          Short index load *TOS+7
-   01a0: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01a0: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01a3: SLDO 0d          Short load global BASE13 (SEG)
    01a4: SLDC 01          Short load constant 1
    01a5: ADI              Add integers (TOS + TOS-1)
@@ -22064,8 +22756,8 @@ BEGIN
    01b5: SLDO 0d          Short load global BASE13 (SEG)
    01b6: SLDC 00          Short load constant 0
    01b7: SLDC 00          Short load constant 0
-   01b8: CXP  01 0f       Call external procedure PASCALCO.FUNC15
-   01bb: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01b8: CXP  01 0f       Call external procedure PASCALCOMPILER.FUNC15
+   01bb: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01be: SLDO 0d          Short load global BASE13 (SEG)
    01bf: SLDC 01          Short load constant 1
    01c0: ADI              Add integers (TOS + TOS-1)
@@ -22083,45 +22775,46 @@ BEGIN
    01d7: SLDC 00          Short load constant 0
    01d8: IXA  0001        Index array (TOS-1 + TOS * 1)
    01da: SIND 00          Short index load *TOS+0
-   01db: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01db: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01de: LAO  00be        Load global BASE190
    01e1: SLDC 01          Short load constant 1
    01e2: IXA  0001        Index array (TOS-1 + TOS * 1)
    01e4: SIND 00          Short index load *TOS+0
-   01e5: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01e5: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01e8: LAO  00be        Load global BASE190
    01eb: SLDC 02          Short load constant 2
    01ec: IXA  0001        Index array (TOS-1 + TOS * 1)
    01ee: SIND 00          Short index load *TOS+0
-   01ef: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01ef: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01f2: LAO  00be        Load global BASE190
    01f5: SLDC 03          Short load constant 3
    01f6: IXA  0001        Index array (TOS-1 + TOS * 1)
    01f8: SIND 00          Short index load *TOS+0
-   01f9: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01f9: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    01fc: UJP  $020e       Unconditional jump
 -> 01fe: SLDC 00          Short load constant 0
-   01ff: CXP  01 17       Call external procedure PASCALCO.PROC23
+   01ff: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0202: SLDC 00          Short load constant 0
-   0203: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0203: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    0206: SLDC 00          Short load constant 0
-   0207: CXP  01 17       Call external procedure PASCALCO.PROC23
+   0207: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
    020a: SLDC 00          Short load constant 0
-   020b: CXP  01 17       Call external procedure PASCALCO.PROC23
+   020b: CXP  01 17       Call external procedure PASCALCOMPILER.PROC23
 -> 020e: SLDC 01          Short load constant 1
    020f: SRO  000b        Store global word BASE11
    0211: SLDO 09          Short load global BASE9 (IC)
    0212: LDCI 01b0        Load word 432
    0215: GEQI             Integer TOS-1 >= TOS
    0216: FJP  $021e       Jump if TOS false
+   PASCALCOMPILER.ERROR(407) { Too many libraries }
    0218: LDCI 0197        Load word 407
-   021b: CXP  01 04       Call external procedure PASCALCO.ERROR
+   021b: CXP  01 04       Call external procedure PASCALCOMPILER.ERROR
 -> 021e: SLDO 09          Short load global BASE9 (IC)
    021f: LDCI 01b0        Load word 432
    0222: LESI             Integer TOS-1 < TOS
    0223: FJP  $022b       Jump if TOS false
    0225: SLDC 00          Short load constant 0
-   0226: CXP  01 16       Call external procedure PASCALCO.PROC22
+   0226: CXP  01 16       Call external procedure PASCALCOMPILER.PROC22
    0229: UJP  $021e       Unconditional jump
 -> 022b: LDO  025d        Load global word BASE605
    022e: LDCN             Load constant NIL
@@ -22164,7 +22857,7 @@ BEGIN
    0266: SLDC 00          Short load constant 0
    0267: SRO  044a        Store global word BASE1098
    026a: SLDC 01          Short load constant 1
-   026b: CXP  01 18       Call external procedure PASCALCO.PROC24
+   026b: CXP  01 18       Call external procedure PASCALCOMPILER.PROC24
 -> 026e: RNP  00          Return from nonbase procedure
 END
-
+```

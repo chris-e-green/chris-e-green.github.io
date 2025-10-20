@@ -1,9 +1,3 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-//
-// Swift Argument Parser
-// https://swiftpackageindex.com/apple/swift-argument-parser/documentation
-
 import ArgumentParser
 import Foundation
 
@@ -111,7 +105,6 @@ struct pdisasm: ParsableCommand {
 
         var segTable: [Int: Segment] = [:]
 
-
         // decode Segment Dictionary
         // first, decode the per-segment parts
         for i in 0...15 {
@@ -172,11 +165,20 @@ struct pdisasm: ParsableCommand {
             comment: commentStr
         )
 
-        var allBaseLocs: Set<Int> = []
-        
-        var allGlobalLocs: Set<Int> = []
+        // var allBaseLocs: Set<Int> = []
+
+        // var allGlobalLocs: Set<Int> = []
 
         var allCodeSegs: [Int: CodeSegment] = [:]
+
+        var allLocations: Set<Location> = []
+
+        var allProcedures: [ProcIdentifier] = []
+
+        var allLabels: [Location: LocInfo] = [:]
+
+        // maps a destination location to a set of caller locations 
+        var allCallers: Set<Call> = []
 
         // for each segment (sorted by segment number), extract the code block from the file
         // if it's the PASCALSYSTEM segment, load the hidden half of the segment too.
@@ -255,7 +257,8 @@ struct pdisasm: ParsableCommand {
 
             var segBaseLocs: Set<Int> = []
 
-            var tempCallers: [Int: Set<Int>] = [:]
+            // var tempCallers: [Location: Set<Location>] = [:]
+            var tempCallers: Set <Call> = []
 
             if verbose { print("processing P-code segment \(seg.segNum)") }
 
@@ -272,34 +275,154 @@ struct pdisasm: ParsableCommand {
                 } else {
                     inCode = code
                 }
-                proc.procedureNumber = Int(inCode[addr])
-                if proc.procedureNumber == 0 && seg.mType == 7 {
+
+                // Validate that the procedure header and surrounding bytes are present
+                // decodePascalProcedure reads bytes at addr+1 and at addr-2..addr-8, so ensure
+                // those indexes are within bounds for the chosen code block. If not, skip
+                // this procedure pointer to avoid crashes on malformed binaries.
+                let minNeededIndex = addr - 8
+                let maxNeededIndex = addr + 1
+                if minNeededIndex < 0 || maxNeededIndex >= inCode.count {
+                    if verbose {
+                        print("Skipping procedure at index \(procIdx + 1): pointer out of range (addr=\(addr), code.len=\(inCode.count), minNeeded=\(minNeededIndex), maxNeeded=\(maxNeededIndex))")
+                    }
+                    continue
+                }
+                // Safely read the procedure number from inCode at addr. If the pointer is
+                // out-of-bounds, log and fall back to 0 rather than crashing.
+                var procNumber = 0
+                if addr >= 0 && addr < inCode.count {
+                    procNumber = Int(inCode[addr])
+                } else {
+                    if verbose {
+                        print("Warning: procedure pointer out of bounds: seg=\(seg.segNum) ptr=\(procPtr) addr=\(addr) code.len=\(inCode.count) offset=\(offset)")
+                    }
+                    procNumber = 0
+                }
+
+                proc.procType = ProcIdentifier(
+                    isFunction: false,
+                    segmentNumber: seg.segNum,
+                    segmentName: seg.name,
+                    procNumber: procNumber
+                )
+                // proc.procType?.procNumber = Int(inCode[addr])
+                if proc.procType?.procNumber == 0 && seg.mType == 7 {
                     if verbose { print("Found assembler procedure \(procIdx + 1)") }
                     decodeAssemblerProcedure(
-                        procedureNumber: procIdx + 1, proc: &proc, code: inCode, addr: addr)
+                        segmentNumber: seg.segNum, procedureNumber: procIdx + 1, proc: &proc, code: inCode, addr: addr)
                 } else {
                     if verbose { print("Found Pascal procedure \(procIdx + 1)") }
                     decodePascalProcedure(
                         currSeg: seg, proc: &proc, knownNames: &names, code: inCode, addr: addr,
-                        callers: &tempCallers, globals: &procGlobalLocs, baseLocs: &procBaseLocs)
+                        callers: &tempCallers, globals: &procGlobalLocs, baseLocs: &procBaseLocs,
+                        allLocations: &allLocations, allProcedures: &allProcedures)
                 }
+                // print("Procedure \(procIdx + 1) processed.")
+                // print(tempCallers.sorted(by: { $0.from < $1.from }))
 
                 codeSeg.procedures.append(proc)
 
                 segGlobalLocs.formUnion(procGlobalLocs)
                 segBaseLocs.formUnion(procBaseLocs)
             }
+            // print("Segment \(seg.segNum) processed.")
+            // print(tempCallers.sorted(by: {$0.from < $1.from }))
 
-            for c in tempCallers {
-                codeSeg.procedures[c.key - 1].callers = c.value
-            }
+            allCallers.formUnion(tempCallers)
+
+            // allCallers.merge(tempCallers, uniquingKeysWith: { $0.union($1) })
+            // for (dest, callers) in tempCallers {
+            //     callers.forEach({ caller in 
+            //       let c = allProcedures.first(where: { $0.segmentNumber == caller.segment && $0.procNumber == caller.procedure! })
+            //       allCodeSegs[Int(caller.segment)]?.procedures[caller.procedure! - 1].callers.insert(c!)
+            //      })
+            //     // if allProcedures.contains(where: { $0.procNumber == p.first?.procNumber }) {
+            //     //     let procIndex = allProcedures.firstIndex(where: { $0.procNumber == p.first?.procNumber })!
+            //     //     allCodeSegs[Int(seg.segNum)]?.procedures[procIndex].callers.formUnion(p)
+            //     // }
+            // }
+            
+            // for c in tempCallers {
+            //     codeSeg.procedures[c.key - 1].callers = c.value
+            // }
 
             allCodeSegs[Int(seg.segNum)] = codeSeg
 
-            allBaseLocs.formUnion(segBaseLocs)
+            // allBaseLocs.formUnion(segBaseLocs)
 
-            allGlobalLocs.formUnion(segGlobalLocs)
+            // allGlobalLocs.formUnion(segGlobalLocs)
         }
-        outputResults(sourceFilename: fileURL.lastPathComponent, segDictionary: segDict, globals: allGlobalLocs, knownNames: names, codeSegs: allCodeSegs)
+        // retrieve any pre-configured location names
+        let version = segTable[1]?.version ?? 0 
+        
+        let decoder = JSONDecoder()
+        var globalNames: [Int: LocInfo] = [:]
+        var globalData: Data
+        do {
+            globalData = try Data(contentsOf: URL(fileURLWithPath: "globals\(version).json"))
+            globalNames = try decoder.decode([Int: LocInfo].self, from: globalData)
+        } catch {
+            print("Problem reading globals\(version).json, \(error.localizedDescription)")
+        }
+        // print(globalNames)
+
+        var pascalNames: [Int: LocInfo] = [:]
+        var pascalData: Data
+        do {
+            pascalData = try Data(contentsOf: URL(fileURLWithPath: "pascal\(version).json"))
+            pascalNames = try decoder.decode([Int: LocInfo].self, from: pascalData)
+        } catch {
+            print("Problem reading pascal(version).json, \(error.localizedDescription)")
+        }
+
+        var procedureData: Data
+        do { 
+            procedureData = try Data(contentsOf: URL(fileURLWithPath: "procedures\(version).json"))
+            allProcedures = try decoder.decode([ProcIdentifier].self, from: procedureData)
+        }
+        catch {
+            print("Problem reading procedures\(version).json, \(error.localizedDescription)")
+        }           
+
+        // ok, we've processed all the segments.
+        // we need to post-process the locations we have stored to assign names to them
+        allLocations.filter({ $0.segment == 0 && $0.lexLevel == -1 }).forEach({ loc in
+            if let addr = loc.addr {
+                allLabels[loc] = globalNames[addr]
+            }   
+        })
+        allLocations.filter({ $0.segment == 0 && $0.procedure != nil && $0.addr == nil }).forEach({ loc in
+            // a global/pascal procedure
+            allLabels[loc] = pascalNames[loc.procedure!]
+        })
+        pascalNames.forEach({ (key: Int, value: LocInfo) in 
+            allProcedures.append(ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: key, procName: value.name))
+         })
+
+        // allProcedures.filter({ $0.segmentNumber == 0 })
+        // .forEach({ proc in
+        //     if let pName = pascalNames[proc.procNumber] {
+        //         proc.procName = pName.name
+        //     }
+        // })  
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        globalData = try encoder.encode(globalNames)
+        try globalData.write(to: URL(fileURLWithPath: "globals\(version).json"))
+        // print(String(data: globalData, encoding: .utf8)!)
+        // pascalData = try encoder.encode(pascalNames)
+        // try pascalData.write(to: URL(fileURLWithPath: "pascal\(version).json"))
+
+        procedureData = try encoder.encode(allProcedures)
+        try procedureData.write(to: URL(fileURLWithPath: "procedures\(version).json"))
+
+        // now output the results.
+        outputResults(
+            sourceFilename: fileURL.lastPathComponent, segDictionary: segDict,
+            // globals: allGlobalLocs, 
+            knownNames: names, codeSegs: allCodeSegs,
+            allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
     }
 }

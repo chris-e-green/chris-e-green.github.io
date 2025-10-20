@@ -11,8 +11,8 @@ extension Data {
     /// Returns 512-byte blocks from `Data`.
     /// - Parameters:
     ///   - blockNum: the starting block number.
-    ///   - length: the number of blocks to return.
-    /// - Returns: A `Data` object of `length` blocks, starting at block `blockNum`.
+    ///   - length: the number of bytes to return.
+    /// - Returns: A `Data` object of `length` bytes, starting at block `blockNum`.
     func getCodeBlock(at blockNum:Int, length:Int) -> Data {
         return self.subdata(in: Int(blockNum)*512..<(Int(blockNum)*512)+Int(length))
     }

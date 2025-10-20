@@ -12,9 +12,9 @@ struct Segment: CustomStringConvertible {
     var segNum: Int = 0
     var mType: Int = 0
     var version: Int = 0
+
     var description: String {
-        return
-            "| \(segNum) | \(name) | \(String(format:"%04X",codeaddr)) | \(codeleng) | \(segkind) | \(String(format:"%04X",textaddr)) | \(mType) | \(version) |"
+        return "Segment(name: \"\(name)\", codeaddr: \(String(format:"%04X", codeaddr)), len: \(codeleng))"
     }
 }
 
@@ -24,23 +24,24 @@ struct SegDictionary: CustomStringConvertible {
     var comment: String
 
     var description: String {
-        let sortedSegments = segTable.sorted(by: {
-            $0.value.codeaddr < $1.value.codeaddr
-        })
-        var components = [
-            "## Segment Table",
-            "| slot | segNum | name | block | length | kind | textAddr | mType | version |",
-            "|-----:|-------:|------|------:|-------:|------|---------:|-------|--------:|",
-        ]
-        components.reserveCapacity(components.count + sortedSegments.count + 3)
-        for (slot, v) in sortedSegments { components.append("| \(slot) \(v)") }
-        components.append(contentsOf: [
-            "",
-            "intrinsics: \(intrinsics)",
-            "",
-            "comment: \(comment)",
-        ])
-        return components.joined(separator: "\n")
+        let sortedSegments = segTable.sorted { $0.value.codeaddr < $1.value.codeaddr }
+
+        let tableRows = sortedSegments.map { (slot, segment) in
+            return "| \(slot) | \(segment.segNum) | \(segment.name) | \(String(format:"%04X", segment.codeaddr)) | \(segment.codeleng) | \(segment.segkind) | \(String(format:"%04X", segment.textaddr)) | \(segment.mType) | \(segment.version) |"
+        }
+
+        return """
+        ## Segment Table
+        
+        | slot | segNum | name | codeaddr | codeleng | kind | textAddr | mType | version |
+        |-----:|-------:|------|---------:|---------:|------|---------:|-------|--------:|
+        \(tableRows.joined(separator: "\n"))
+
+        intrinsics: `\(intrinsics)`
+
+        comment: \(comment)
+
+        """
     }
 
     init(segTable: [Int: Segment], intrinsics: Set<UInt8>, comment: String) {

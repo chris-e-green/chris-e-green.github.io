@@ -72,7 +72,7 @@ To date, I've been able to locate:
 | 1.2                 | 3                | 5              | 41     | 128K   | runtime   |                                                                                                   |
 | 1.3                 | 4                | 6              | 0      | 64K    | developer |                                                                                                   |
 | 1.3                 | 4                | 6              | 40     | 128K   | developer |                                                                                                   |
-| 1.3                 | 4                | 6              | 41     | 128K   | developer |                                                                                                   |
+| 1.3                 | 4                | 6              | 41     | 128K   | runtime   |                                                                                                   |
 
 ## Methodology
 

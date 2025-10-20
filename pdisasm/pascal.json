@@ -1,0 +1,206 @@
+{
+  "53" : {
+    "name" : "PUTPREFIXED",
+    "type" : ""
+  },
+  "54" : {
+    "name" : "CHECKDEL",
+    "type" : ""
+  },
+  "27" : {
+    "name" : "SPOS",
+    "type" : ""
+  },
+  "7" : {
+    "name" : "FGET",
+    "type" : ""
+  },
+  "20" : {
+    "name" : "FWRITEBYTES",
+    "type" : ""
+  },
+  "3" : {
+    "name" : "FINIT",
+    "type" : ""
+  },
+  "13" : {
+    "name" : "FWRITEINT",
+    "type" : ""
+  },
+  "17" : {
+    "name" : "FWRITECHAR",
+    "type" : ""
+  },
+  "42" : {
+    "name" : "FETCHDIR",
+    "type" : ""
+  },
+  "49" : {
+    "name" : "CANTSTRETCH",
+    "type" : ""
+  },
+  "22" : {
+    "name" : "FWRITELN",
+    "type" : ""
+  },
+  "30" : {
+    "name" : "VOLSEARCH",
+    "type" : ""
+  },
+  "10" : {
+    "name" : "FEOF",
+    "type" : ""
+  },
+  "1" : {
+    "name" : "PASCALSYSTEM",
+    "type" : ""
+  },
+  "51" : {
+    "name" : "PRINTLOCS",
+    "type" : ""
+  },
+  "18" : {
+    "name" : "FREADSTRING",
+    "type" : ""
+  },
+  "6" : {
+    "name" : "FCLOSE",
+    "type" : ""
+  },
+  "14" : {
+    "name" : "XREADREAL",
+    "type" : ""
+  },
+  "35" : {
+    "name" : "INSENTRY",
+    "type" : ""
+  },
+  "4" : {
+    "name" : "FRESET",
+    "type" : ""
+  },
+  "41" : {
+    "name" : "GETCHAR",
+    "type" : ""
+  },
+  "37" : {
+    "name" : "CLEARSCREEN",
+    "type" : ""
+  },
+  "11" : {
+    "name" : "FEOLN",
+    "type" : ""
+  },
+  "28" : {
+    "name" : "FBLOCKIO",
+    "type" : ""
+  },
+  "19" : {
+    "name" : "FWRITESTRING",
+    "type" : ""
+  },
+  "26" : {
+    "name" : "SDELETE",
+    "type" : ""
+  },
+  "5" : {
+    "name" : "FOPEN",
+    "type" : ""
+  },
+  "25" : {
+    "name" : "SCOPY",
+    "type" : ""
+  },
+  "8" : {
+    "name" : "FPUT",
+    "type" : ""
+  },
+  "16" : {
+    "name" : "FREADCHAR",
+    "type" : ""
+  },
+  "40" : {
+    "name" : "SPACEWAIT",
+    "type" : ""
+  },
+  "52" : {
+    "name" : "PRINTEXECERR",
+    "type" : ""
+  },
+  "43" : {
+    "name" : "PARSECMD",
+    "type" : ""
+  },
+  "55" : {
+    "name" : "DOBLOCKIO",
+    "type" : ""
+  },
+  "50" : {
+    "name" : "WAITSYSVOL",
+    "type" : ""
+  },
+  "34" : {
+    "name" : "DELENTRY",
+    "type" : ""
+  },
+  "38" : {
+    "name" : "CLEARLINE",
+    "type" : ""
+  },
+  "15" : {
+    "name" : "XWRITEREAL",
+    "type" : ""
+  },
+  "39" : {
+    "name" : "PROMPT",
+    "type" : ""
+  },
+  "24" : {
+    "name" : "SINSERT",
+    "type" : ""
+  },
+  "48" : {
+    "name" : "COMMAND",
+    "type" : ""
+  },
+  "33" : {
+    "name" : "SCANTITLE",
+    "type" : ""
+  },
+  "12" : {
+    "name" : "FREADINT",
+    "type" : ""
+  },
+  "32" : {
+    "name" : "DIRSEARCH",
+    "type" : ""
+  },
+  "29" : {
+    "name" : "FGOTOXY",
+    "type" : ""
+  },
+  "31" : {
+    "name" : "WRITEDIR",
+    "type" : ""
+  },
+  "21" : {
+    "name" : "FREADLN",
+    "type" : ""
+  },
+  "9" : {
+    "name" : "XSEEK",
+    "type" : ""
+  },
+  "2" : {
+    "name" : "EXECERROR",
+    "type" : ""
+  },
+  "36" : {
+    "name" : "HOMECURSOR",
+    "type" : ""
+  },
+  "23" : {
+    "name" : "SCONCAT",
+    "type" : ""
+  }
+}

@@ -1,0 +1,13 @@
+
+#  sample.bin 
+
+## Segment Table
+
+| slot | segNum | name | codeaddr | codeleng | kind | textAddr | mType | version |
+|-----:|-------:|------|---------:|---------:|------|---------:|-------|--------:|
+
+intrinsics: `[]`
+
+comment: 
+
+## Globals

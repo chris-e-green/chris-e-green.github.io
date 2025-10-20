@@ -1,0 +1,142 @@
+{
+  "4" : {
+    "name" : "SYSTERM",
+    "type" : "FIBP"
+  },
+  "17" : {
+    "name" : "USERINFO.GOTSYM",
+    "type" : "BOOLEAN"
+  },
+  "68" : {
+    "type" : "^INTEGER",
+    "name" : "DEBUGINFO"
+  },
+  "16" : {
+    "name" : "USERINFO.GOTCODE",
+    "type" : "BOOLEAN"
+  },
+  "56" : {
+    "name" : "SYSTERM",
+    "type" : "FIBP"
+  },
+  "38" : {
+    "name" : "USERINFO.SYMTID",
+    "type" : "TID"
+  },
+  "67" : {
+    "name" : "THEDATE",
+    "type" : "DATEREC"
+  },
+  "14" : {
+    "name" : "USERINFO.SLOWTERM",
+    "type" : "BOOLEAN"
+  },
+  "46" : {
+    "name" : "USERINFO.WORKTID",
+    "type" : "TID"
+  },
+  "58" : {
+    "type" : "FIBP",
+    "name" : "INPUTFIB"
+  },
+  "111" : {
+    "name" : "IPOT",
+    "type" : "ARRAY [0..4] OF INTEGER"
+  },
+  "8" : {
+    "name" : "USERINFO.CODEFIBP",
+    "type" : "FIBP"
+  },
+  "69" : {
+    "name" : "STATE",
+    "type" : "CMDSTATE"
+  },
+  "18" : {
+    "name" : "USERINFO.CODEVID",
+    "type" : "VID"
+  },
+  "55" : {
+    "name" : "SWAPFIB",
+    "type" : "FIBP"
+  },
+  "9" : {
+    "name" : "USERINFO.SYMFIB",
+    "type" : "FIBP"
+  },
+  "30" : {
+    "type" : "TID",
+    "name" : "USERINFO.CODETID"
+  },
+  "10" : {
+    "name" : "USERINFO.ERRNUM",
+    "type" : "INTEGER"
+  },
+  "1" : {
+    "name" : "SYSCOM",
+    "type" : "^SYSCOMREC"
+  },
+  "15" : {
+    "name" : "USERINFO.ALTMODE",
+    "type" : "CHAR"
+  },
+  "63" : {
+    "name" : "SYVID",
+    "type" : "VID"
+  },
+  "122" : {
+    "name" : "DIGITS",
+    "type" : "SET OF '0'..'9'"
+  },
+  "54" : {
+    "name" : "EMPTYHEAP",
+    "type" : "^INTEGER"
+  },
+  "2" : {
+    "name" : "INPUT",
+    "type" : "FIBP"
+  },
+  "116" : {
+    "name" : "FILLER",
+    "type" : "STRING[FILL_LEN]"
+  },
+  "11" : {
+    "type" : "INTEGER",
+    "name" : "USERINFO.ERRBLK"
+  },
+  "126" : {
+    "name" : "UNITABLE",
+    "type" : "ARRAY OF UNITREC"
+  },
+  "26" : {
+    "type" : "VID",
+    "name" : "USERINFO.WORKVID"
+  },
+  "13" : {
+    "name" : "USERINFO.STUPID",
+    "type" : "BOOLEAN"
+  },
+  "3" : {
+    "name" : "OUTPUT",
+    "type" : "FIBP"
+  },
+  "57" : {
+    "type" : "FIBP",
+    "name" : "OUTPUTFIB"
+  },
+  "22" : {
+    "name" : "USERINFO.SYMVID",
+    "type" : "VID"
+  },
+  "12" : {
+    "name" : "USERINFO.ERRSYM",
+    "type" : "INTEGER"
+  },
+  "59" : {
+    "type" : "VID",
+    "name" : "DKVID"
+  },
+  "70" : {
+    "name" : "PL",
+    "type" : "STRING"
+  }
+}
