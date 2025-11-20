@@ -4,12 +4,12 @@ import XCTest
 final class EdgeCaseTests: XCTestCase {
     func testBigBoundaryValues() {
         // single-byte BIG (127)
-        let data1 = Data([0x7F])
-        XCTAssertEqual(data1.readBig(at: 0).0, 127)
+        let data1 = CodeData(data: Data())
+        XCTAssertEqual(try data1.readBig(at: 0).0, 127)
 
         // two-byte BIG: 0xFF, 0xEE -> (0xFF - 128) << 8 | 0xEE = 0x7FEE
-        let data2 = Data([0xFF, 0xEE])
-        XCTAssertEqual(data2.readBig(at: 0).0, ((0xFF - 0x80) << 8) | 0xEE)
+        let data2 = CodeData(data: Data([0xFF, 0xEE]))
+        XCTAssertEqual(try data2.readBig(at: 0).0, ((0xFF - 0x80) << 8) | 0xEE)
     }
 
     func testReadWordArrayMultipleWords() throws {

@@ -2,17 +2,18 @@ import XCTest
 @testable import pdisasm
 
 final class ExtraTests: XCTestCase {
-    func testDataReadBigAndSelfRef() {
+    func testDataReadBigAndSelfRef() throws {
         // data: [0x81, 0x02] -> BIG = (0x81 - 0x80) << 8 | 0x02 = 0x0102 = 258
         let arr: [UInt8] = [0x81, 0x02, 0x34, 0x12]
         let data = Data(arr)
-        let (val, len) = data.readBig(at: 0)
-        XCTAssertEqual(val, 0x0102)
-        XCTAssertEqual(len, 2)
+    let cd1 = CodeData(data: data, ipc: 0, header: 0)
+    let (val, len) = try cd1.readBig(at: 0)
+    XCTAssertEqual(val, 0x0102)
+    XCTAssertEqual(len, 2)
 
-        // self ref pointer at index 2 contains word 0x1234 -> getSelfRefPointer(2) == 2 - 0x1234
-        let ptr = data.getSelfRefPointer(at: 2)
-        XCTAssertEqual(ptr, 2 - 0x1234)
+    // self ref pointer at index 2 contains word 0x1234 -> getSelfRefPointer(2) == 2 - 0x1234
+    let cd2 = CodeData(data: data, ipc: 0, header: 0)
+    XCTAssertEqual(try cd2.getSelfRefPointer(at: 2), 2 - 0x1234)
     }
 
     func testCodeDataStringAndArrays() throws {

@@ -7,7 +7,7 @@
             "cwd": "${workspaceFolder:pdisasm}",
             "name": "Debug pdisasm",
             "program": "${workspaceFolder:pdisasm}/.build/debug/pdisasm",
-            "preLaunchTask": "swift: Build Debug pdisasm"
+            "preLaunchTask": "swift: Build Debug run-sim"
         },
         {
             "type": "swift",
@@ -16,7 +16,47 @@
             "cwd": "${workspaceFolder:pdisasm}",
             "name": "Release pdisasm",
             "program": "${workspaceFolder:pdisasm}/.build/release/pdisasm",
-            "preLaunchTask": "swift: Build Release pdisasm"
+            "preLaunchTask": "swift: Build Release run-sim"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Debug run-sim",
+            "preLaunchTask": "swift: Build Debug run-sim",
+            "target": "run-sim",
+            "configuration": "debug"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Release run-sim",
+            "preLaunchTask": "swift: Build Release run-sim",
+            "target": "run-sim",
+            "configuration": "release"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Debug pdisasm-cli",
+            "preLaunchTask": "swift: Build Debug pdisasm-cli",
+            "target": "pdisasm-cli",
+            "configuration": "debug"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:pdisasm}",
+            "name": "Release pdisasm-cli",
+            "preLaunchTask": "swift: Build Release pdisasm-cli",
+            "target": "pdisasm-cli",
+            "configuration": "release"
         }
     ]
 }

@@ -1,34 +1,57 @@
 
 
-struct Instruction {
-    var mnemonic: String
-    var params: [Int] = []
-    var memLocation: Location?
-    var destination: Location?
-    var comment: String?
-    var isPascal: Bool = true
+public struct Instruction {
+    public var mnemonic: String
+    public var params: [Int] = []
+    public var memLocation: Location?
+    public var destination: Location?
+    public var comment: String?
+    public var isPascal: Bool = true
+    public var stackState: [String]
+    public var prePseudoCode: String? // pseudo-code to print before instruction
+    public var pseudoCode: String? // pseudo-code to print after instruction
+
+    public init(mnemonic: String, params: [Int] = [], memLocation: Location? = nil, destination: Location? = nil, comment: String? = nil, isPascal: Bool = true, stackState: [String], pseudoCode: String? = nil, prePseudoCode: String? = nil) {
+        self.mnemonic = mnemonic
+        self.params = params
+        self.memLocation = memLocation
+        self.destination = destination
+        self.comment = comment
+        self.isPascal = isPascal
+        self.stackState = stackState
+        self.pseudoCode = pseudoCode
+        self.prePseudoCode = prePseudoCode
+    }
 }
 
-struct Procedure {
-    var lexicalLevel: Int = 0
+public struct Procedure {
+    public var lexicalLevel: Int = 0
     // var procedureNumber: Int = 0
-    var enterIC: Int = 0
-    var exitIC: Int = 0
-    var parameterSize: Int = 0
-    var dataSize: Int = 0
+    public var enterIC: Int = 0
+    public var exitIC: Int = 0
+    public var parameterSize: Int = 0
+    public var dataSize: Int = 0
     // jumpTable and code were unused; removed to reduce dead state.
     // var header: String?
-    var procType: ProcIdentifier?
+    public var procType: ProcIdentifier?
     // var name: String?
-    var variables: [String] = []
-    var instructions: [Int: Instruction] = [:]
-    var entryPoints: Set<Int> = []
-    var callers: Set<ProcIdentifier> = []
+    public var variables: [String] = []
+    public var instructions: [Int: Instruction] = [:]
+    public var entryPoints: Set<Int> = []
+    public var callers: Set<ProcIdentifier> = []
+
+    public init() {}
 }
 
 
-struct ProcedureDictionary {
-    var segmentNumber: Int
-    var procedureCount: Int
-    var procedurePointers: [Int]
+public struct ProcedureDictionary {
+    public var segmentNumber: Int
+    public var procedureCount: Int
+    public var procedurePointers: [Int]
+
+    public init(segmentNumber: Int, procedureCount: Int, procedurePointers: [Int]) {
+        self.segmentNumber = segmentNumber
+        self.procedureCount = procedureCount
+        self.procedurePointers = procedurePointers
+    }
 }

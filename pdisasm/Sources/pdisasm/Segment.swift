@@ -1,29 +1,40 @@
-enum SegmentKind: Int {
+public enum SegmentKind: Int {
     case linked, hostseg, segproc, unitseg, seprtseg, unlinked_intrins,
         linked_intrins, dataseg
 }
 
-struct Segment: CustomStringConvertible {
-    var codeaddr: Int
-    var codeleng: Int
-    var name: String = ""
-    var segkind: SegmentKind = .dataseg
-    var textaddr: Int = 0
-    var segNum: Int = 0
-    var mType: Int = 0
-    var version: Int = 0
+public struct Segment: CustomStringConvertible {
+    public var codeaddr: Int
+    public var codeleng: Int
+    public var name: String = ""
+    public var segkind: SegmentKind = .dataseg
+    public var textaddr: Int = 0
+    public var segNum: Int = 0
+    public var mType: Int = 0
+    public var version: Int = 0
 
-    var description: String {
+    public var description: String {
         return "Segment(name: \"\(name)\", codeaddr: \(String(format:"%04X", codeaddr)), len: \(codeleng))"
+    }
+
+    public init(codeaddr: Int, codeleng: Int, name: String, segkind: SegmentKind, textaddr: Int, segNum: Int, mType: Int, version: Int) {
+        self.codeaddr = codeaddr
+        self.codeleng = codeleng
+        self.name = name
+        self.segkind = segkind
+        self.textaddr = textaddr
+        self.segNum = segNum
+        self.mType = mType
+        self.version = version
     }
 }
 
-struct SegDictionary: CustomStringConvertible {
-    var segTable: [Int: Segment]
-    var intrinsics: Set<UInt8>
-    var comment: String
+public struct SegDictionary: CustomStringConvertible {
+    public var segTable: [Int: Segment]
+    public var intrinsics: Set<UInt8>
+    public var comment: String
 
-    var description: String {
+    public var description: String {
         let sortedSegments = segTable.sorted { $0.value.codeaddr < $1.value.codeaddr }
 
         let tableRows = sortedSegments.map { (slot, segment) in
@@ -44,7 +55,7 @@ struct SegDictionary: CustomStringConvertible {
         """
     }
 
-    init(segTable: [Int: Segment], intrinsics: Set<UInt8>, comment: String) {
+    public init(segTable: [Int: Segment], intrinsics: Set<UInt8>, comment: String) {
         self.segTable = segTable
         self.intrinsics = intrinsics
         self.comment = comment

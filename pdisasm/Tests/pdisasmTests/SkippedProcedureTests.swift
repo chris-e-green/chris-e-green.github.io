@@ -25,7 +25,12 @@ final class SkippedProcedureTests: XCTestCase {
         var codeSeg = CodeSegment(procedureDictionary: ProcedureDictionary(segmentNumber: 0, procedureCount: 0, procedurePointers: []), procedures: [])
         codeSeg.procedureDictionary = ProcedureDictionary(segmentNumber: Int(codeBlock[codeBlock.endIndex - 2]), procedureCount: Int(codeBlock[codeBlock.endIndex - 1]), procedurePointers: [])
         for i in 1...codeSeg.procedureDictionary.procedureCount {
-            codeSeg.procedureDictionary.procedurePointers.append(codeBlock.getSelfRefPointer(at: codeBlock.endIndex - i * 2 - 2))
+            let ptrIndex = codeBlock.endIndex - i * 2 - 2
+            if let ptr = try? CodeData(data: codeBlock, ipc: 0, header: 0).getSelfRefPointer(at: ptrIndex) {
+                codeSeg.procedureDictionary.procedurePointers.append(ptr)
+            } else {
+                codeSeg.procedureDictionary.procedurePointers.append(0)
+            }
         }
 
         var names: [Int: Name] = [:]

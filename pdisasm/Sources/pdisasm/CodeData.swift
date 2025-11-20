@@ -144,4 +144,19 @@ struct CodeData {
         }
         return words
     }
+
+        /// Returns 512-byte blocks from `Data`.
+    /// - Parameters:
+    ///   - blockNum: the starting block number.
+    ///   - length: the number of bytes to return.
+    /// - Returns: A `Data` object of `length` bytes, starting at block `blockNum`.
+    /// Safe variant of extracting a 512-byte aligned code block.
+    /// If the requested range is out of bounds, this returns an empty `Data`.
+    func getCodeBlock(at blockNum:Int, length:Int) -> Data {
+        let start = Int(blockNum) * 512
+        let end = start + Int(length)
+        guard start >= 0, end <= self.data.count else { return Data() }
+        return self.data.subdata(in: start..<end)
+    }
+
 }

@@ -181,43 +181,44 @@ let wdc6502: [UInt8: Wdc6502OpInfo] = [
     0xfe:Wdc6502OpInfo(mnemonic:"INC $%04x,X",paramLength: 2),
 ]
 
-func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inout Procedure, code: Data, addr: Int) {
+func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inout Procedure, code: Data, addr: Int) throws {
                     proc.procType = ProcIdentifier(isFunction: false, isAssembly: true, segmentNumber: segmentNumber, procNumber: procedureNumber, procName: "ASMPROC\(procedureNumber)")
                     // proc.name = "ASMPROC\(procedureNumber)"
                     // proc.procedureNumber = procedureNumber
-                    proc.enterIC = code.getSelfRefPointer(at: addr - 2)
+                    let cd = CodeData(data: code, ipc: 0, header: 0)
+                    proc.enterIC = try cd.getSelfRefPointer(at: addr - 2)
                     proc.entryPoints.insert(proc.enterIC)
                     var pos = 4
 
                     var baseRelocs: Set<Int> = []
-                    let baseCount = code.readWord(at: addr - pos)
+                    let baseCount = Int(try cd.readWord(at: addr - pos))
                     pos += 2
                     for _ in 0..<baseCount {
-                        baseRelocs.insert(code.getSelfRefPointer(at: addr - pos))
+                        baseRelocs.insert(try cd.getSelfRefPointer(at: addr - pos))
                         pos += 2
                     }
                     var segRelocs: Set<Int> = []
-                    let segRelocCount = code.readWord(at: addr - pos)
+                    let segRelocCount = Int(try cd.readWord(at: addr - pos))
                     pos += 2
                     for _ in 0..<segRelocCount {
-                        segRelocs.insert(code.getSelfRefPointer(at: addr - pos))
+                        segRelocs.insert(try cd.getSelfRefPointer(at: addr - pos))
                         pos += 2
                     }
                     var procRelocs: Set<Int> = []
-                    let procRelocCount = code.readWord(at: addr - pos)
+                    let procRelocCount = Int(try cd.readWord(at: addr - pos))
                     pos += 2
                     for _ in 0..<procRelocCount {
-                        procRelocs.insert(code.getSelfRefPointer(at: addr - pos))
+                        procRelocs.insert(try cd.getSelfRefPointer(at: addr - pos))
                         pos += 2
                     }
                     var interpRelocs: Set<Int> = []
-                    let interpRelocCount = code.readWord(at: addr - pos)
+                    let interpRelocCount = Int(try cd.readWord(at: addr - pos))
                     for _ in 0..<interpRelocCount {
-                        interpRelocs.insert(code.getSelfRefPointer(at: addr - pos))
+                        interpRelocs.insert(try cd.getSelfRefPointer(at: addr - pos))
                         pos += 2
                     }
                     var ipc = proc.enterIC
-                    var op = code[ipc]
+                    var op = try cd.readByte(at: ipc)
                     var done = false
                     repeat {
                         if let opcode = wdc6502[op] {
@@ -228,7 +229,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
 
                                 if isBranch { 
                                     // it's a relative branch of some sort
-                                    var offset = Int(code[ipc + 1])
+                                    var offset = Int(try cd.readByte(at: ipc + 1))
                                     if offset > 127 {
                                         offset -= 256
                                     }
@@ -236,11 +237,11 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                                     proc.entryPoints.insert(param)
                                     machCodeStr += String(format:" %04x ", param)
                                 } else {
-                                    param = Int(code[ipc + 1])
+                                    param = Int(try cd.readByte(at: ipc + 1))
                                     machCodeStr += String(format:" %02x   ", param)
                                 }
                             } else if opcode.paramLength == 2 {
-                                param = code.readWord(at: ipc + 1)
+                                param = Int(try cd.readWord(at: ipc + 1))
                                 if procRelocs.contains(ipc + 1) { // adjust for relocation
                                     param += proc.enterIC
                                 }
@@ -249,15 +250,25 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                             } else {
                                 machCodeStr += "      "
                             }
-                            proc.instructions[ipc] = Instruction(mnemonic: machCodeStr + String(format: opcode.mnemonic, param), isPascal: false)
+                            proc.instructions[ipc] = Instruction(mnemonic: machCodeStr + String(format: opcode.mnemonic, param), isPascal: false, stackState: [])
                             ipc += 1
                             if procRelocs.contains(ipc) && opcode.paramLength > 0 {
                                 proc.instructions[ipc - 1]?.comment = " <- proc relocated"
                             }
                             ipc += opcode.paramLength
+                            if ipc < code.count {
+                                op = try cd.readByte(at: ipc)
+                            } else {
+                                break
+                            }
                         } else {
-                            proc.instructions[ipc] = Instruction(mnemonic: String(format: "???     %02x", op), isPascal: false)
+                            proc.instructions[ipc] = Instruction(mnemonic: String(format: "???     %02x", op), isPascal: false, stackState: [])
                             ipc += 1
+                            if ipc < code.count {
+                                op = try cd.readByte(at: ipc)
+                            } else {
+                                break
+                            }
 
                         }
                         if op == 0x60 { done = true }
@@ -268,7 +279,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                     var i = ipc
                     while i < (addr - pos) {
                         if i.isMultiple(of: 16) && !s.isEmpty {
-                            proc.instructions[((i - 1) / 16) * 16] = Instruction(mnemonic: s + " | " + sh, isPascal: false)
+                            proc.instructions[((i - 1) / 16) * 16] = Instruction(mnemonic: s + " | " + sh, isPascal: false, stackState: [])
                             s = ""
                             sh = ""
                         } else if i.isMultiple(of: 8) && !s.isEmpty {
@@ -276,7 +287,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                             sh += " "
                         }
                         if procRelocs.contains(i) { // adjust for relocation
-                            s += String(format: " *%04x", code.readWord(at: i) + proc.enterIC)
+                            s += String(format: " *%04x", Int(try cd.readWord(at: i)) + proc.enterIC)
                             sh += "  "
                             i += 2
                         } else {
@@ -290,6 +301,6 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                         }
                     }
                     if !s.isEmpty {
-                        proc.instructions[((addr - pos - 1) / 16) * 16] = Instruction(mnemonic: s + String(repeating: " ", count: (48 - s.count)) + " | " + sh, isPascal: false)
+                        proc.instructions[((addr - pos - 1) / 16) * 16] = Instruction(mnemonic: s + String(repeating: " ", count: (48 - s.count)) + " | " + sh, isPascal: false, stackState: [])
                     }
 }

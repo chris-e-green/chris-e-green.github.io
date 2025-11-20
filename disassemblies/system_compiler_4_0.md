@@ -3271,71 +3271,93 @@ BEGIN
 -> 04f7: RNP  00          Return from nonbase procedure
 END
 
-### FUNCTION PASCALCOMPILER.FUNC29(PARAM1): RETVAL (* P=29, LL=2, D=6, Callers: PROC26 *)
+### FUNCTION PASCALCOMPILER.FUNC29(PARAM1): BOOLEAN (* P=29, LL=2, D=6, Callers: PROC26 *)
   MP1=RETVAL1
   MP2=RETVAL2
   MP3=PARAM1
-  MP4
+  MP4=PARAM1_C
   MP6
 BEGIN
+  FUNC29 := FALSE
 -> 0e6e: SLDC 00          Short load constant 0
    0e6f: STL  0001        Store TOS into MP1
-   0e71: SLDL 03          Short load local MP3
+  IF PARAM1 <> NIL THEN
+   0e71: SLDL 03          Short load local MP3 (PARAM1)
    0e72: LDCN             Load constant NIL
    0e73: NEQI             Integer TOS-1 <> TOS
    0e74: FJP  $0ecc       Jump if TOS false
-   0e76: SLDL 03          Short load local MP3
-   0e77: STL  0004        Store TOS into MP4
-   0e79: SLDL 04          Short load local MP4
+  BEGIN
+    PARAM1_C := PARAM1
+   0e76: SLDL 03          Short load local MP3 (PARAM1)
+   0e77: STL  0004        Store TOS into MP4 (PARAM1_C)
+    IF PARAM1_C.8 IN [5,6] THEN
+   0e79: SLDL 04          Short load local MP4 (PARAM1_C)
    0e7a: IND  0008        Static index and load word (TOS+8)
    0e7c: SLDC 60          Short load constant 96 [5,6]
    0e7d: SLDC 01          Short load constant 1
    0e7e: INN              Set membership (TOS-1 in set TOS)
    0e7f: FJP  $0eba       Jump if TOS false
-   0e81: SLDL 04          Short load local MP4
+    BEGIN
+      IF PARAM1_C.9 = 1 THEN
+   0e81: SLDL 04          Short load local MP4 (PARAM1_C)
    0e82: IND  0009        Static index and load word (TOS+9)
    0e84: SLDC 01          Short load constant 1
    0e85: EQUI             Integer TOS-1 = TOS
    0e86: FJP  $0eba       Jump if TOS false
-   0e88: SLDL 04          Short load local MP4
+      BEGIN
+        IF PARAM1_C.13 = 0 THEN
+   0e88: SLDL 04          Short load local MP4 (PARAM1_C)
    0e89: IND  000d        Static index and load word (TOS+13)
    0e8b: SLDC 00          Short load constant 0
    0e8c: EQUI             Integer TOS-1 = TOS
    0e8d: FJP  $0eba       Jump if TOS false
-   0e8f: SLDL 04          Short load local MP4
+        BEGIN
+          IF PARAM1_C.15 THEN
+   0e8f: SLDL 04          Short load local MP4 (PARAM1_C)
    0e90: IND  000f        Static index and load word (TOS+15)
    0e92: FJP  $0eba       Jump if TOS false
+          BEGIN
+            FUNC29 := TRUE
    0e94: SLDC 01          Short load constant 1
-   0e95: STL  0001        Store TOS into MP1
-  PASCALSY.FWRITELN(OUTPUT)
+   0e95: STL  0001        Store TOS into MP1 
+            PASCALSY.FWRITELN(OUTPUT)
    0e97: LOD  03 0003     Load word at G3 (OUTPUT)
    0e9a: CXP  00 16       Call external procedure PASCALSY.FWRITELN
-  PASCALSY.FWRITEBYTES(OUTPUT,MP4,8,8)
+            PASCALSY.FWRITEBYTES(OUTPUT,PARAM1_C,8,8)
    0e9d: LOD  03 0003     Load word at G3 (OUTPUT)
-   0ea0: SLDL 04          Short load local MP4
+   0ea0: SLDL 04          Short load local MP4 (PARAM1_C)
    0ea1: SLDC 08          Short load constant 8
    0ea2: SLDC 08          Short load constant 8
    0ea3: CXP  00 14       Call external procedure PASCALSY.FWRITEBYTES
-  PASCALSY.FWRITESTRING(OUTPUT,' undefined',0)
+            PASCALSY.FWRITESTRING(OUTPUT,' undefined',0)
    0ea6: LOD  03 0003     Load word at G3 (OUTPUT)
    0ea9: LSA  0a          Load string address: ' undefined'
    0eb5: NOP              No operation
    0eb6: SLDC 00          Short load constant 0
    0eb7: CXP  00 13       Call external procedure PASCALSY.FWRITESTRING
--> 0eba: SLDL 04          Short load local MP4
+          END
+        END
+      END
+    END
+    IF FUNC29(PARAM1_C.4) OR FUNC29(PARAM1_C.5) THEN
+-> 0eba: SLDL 04          Short load local MP4 (PARAM1_C)
    0ebb: SIND 04          Short index load *TOS+4
    0ebc: SLDC 00          Short load constant 0
    0ebd: SLDC 00          Short load constant 0
    0ebe: CIP  1d          Call intermediate procedure 29 PASCALCOMPILER.29
-   0ec0: SLDL 04          Short load local MP4
+   0ec0: SLDL 04          Short load local MP4 (PARAM1_C)
    0ec1: SIND 05          Short index load *TOS+5
    0ec2: SLDC 00          Short load constant 0
    0ec3: SLDC 00          Short load constant 0
    0ec4: CIP  1d          Call intermediate procedure 29 PASCALCOMPILER.29
    0ec6: LOR              Logical OR (TOS | TOS-1)
    0ec7: FJP  $0ecc       Jump if TOS false
+    BEGIN
+      FUNC29 := TRUE
    0ec9: SLDC 01          Short load constant 1
    0eca: STL  0001        Store TOS into MP1
+    END
+  END
 -> 0ecc: RNP  01          Return from nonbase procedure
 END
 

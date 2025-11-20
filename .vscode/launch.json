@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:chris-e-green.github.io}/pdisasm",
+            "name": "Debug run-sim (pdisasm)",
+            "target": "run-sim",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug run-sim (pdisasm)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:chris-e-green.github.io}/pdisasm",
+            "name": "Release run-sim (pdisasm)",
+            "target": "run-sim",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release run-sim (pdisasm)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:chris-e-green.github.io}/pdisasm",
+            "name": "Debug pdisasm-cli (pdisasm)",
+            "target": "pdisasm-cli",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug pdisasm-cli (pdisasm)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:chris-e-green.github.io}/pdisasm",
+            "name": "Release pdisasm-cli (pdisasm)",
+            "target": "pdisasm-cli",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release pdisasm-cli (pdisasm)"
+        }
+    ]
+}

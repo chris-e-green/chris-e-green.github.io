@@ -2,12 +2,13 @@ import XCTest
 @testable import pdisasm
 
 final class SmokeTests: XCTestCase {
-    func testDataExtensionsReadWord() {
+    func testDataExtensionsReadWord() throws {
         // create a 4 byte data
         let arr: [UInt8] = [0x34, 0x12, 0x78, 0x56]
         let data = Data(arr)
-        XCTAssertEqual(data.readWord(at: 0), 0x1234)
-        XCTAssertEqual(data.readWord(at: 2), 0x5678)
+    let cd = CodeData(data: data, ipc: 0, header: 0)
+    XCTAssertEqual(try cd.readWord(at: 0), 0x1234)
+    XCTAssertEqual(try cd.readWord(at: 2), 0x5678)
     }
 
     func testCodeDataReadByteAndWord() throws {
