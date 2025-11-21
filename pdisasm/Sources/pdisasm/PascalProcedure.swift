@@ -102,6 +102,56 @@ func decodePascalProcedure(
     proc.entryPoints.insert(proc.exitIC)
     let myLoc = Location(segment: currSeg.segNum, procedure: proc.procType?.procNumber)
 
+    // Build lookup dictionaries for O(1) access instead of O(n) linear searches
+    var procLookup: [String: ProcIdentifier] = [:]
+    for p in allProcedures {
+        let key = "\(p.segmentNumber):\(p.procNumber)"
+        procLookup[key] = p
+    }
+    
+    var labelLookup: [String: LocationTwo] = [:]
+    for label in allLabels {
+        let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr)"
+        labelLookup[key] = label
+    }
+    
+    // Helper to lookup label by Location
+    func findLabel(_ loc: Location) -> String? {
+        let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
+        return labelLookup[key]?.name
+    }
+    
+    // Helper to handle call procedure opcodes - handles parameter popping and pseudo-code generation
+    // Returns (pseudoCode: String?, didModifyStack: Bool)
+    func handleCallProcedure(loc: Location, stack: inout [String]) -> String? {
+        let lookupKey = "\(loc.segment):\(loc.procedure ?? -1)"
+        guard let called = procLookup[lookupKey] else {
+            return nil
+        }
+        
+        // found called procedure, remove its parameters from stack
+        let parmCount = called.parameters.count
+        var aParams: [String] = []
+        if called.isFunction {
+            // pop the extra two return words off the stack
+            _ = stack.popLast()
+            _ = stack.popLast()
+        }
+        for _ in 0..<parmCount {
+            aParams.append(stack.popLast() ?? "underflow!")
+        }
+        
+        let callSignature = "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
+        
+        if called.isFunction {
+            // if function, push return value onto stack
+            stack.append(callSignature)
+            return nil  // no pseudo-code, value goes on stack
+        } else {
+            return callSignature  // procedure call as pseudo-code
+        }
+    }
+
     // Decode loop: perform all CodeData reads inside a single do/catch so any
     // bounds/EOF error will abort decoding cleanly rather than crashing.
     while ic < addr && !done {
@@ -422,7 +472,7 @@ func decodePascalProcedure(
                 let (val, inc) = try cd.readBig(at: ic + 1)
                 let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
                 currentStack.append(
-                    "^\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "^\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LAO", params: [val], memLocation: loc,
@@ -448,7 +498,7 @@ func decodePascalProcedure(
                 let (val, inc) = try cd.readBig(at: ic + 2)
                 let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
                 currentStack.append(
-                    "^\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "^\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LAE", params: [seg, val], memLocation: loc,
@@ -468,7 +518,7 @@ func decodePascalProcedure(
                 let (val, inc) = try cd.readBig(at: ic + 1)
                 let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
                 currentStack.append(
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LDO", params: [val], memLocation: loc, comment: "Load global word",
@@ -487,7 +537,7 @@ func decodePascalProcedure(
                 let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
                 let src = currentStack.popLast() ?? "underflow!"
                 let pseudoCode =
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description) := \(src)"
+                    "\(findLabel(loc) ?? loc.description) := \(src)"
                 proc.instructions[ic] = Instruction(
                     mnemonic: "SRO", params: [val], memLocation: loc, comment: "Store global word",
                     stackState: currentStack, pseudoCode: pseudoCode)
@@ -546,32 +596,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-
-                var pseudoCode: String? = nil
-                if let called = allProcedures.first(where: {
-                    $0.procNumber == loc.procedure && $0.segmentNumber == loc.segment
-                }) {
-                    // found called procedure, remove its parameters from stack
-                    let parmCount = called.parameters.count
-                    var aParams: [String] = []
-                    if called.isFunction {
-                        // pop the extra two return words off the stack
-                        _ = currentStack.popLast()
-                        _ = currentStack.popLast()
-                    }
-                    for _ in 0..<parmCount {
-                        aParams.append(currentStack.popLast() ?? "underflow!")
-                    }
-                    if called.isFunction {
-                        // if function, push return value onto stack
-                        currentStack.append(
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                        )
-                    } else {
-                        pseudoCode =
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                    }
-                }
+                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CIP", params: [procNum], destination: loc,
                     comment: "Call intermediate procedure", stackState: currentStack,
@@ -612,7 +637,7 @@ func decodePascalProcedure(
                 let loc = Location(
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
                 currentStack.append(
-                    "^\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "^\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LDA", params: [Int(byte1), val], memLocation: loc,
@@ -659,7 +684,7 @@ func decodePascalProcedure(
                 let loc = Location(
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
                 currentStack.append(
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LOD", params: [Int(byte1), val], memLocation: loc,
@@ -690,7 +715,7 @@ func decodePascalProcedure(
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
                 let src = currentStack.popLast() ?? "underflow!"
                 let pseudoCode =
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description) := \(src)"
+                    "\(findLabel(loc) ?? loc.description) := \(src)"
                 proc.instructions[ic] = Instruction(
                     mnemonic: "STR", params: [Int(byte1), val], memLocation: loc,
                     comment: "Store intermediate word", stackState: currentStack,
@@ -800,39 +825,12 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                var pseudoCode: String? = nil
-                if let called = allProcedures.first(where: {
-                    $0.procNumber == loc.procedure && $0.segmentNumber == loc.segment
-                }) {
-                    // found called procedure, remove its parameters from stack
-                    let parmCount = called.parameters.count
-                    var aParams: [String] = []
-                    if called.isFunction {
-                        // pop the extra two return words off the stack
-                        _ = currentStack.popLast()
-                        _ = currentStack.popLast()
-                    }
-                    for _ in 0..<parmCount {
-                        aParams.append(currentStack.popLast() ?? "underflow!")
-                    }
-                    if called.isFunction {
-                        // if function, push return value onto stack
-                        currentStack.append(
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                        )
-                    } else {
-                        pseudoCode =
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                    }
-                }
+                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CBP", params: [procNum], destination: loc,
                     comment: "Call base procedure", stackState: currentStack, pseudoCode: pseudoCode
                 )
                 allLocations.insert(loc)
-                if procNum != proc.procType?.procNumber {  // don't add if recursive
-                    callers.insert(Call(from: myLoc, to: loc))
-                }
                 ic += 2
             case 0xC3:
                 let a = currentStack.popLast() ?? "underflow!"
@@ -861,7 +859,7 @@ func decodePascalProcedure(
                     segment: currSeg.segNum, procedure: proc.procType?.procNumber,
                     lexLevel: proc.lexicalLevel, addr: val)
                 currentStack.append(
-                    "^\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "^\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LLA", params: [val], memLocation: loc, comment: "Load local address",
@@ -895,7 +893,7 @@ func decodePascalProcedure(
                     segment: currSeg.segNum, procedure: proc.procType?.procNumber,
                     lexLevel: proc.lexicalLevel, addr: val)
                 currentStack.append(
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LDL", params: [val], memLocation: loc, comment: "Load local word",
@@ -915,7 +913,7 @@ func decodePascalProcedure(
                     segment: currSeg.segNum, procedure: proc.procType?.procNumber,
                     lexLevel: proc.lexicalLevel, addr: val)
                 let pseudoCode =
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
+                    "\(findLabel(loc) ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
                 proc.instructions[ic] = Instruction(
                     mnemonic: "STL", params: [val], memLocation: loc, comment: "Store local word",
                     stackState: currentStack, pseudoCode: pseudoCode)
@@ -928,31 +926,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber || seg != currSeg.segNum {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                var pseudoCode: String? = nil
-                if let called = allProcedures.first(where: {
-                    $0.procNumber == loc.procedure && $0.segmentNumber == loc.segment
-                }) {
-                    // found called procedure, remove its parameters from stack
-                    let parmCount = called.parameters.count
-                    var aParams: [String] = []
-                    if called.isFunction {
-                        // pop the extra two return words off the stack
-                        _ = currentStack.popLast()
-                        _ = currentStack.popLast()
-                    }
-                    for _ in 0..<parmCount {
-                        aParams.append(currentStack.popLast() ?? "underflow!")
-                    }
-                    if called.isFunction {
-                        // if function, push return value onto stack
-                        currentStack.append(
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                        )
-                    } else {
-                        pseudoCode =
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                    }
-                }
+                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CXP", params: [seg, procNum], destination: loc,
                     comment: "Call external procedure", stackState: currentStack,
@@ -965,33 +939,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-
-                var pseudoCode: String? = nil
-                if let called = allProcedures.first(where: {
-                    $0.procNumber == loc.procedure && $0.segmentNumber == loc.segment
-                }) {
-                    // found called procedure, remove its parameters from stack
-                    let parmCount = called.parameters.count
-                    var aParams: [String] = []
-                    if called.isFunction {
-                        // pop the extra two return words off the stack
-                        _ = currentStack.popLast()
-                        _ = currentStack.popLast()
-                    }
-                    for _ in 0..<parmCount {
-                        aParams.append(currentStack.popLast() ?? "underflow!")
-                    }
-                    if called.isFunction {
-                        // if function, push return value onto stack
-                        currentStack.append(
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                        )
-                    } else {
-                        pseudoCode =
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                    }
-                }
-
+                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CLP", params: [procNum], destination: loc,
                     comment: "Call local procedure", stackState: currentStack,
@@ -1004,33 +952,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-
-                var pseudoCode: String? = nil
-                if let called = allProcedures.first(where: {
-                    $0.procNumber == loc.procedure && $0.segmentNumber == loc.segment
-                }) {
-                    // found called procedure, remove its parameters from stack
-                    let parmCount = called.parameters.count
-                    var aParams: [String] = []
-                    if called.isFunction {
-                        // pop the extra two return words off the stack
-                        _ = currentStack.popLast()
-                        _ = currentStack.popLast()
-                    }
-                    for _ in 0..<parmCount {
-                        aParams.append(currentStack.popLast() ?? "underflow!")
-                    }
-                    if called.isFunction {
-                        // if function, push return value onto stack
-                        currentStack.append(
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                        )
-                    } else {
-                        pseudoCode =
-                            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-                    }
-                }
-
+                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CGP", params: [procNum], destination: loc,
                     comment: "Call global procedure", stackState: currentStack,
@@ -1061,7 +983,7 @@ func decodePascalProcedure(
                 let (val, inc) = try cd.readBig(at: ic + 2)
                 let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
                 let pseudoCode =
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
+                    "\(findLabel(loc) ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
                 proc.instructions[ic] = Instruction(
                     mnemonic: "STE", params: [seg, val], memLocation: loc,
                     comment: "Store extended word TOS into", stackState: currentStack,
@@ -1104,7 +1026,7 @@ func decodePascalProcedure(
                     segment: currSeg.segNum, procedure: proc.procType?.procNumber,
                     lexLevel: proc.lexicalLevel, addr: val)
                 currentStack.append(
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "SLDL", params: [val], memLocation: loc,
@@ -1116,7 +1038,7 @@ func decodePascalProcedure(
                 let val = b2 - 0xe7
                 let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
                 currentStack.append(
-                    "\(allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr })?.name ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "SLDO", params: [val], memLocation: loc,
