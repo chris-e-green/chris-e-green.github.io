@@ -26,15 +26,11 @@ public struct Instruction {
 
 public struct Procedure {
     public var lexicalLevel: Int = 0
-    // var procedureNumber: Int = 0
     public var enterIC: Int = 0
     public var exitIC: Int = 0
     public var parameterSize: Int = 0
     public var dataSize: Int = 0
-    // jumpTable and code were unused; removed to reduce dead state.
-    // var header: String?
     public var procType: ProcIdentifier?
-    // var name: String?
     public var variables: [String] = []
     public var instructions: [Int: Instruction] = [:]
     public var entryPoints: Set<Int> = []

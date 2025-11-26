@@ -9,9 +9,9 @@ final class CallReturnNonDenseTests: XCTestCase {
         proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 1)
 
         // Non-dense caller: 100,110,120
-        proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [7])
-        proc.instructions[110] = Instruction(mnemonic: "CIP", params: [2]) // call proc #2
-        proc.instructions[120] = Instruction(mnemonic: "RNP", params: [])
+        proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [7], stackState: [])
+        proc.instructions[110] = Instruction(mnemonic: "CIP", params: [2], stackState: []) // call proc #2
+        proc.instructions[120] = Instruction(mnemonic: "RNP", params: [], stackState: [])
 
         let insns = simInsns(from: proc)
         let sortedICs = insns.map { $0.ic }.sorted()
@@ -31,7 +31,7 @@ final class CallReturnNonDenseTests: XCTestCase {
         // step CIP (call)
         guard let callIns = insMap[pc] else { XCTFail("missing call"); return }
         let d2 = sortedICs.firstIndex(of: pc).flatMap { idx in idx + 1 < sortedICs.count ? sortedICs[idx + 1] : nil }
-        let (n2, callProc, returned) = try machine.executeStep(ins: callIns, currentPC: pc, defaultNextPC: d2)
+        let (_, callProc, returned) = try machine.executeStep(ins: callIns, currentPC: pc, defaultNextPC: d2)
         XCTAssertEqual(callProc, 2)
         XCTAssertFalse(returned)
         // return IP should be pushed (defaultNextPC)
@@ -46,8 +46,8 @@ final class CallReturnNonDenseTests: XCTestCase {
         proc.exitIC = 210
         proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 2)
 
-        proc.instructions[200] = Instruction(mnemonic: "SLDC", params: [3])
-        proc.instructions[210] = Instruction(mnemonic: "RNP", params: [])
+        proc.instructions[200] = Instruction(mnemonic: "SLDC", params: [3], stackState: [])
+        proc.instructions[210] = Instruction(mnemonic: "RNP", params: [], stackState: [])
 
         let insns = simInsns(from: proc)
         let sortedICs = insns.map { $0.ic }.sorted()

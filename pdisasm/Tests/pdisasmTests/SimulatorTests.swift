@@ -35,10 +35,10 @@ final class SimulatorTests: XCTestCase {
 
     func testConvertProcedureAndRun() throws {
         var p = Procedure()
-        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [7])
-        p.instructions[1] = Instruction(mnemonic: "SLDC", params: [8])
-        p.instructions[2] = Instruction(mnemonic: "MPI")
-        p.instructions[3] = Instruction(mnemonic: "RNP")
+        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [7], stackState: [])
+        p.instructions[1] = Instruction(mnemonic: "SLDC", params: [8], stackState: [])
+        p.instructions[2] = Instruction(mnemonic: "MPI", stackState: [])
+        p.instructions[3] = Instruction(mnemonic: "RNP", stackState: [])
 
         let insns = simInsns(from: p)
         let m = Machine()
@@ -49,16 +49,16 @@ final class SimulatorTests: XCTestCase {
     func testEncodedAddressLoadStore() throws {
         // Create an instruction with memLocation encoded as segment 1 addr 42
         var p = Procedure()
-        let loc = Location(segment: 1, procedure: nil, lexLevel: nil, addr: 42, label: nil)
-        var ins = Instruction(mnemonic: "STL", params: [])
+        let loc = Location(segment: 1, procedure: nil, lexLevel: nil, addr: 42)
+        var ins = Instruction(mnemonic: "STL", params: [], stackState: [])
         ins.memLocation = loc
-        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [123])
+        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [123], stackState: [])
         p.instructions[1] = ins
         // LOD should get value at same encoded location
-        var lod = Instruction(mnemonic: "LOD", params: [])
+        var lod = Instruction(mnemonic: "LOD", params: [], stackState: [])
         lod.memLocation = loc
         p.instructions[2] = lod
-        p.instructions[3] = Instruction(mnemonic: "RNP")
+        p.instructions[3] = Instruction(mnemonic: "RNP", stackState: [])
 
         let insns = simInsns(from: p)
         let m = Machine()
@@ -69,15 +69,15 @@ final class SimulatorTests: XCTestCase {
     func testLexicalLocalAddressing() throws {
         // memLocation with lexLevel should produce a distinct flat key vs global segment
         var p = Procedure()
-        let localLoc = Location(segment: 0, procedure: nil, lexLevel: 1, addr: 8, label: nil)
-        var st = Instruction(mnemonic: "STL", params: [])
+        let localLoc = Location(segment: 0, procedure: nil, lexLevel: 1, addr: 8)
+        var st = Instruction(mnemonic: "STL", params: [], stackState: [])
         st.memLocation = localLoc
-        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [5])
+        p.instructions[0] = Instruction(mnemonic: "SLDC", params: [5], stackState: [])
         p.instructions[1] = st
-        var ld = Instruction(mnemonic: "LOD", params: [])
+        var ld = Instruction(mnemonic: "LOD", params: [], stackState: [])
         ld.memLocation = localLoc
         p.instructions[2] = ld
-        p.instructions[3] = Instruction(mnemonic: "RNP")
+        p.instructions[3] = Instruction(mnemonic: "RNP", stackState: [])
 
         let insns = simInsns(from: p)
         let m = Machine()

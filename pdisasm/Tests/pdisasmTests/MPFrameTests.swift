@@ -27,7 +27,7 @@ final class MPFrameTests: XCTestCase {
         let m = Machine()
         XCTAssertNil(m.MP)
         // base == 0 should allocate a deterministic default base (id * 0x1000)
-        let id = m.enterFrame(base: 0)
+        let _ = m.enterFrame(base: 0)
         XCTAssertNotNil(m.MP)
         let mp = m.MP!
         XCTAssertTrue(mp % 0x1000 == 0, "MP should be a multiple of 0x1000")

@@ -1,41 +1,687 @@
 import Foundation
 
-func popSet(stack: inout [String]) -> (Int, String) {
-    let setLen = stack.popLast() ?? "underflow!"
-    var setData: [String] = []
-    var prevElement: String = ""
-    if let len = Int(setLen) {
-        for i in 0..<len {
-            let element = stack.popLast() ?? "underflow!"
-            if element.contains("[") == false {
-                if let value = UInt64(element) {
-                    for j in 0..<16 {
-                        if (value >> j) & 1 == 1 {
-                            setData.append("\(i * 16 + j)")
-                        }
-                    }
-                } else {
-                    setData.append(element)
-                }
+// MARK: - Opcode Decoder
+
+/// Handles decoding of P-code opcodes and extracting instruction parameters
+struct OpcodeDecoder {
+    let cd: CodeData
+
+    struct DecodedInstruction {
+        let mnemonic: String
+        let params: [Int]
+        let bytesConsumed: Int
+        let comment: String?
+        let memLocation: Location?
+        let destination: Location?
+        let requiresComparator: Bool
+        let comparatorOffset: Int
+
+        init(
+            mnemonic: String, params: [Int] = [], bytesConsumed: Int, comment: String? = nil,
+            memLocation: Location? = nil, destination: Location? = nil,
+            requiresComparator: Bool = false, comparatorOffset: Int = 0
+        ) {
+            self.mnemonic = mnemonic
+            self.params = params
+            self.bytesConsumed = bytesConsumed
+            self.comment = comment
+            self.memLocation = memLocation
+            self.destination = destination
+            self.requiresComparator = requiresComparator
+            self.comparatorOffset = comparatorOffset
+        }
+    }
+
+    func decode(opcode: UInt8, at ic: Int, currSeg: Segment, proc: Procedure, addr: Int) throws
+        -> DecodedInstruction
+    {
+        switch opcode {
+        case 0x00..<0x80:
+            return DecodedInstruction(
+                mnemonic: "SLDC",
+                params: [Int(opcode)],
+                bytesConsumed: 1,
+                comment: "Short load one-word constant \(opcode)")
+        case 0x80:
+            return DecodedInstruction(
+                mnemonic: "ABI", bytesConsumed: 1, comment: "Absolute value of integer (TOS)")
+        case 0x81:
+            return DecodedInstruction(
+                mnemonic: "ABR", bytesConsumed: 1, comment: "Absolute value of real (TOS)")
+        case 0x82:
+            return DecodedInstruction(
+                mnemonic: "ADI", bytesConsumed: 1, comment: "Add integers (TOS + TOS-1)")
+        case 0x83:
+            return DecodedInstruction(
+                mnemonic: "ADR", bytesConsumed: 1, comment: "Add reals (TOS + TOS-1)")
+        case 0x84:
+            return DecodedInstruction(
+                mnemonic: "LAND", bytesConsumed: 1, comment: "Logical AND (TOS & TOS-1)")
+        case 0x85:
+            return DecodedInstruction(
+                mnemonic: "DIF", bytesConsumed: 1, comment: "Set difference (TOS-1 AND NOT TOS)")
+        case 0x86:
+            return DecodedInstruction(
+                mnemonic: "DVI", bytesConsumed: 1, comment: "Divide integers (TOS-1 / TOS)")
+        case 0x87:
+            return DecodedInstruction(
+                mnemonic: "DVR", bytesConsumed: 1, comment: "Divide reals (TOS-1 / TOS)")
+        case 0x88:
+            return DecodedInstruction(
+                mnemonic: "CHK", bytesConsumed: 1, comment: "Check subrange (TOS-1 <= TOS-2 <= TOS)"
+            )
+        case 0x89:
+            return DecodedInstruction(
+                mnemonic: "FLO", bytesConsumed: 1,
+                comment: "Float next to TOS (int TOS-1 to real TOS)")
+        case 0x8A:
+            return DecodedInstruction(
+                mnemonic: "FLT", bytesConsumed: 1, comment: "Float TOS (int TOS to real TOS)")
+        case 0x8B:
+            return DecodedInstruction(
+                mnemonic: "INN", bytesConsumed: 1, comment: "Set membership (TOS-1 in set TOS)")
+        case 0x8C:
+            return DecodedInstruction(
+                mnemonic: "INT", bytesConsumed: 1, comment: "Set intersection (TOS AND TOS-1)")
+        case 0x8D:
+            return DecodedInstruction(
+                mnemonic: "LOR", bytesConsumed: 1, comment: "Logical OR (TOS | TOS-1)")
+        case 0x8E:
+            return DecodedInstruction(
+                mnemonic: "MODI", bytesConsumed: 1, comment: "Modulo integers (TOS-1 % TOS)")
+        case 0x8F:
+            return DecodedInstruction(
+                mnemonic: "MPI", bytesConsumed: 1, comment: "Multiply integers (TOS * TOS-1)")
+        case 0x90:
+            return DecodedInstruction(
+                mnemonic: "MPR", bytesConsumed: 1, comment: "Multiply reals (TOS * TOS-1)")
+        case 0x91:
+            return DecodedInstruction(mnemonic: "NGI", bytesConsumed: 1, comment: "Negate integer")
+        case 0x92:
+            return DecodedInstruction(mnemonic: "NGR", bytesConsumed: 1, comment: "Negate real")
+        case 0x93:
+            return DecodedInstruction(
+                mnemonic: "LNOT", bytesConsumed: 1, comment: "Logical NOT (~TOS)")
+        case 0x94:
+            return DecodedInstruction(
+                mnemonic: "SRS", bytesConsumed: 1, comment: "Subrange set [TOS-1..TOS]")
+        case 0x95:
+            return DecodedInstruction(
+                mnemonic: "SBI", bytesConsumed: 1, comment: "Subtract integers (TOS-1 - TOS)")
+        case 0x96:
+            return DecodedInstruction(
+                mnemonic: "SBR", bytesConsumed: 1, comment: "Subtract reals (TOS-1 - TOS)")
+        case 0x97:
+            return DecodedInstruction(
+                mnemonic: "SGS", bytesConsumed: 1, comment: "Build singleton set [TOS]")
+        case 0x98:
+            return DecodedInstruction(
+                mnemonic: "SQI", bytesConsumed: 1, comment: "Square integer (TOS * TOS)")
+        case 0x99:
+            return DecodedInstruction(
+                mnemonic: "SQR", bytesConsumed: 1, comment: "Square real (TOS * TOS)")
+        case 0x9A:
+            return DecodedInstruction(
+                mnemonic: "STO", bytesConsumed: 1, comment: "Store indirect word (TOS into TOS-1)")
+        case 0x9B:
+            return DecodedInstruction(
+                mnemonic: "IXS", bytesConsumed: 1,
+                comment: "Index string array (check 1<=TOS<=len of str TOS-1)")
+        case 0x9C:
+            return DecodedInstruction(
+                mnemonic: "UNI", bytesConsumed: 1, comment: "Set union (TOS OR TOS-1)")
+        case 0x9D:
+            let seg = Int(try cd.readByte(at: ic + 1))
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            return DecodedInstruction(
+                mnemonic: "LDE",
+                params: [seg, val],
+                bytesConsumed: 2 + inc,
+                comment: "Load extended word (word offset \(val) in data seg \(seg))")
+        case 0x9E:
+            let procNum = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "CSP",
+                params: [procNum],
+                bytesConsumed: 2,
+                comment: "Call standard procedure \(cspNames[procNum] ?? String(procNum))")
+        case 0x9F:
+            return DecodedInstruction(
+                mnemonic: "LDCN", bytesConsumed: 1, comment: "Load constant NIL")
+        case 0xA0:
+            let count = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "ADJ", params: [count], bytesConsumed: 2,
+                comment: "Adjust set to \(count) words")
+        case 0xA1:
+            let offset = Int(try cd.readByte(at: ic + 1))
+            var dest: Int = 0
+            if offset > 0x7f {
+                let jte = addr + offset - 256
+                dest = jte - Int(try cd.readWord(at: jte))
             } else {
-                let elementParts = element.split(separator: "[")
-                if String(elementParts[0]) != prevElement {
-                    prevElement = String(elementParts[0])
-                    setData.append(String(elementParts[0]))
+                dest = ic + offset + 2
+            }
+            return DecodedInstruction(
+                mnemonic: "FJP",
+                params: [dest],
+                bytesConsumed: 2,
+                comment: "Jump if TOS false to \(String(format: "%04x", dest))")
+        case 0xA2:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            return DecodedInstruction(
+                mnemonic: "INC", params: [val], bytesConsumed: 1 + inc,
+                comment: "Inc field ptr (TOS+\(val))")
+        case 0xA3:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            return DecodedInstruction(
+                mnemonic: "IND", params: [val], bytesConsumed: 1 + inc,
+                comment: "Static index and load word (TOS+\(val))")
+        case 0xA4:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            return DecodedInstruction(
+                mnemonic: "IXA", params: [val], bytesConsumed: 1 + inc,
+                comment: "Index array (TOS-1 + TOS * \(val))")
+        case 0xA5:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LAO", params: [val], bytesConsumed: 1 + inc,
+                comment: "Load global address", memLocation: loc)
+        case 0xA6:
+            let strLen = Int(try cd.readByte(at: ic + 1))
+            var s: String = ""
+            if strLen > 0 {
+                for i in 1...strLen {
+                    let ch = try cd.readByte(at: ic + 1 + Int(i))
+                    s += String(format: "%c", ch)
                 }
             }
+            return DecodedInstruction(
+                mnemonic: "LSA", params: [strLen], bytesConsumed: 2 + strLen,
+                comment: "Load string address: '" + s + "'")
+        case 0xA7:
+            let seg = Int(try cd.readByte(at: ic + 1))
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LAE", params: [seg, val], bytesConsumed: 2 + inc,
+                comment: "Load extended address", memLocation: loc)
+        case 0xA8:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            return DecodedInstruction(
+                mnemonic: "MOV", params: [val], bytesConsumed: 1 + inc,
+                comment: "Move \(val) words (TOS to TOS-1)")
+        case 0xA9:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LDO", params: [val], bytesConsumed: 1 + inc, comment: "Load global word",
+                memLocation: loc)
+        case 0xAA:
+            let sasCount = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "SAS", params: [sasCount], bytesConsumed: 2,
+                comment: "String assign (TOS to TOS-1, \(sasCount) chars)")
+        case 0xAB:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "SRO", params: [val], bytesConsumed: 1 + inc,
+                comment: "Store global word", memLocation: loc)
+        case 0xAC:
+            // XJP has variable-length jump table - size calculated in switch
+            return DecodedInstruction(
+                mnemonic: "XJP", params: [], bytesConsumed: 0, comment: "Case jump")
+        case 0xAD:
+            let retCount = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "RNP", params: [retCount], bytesConsumed: 2,
+                comment: "Return from nonbase procedure")
+        case 0xAE:
+            let procNum = Int(try cd.readByte(at: ic + 1))
+            let loc = Location(segment: currSeg.segNum, procedure: procNum)
+            return DecodedInstruction(
+                mnemonic: "CIP", params: [procNum], bytesConsumed: 2,
+                comment: "Call intermediate procedure", destination: loc)
+        case 0xAF:
+            return DecodedInstruction(
+                mnemonic: "EQL", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB0:
+            return DecodedInstruction(
+                mnemonic: "GEQ", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB1:
+            return DecodedInstruction(
+                mnemonic: "GRT", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB2:
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            let byte1 = try cd.readByte(at: ic + 1)
+            let refLexLevel = proc.lexicalLevel - Int(byte1)
+            let loc = Location(
+                segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LDA", params: [Int(byte1), val], bytesConsumed: 2 + inc,
+                comment: "Load intermediate address", memLocation: loc)
+        case 0xB3:
+            // LDC has variable-length data - just return count, actual size calculated in switch
+            let count = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "LDC", params: [count], bytesConsumed: 0,
+                comment: "Load multiple-word constant")
+        case 0xB4:
+            return DecodedInstruction(
+                mnemonic: "LEQ", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB5:
+            return DecodedInstruction(
+                mnemonic: "LES", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB6:
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            let byte1 = try cd.readByte(at: ic + 1)
+            let refLexLevel = proc.lexicalLevel - Int(byte1)
+            let loc = Location(
+                segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LOD", params: [Int(byte1), val], bytesConsumed: 2 + inc,
+                comment: "Load intermediate word", memLocation: loc)
+        case 0xB7:
+            return DecodedInstruction(
+                mnemonic: "NEQ", bytesConsumed: 0, requiresComparator: true,
+                comparatorOffset: ic + 1)
+        case 0xB8:
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            let byte1 = try cd.readByte(at: ic + 1)
+            let refLexLevel = proc.lexicalLevel - Int(byte1)
+            let loc = Location(
+                segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "STR", params: [Int(byte1), val], bytesConsumed: 2 + inc,
+                comment: "Store intermediate word", memLocation: loc)
+        case 0xB9:
+            let offset = Int(try cd.readByte(at: ic + 1))
+            var dest: Int = 0
+            if offset > 0x7f {
+                let jte = addr + offset - 256
+                dest = jte - Int(try cd.readWord(at: jte))
+            } else {
+                dest = ic + offset + 2
+            }
+            return DecodedInstruction(
+                mnemonic: "UJP",
+                params: [dest],
+                bytesConsumed: 2,
+                comment: "Unconditional jump to \(String(format: "%04x", dest))")
+        case 0xBA:
+            return DecodedInstruction(
+                mnemonic: "LDP", bytesConsumed: 1, comment: "Load packed field (TOS)")
+        case 0xBB:
+            return DecodedInstruction(
+                mnemonic: "STP", bytesConsumed: 1, comment: "Store packed field (TOS into TOS-1)")
+        case 0xBC:
+            let ldmCount = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "LDM", params: [ldmCount], bytesConsumed: 2,
+                comment: "Load \(ldmCount) words from (TOS)")
+        case 0xBD:
+            let stmCount = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "STM", params: [stmCount], bytesConsumed: 2,
+                comment: "Store \(stmCount) words at TOS to TOS-1")
+        case 0xBE:
+            return DecodedInstruction(
+                mnemonic: "LDB", bytesConsumed: 1, comment: "Load byte at byte ptr TOS-1 + TOS")
+        case 0xBF:
+            return DecodedInstruction(
+                mnemonic: "STB", bytesConsumed: 1,
+                comment: "Store byte at TOS to byte ptr TOS-2 + TOS-1")
+        case 0xC0:
+            let elementsPerWord = Int(try cd.readByte(at: ic + 1))
+            let fieldWidth = Int(try cd.readByte(at: ic + 2))
+            return DecodedInstruction(
+                mnemonic: "IXP",
+                params: [elementsPerWord, fieldWidth],
+                bytesConsumed: 3,
+                comment:
+                    "Index packed array TOS-1[TOS], \(elementsPerWord) elts/word, \(fieldWidth) field width"
+            )
+        case 0xC1:
+            let retCount = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "RBP", params: [retCount], bytesConsumed: 2,
+                comment: "Return from base procedure")
+        case 0xC2:
+            let procNum = Int(try cd.readByte(at: ic + 1))
+            let loc = Location(segment: currSeg.segNum, procedure: procNum)
+            return DecodedInstruction(
+                mnemonic: "CBP", params: [procNum], bytesConsumed: 2,
+                comment: "Call base procedure", destination: loc)
+        case 0xC3:
+            return DecodedInstruction(
+                mnemonic: "EQUI", bytesConsumed: 1, comment: "Integer TOS-1 = TOS")
+        case 0xC4:
+            return DecodedInstruction(
+                mnemonic: "GEQI", bytesConsumed: 1, comment: "Integer TOS-1 >= TOS")
+        case 0xC5:
+            return DecodedInstruction(
+                mnemonic: "GRTI", bytesConsumed: 1, comment: "Integer TOS-1 > TOS")
+        case 0xC6:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(
+                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                lexLevel: proc.lexicalLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LLA", params: [val], bytesConsumed: 1 + inc,
+                comment: "Load local address", memLocation: loc)
+        case 0xC7:
+            let val = Int(try cd.readWord(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "LDCI", params: [val], bytesConsumed: 3,
+                comment: "Load one-word constant \(val)")
+        case 0xC8:
+            return DecodedInstruction(
+                mnemonic: "LEQI", bytesConsumed: 1, comment: "Integer TOS-1 <= TOS")
+        case 0xC9:
+            return DecodedInstruction(
+                mnemonic: "LESI", bytesConsumed: 1, comment: "Integer TOS-1 < TOS")
+        case 0xCA:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(
+                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                lexLevel: proc.lexicalLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "LDL", params: [val], bytesConsumed: 1 + inc, comment: "Load local word",
+                memLocation: loc)
+        case 0xCB:
+            return DecodedInstruction(
+                mnemonic: "NEQI", bytesConsumed: 1, comment: "Integer TOS-1 <> TOS")
+        case 0xCC:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            let loc = Location(
+                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                lexLevel: proc.lexicalLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "STL", params: [val], bytesConsumed: 1 + inc, comment: "Store local word",
+                memLocation: loc)
+        case 0xCD:
+            let seg = Int(try cd.readByte(at: ic + 1))
+            let procNum = Int(try cd.readByte(at: ic + 2))
+            let loc = Location(segment: seg, procedure: procNum)
+            return DecodedInstruction(
+                mnemonic: "CXP", params: [seg, procNum], bytesConsumed: 3,
+                comment: "Call external procedure", destination: loc)
+        case 0xCE:
+            let procNum = Int(try cd.readByte(at: ic + 1))
+            let loc = Location(segment: currSeg.segNum, procedure: procNum)
+            return DecodedInstruction(
+                mnemonic: "CLP", params: [procNum], bytesConsumed: 2,
+                comment: "Call local procedure", destination: loc)
+        case 0xCF:
+            let procNum = Int(try cd.readByte(at: ic + 1))
+            let loc = Location(segment: currSeg.segNum, procedure: procNum)
+            return DecodedInstruction(
+                mnemonic: "CGP", params: [procNum], bytesConsumed: 2,
+                comment: "Call global procedure", destination: loc)
+        case 0xD0:
+            let count = Int(try cd.readByte(at: ic + 1))
+            return DecodedInstruction(
+                mnemonic: "LPA", params: [count], bytesConsumed: 2 + count,
+                comment: "Load packed array")
+        case 0xD1:
+            let seg = Int(try cd.readByte(at: ic + 1))
+            let (val, inc) = try cd.readBig(at: ic + 2)
+            let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "STE", params: [seg, val], bytesConsumed: 2 + inc,
+                comment: "Store extended word TOS into", memLocation: loc)
+        case 0xD2:
+            return DecodedInstruction(mnemonic: "NOP", bytesConsumed: 1, comment: "No operation")
+        case 0xD5:
+            let (val, inc) = try cd.readBig(at: ic + 1)
+            return DecodedInstruction(
+                mnemonic: "BPT", params: [val], bytesConsumed: 1 + inc, comment: "Breakpoint")
+        case 0xD6:
+            return DecodedInstruction(
+                mnemonic: "XIT", bytesConsumed: 1, comment: "Exit the operating system")
+        case 0xD7:
+            return DecodedInstruction(mnemonic: "NOP", bytesConsumed: 1, comment: "No operation")
+        case 0xD8...0xE7:
+            let b = Int(opcode)
+            let val = b - 0xd7
+            let loc = Location(
+                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                lexLevel: proc.lexicalLevel, addr: val)
+            return DecodedInstruction(
+                mnemonic: "SLDL", params: [val], bytesConsumed: 1, comment: "Short load local word",
+                memLocation: loc)
+        case 0xE8...0xF7:
+            let b2 = Int(opcode)
+            let val = b2 - 0xe7
+            let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
+            return DecodedInstruction(
+                mnemonic: "SLDO", params: [val], bytesConsumed: 1,
+                comment: "Short load global word", memLocation: loc)
+        case 0xF8...0xFF:
+            let b3 = Int(opcode)
+            let offs = b3 - 0xf8
+            return DecodedInstruction(
+                mnemonic: "SIND", params: [offs], bytesConsumed: 1,
+                comment: "Short index and load word *TOS+\(offs)")
+        default:
+            throw CodeDataError.unexpectedEndOfData
         }
-        return (len, "{" + setData.reversed().joined(separator: ", ") + "}")
     }
-    return (0, "malformed set!")
+
+    func decodeComparator(at index: Int) -> (suffix: String, prefix: String, increment: Int) {
+        guard let b = try? cd.readByte(at: index) else {
+            return ("", "", 1)
+        }
+        switch b {
+        case 2: return ("REAL", "Real", 1)
+        case 4: return ("STR", "String", 1)
+        case 6: return ("BOOL", "Boolean", 1)
+        case 8: return ("SET", "Set", 1)
+        case 10:
+            if let (val, inc) = try? cd.readBig(at: index + 1) {
+                return ("BYTE", "Byte array (\(val) long)", inc + 1)
+            }
+            return ("BYTE", "Byte array (0 long)", 1)
+        case 12:
+            if let (val, inc) = try? cd.readBig(at: index + 1) {
+                return ("WORD", "Word array (\(val) long)", inc + 1)
+            }
+            return ("WORD", "Word array (0 long)", 1)
+        default:
+            return ("", "", 1)
+        }
+    }
 }
 
+// MARK: - Stack Simulator
+
+/// Manages the symbolic execution stack during P-code decoding
+struct StackSimulator {
+    var stack: [String] = []
+
+    mutating func push(_ value: String) {
+        stack.append(value)
+    }
+
+    mutating func pushReal(_ value: String) {
+        stack.append("REAL(\(value))")
+    }
+
+    @discardableResult
+    mutating func pop() -> String {
+        return stack.popLast() ?? "underflow!"
+    }
+
+    @discardableResult
+    mutating func popReal() -> String {
+        let a = stack.popLast() ?? "underflow!"
+        if a.starts(with: "REAL(") {
+            return a
+        } else {
+            let b = stack.popLast() ?? "underflow!"
+            if let val1 = UInt16(a), let val2 = UInt16(b) {
+                let fraction: UInt32 = UInt32(val1) | (UInt32(val2) & 0x007f) << 16
+                let exponent = (val2 & 0x7f80) < 7
+                let sign = (val2 & 0x8000) == 0x8000
+                return "\(sign == true  ? "-" : "")\(fraction)e\(exponent)"
+            } else {
+                return "\(a).\(b)"
+            }
+        }
+    }
+
+    @discardableResult
+    mutating func popSet() -> (Int, String) {
+        let setLen = stack.popLast() ?? "underflow!"
+        var setData: [String] = []
+        var prevElement: String = ""
+        if let len = Int(setLen) {
+            for i in 0..<len {
+                let element = stack.popLast() ?? "underflow!"
+                if element.contains("[") == false {
+                    if let value = UInt64(element) {
+                        for j in 0..<16 {
+                            if (value >> j) & 1 == 1 {
+                                setData.append("\(i * 16 + j)")
+                            }
+                        }
+                    } else {
+                        setData.append(element)
+                    }
+                } else {
+                    let elementParts = element.split(separator: "[")
+                    if String(elementParts[0]) != prevElement {
+                        prevElement = String(elementParts[0])
+                        setData.append(String(elementParts[0]))
+                    }
+                }
+            }
+            return (len, "{" + setData.reversed().joined(separator: ", ") + "}")
+        }
+        return (0, "malformed set!")
+    }
+
+    func snapshot() -> [String] {
+        return stack
+    }
+}
+
+// MARK: - Pseudo-code Generator
+
+/// Generates high-level pseudo-code from decoded instructions and stack states
+struct PseudoCodeGenerator {
+    let procLookup: [String: ProcIdentifier]
+    let labelLookup: [String: LocationTwo]
+
+    func findLabel(_ loc: Location) -> String? {
+        let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
+        return labelLookup[key]?.name
+    }
+
+    func generateForInstruction(
+        _ inst: OpcodeDecoder.DecodedInstruction,
+        stack: inout StackSimulator,
+        loc: Location?
+    ) -> String? {
+        switch inst.mnemonic {
+        case "STO":
+            let src = stack.pop()
+            let dest = stack.pop()
+            return "\(dest) := \(src)"
+        case "MOV":
+            let src = stack.pop()
+            let dst = stack.pop()
+            return "\(dst) := \(src)"
+        case "STP":
+            let a = stack.pop()
+            let bbit = stack.pop()
+            let bwid = stack.pop()
+            let b = stack.pop()
+            return "\(b):\(bwid):\(bbit) := \(a)"
+        case "STB":
+            let src = stack.pop()
+            let dstoffs = stack.pop()
+            let dstaddr = stack.pop()
+            return "byteptr(\(dstaddr) + \(dstoffs)) := \(src)"
+        case "SRO", "STR", "STL", "STE":
+            let src = stack.pop()
+            if let memLoc = inst.memLocation {
+                return "\(findLabel(memLoc) ?? memLoc.description) := \(src)"
+            }
+            return nil
+        case "CIP", "CBP", "CXP", "CLP", "CGP":
+            if let dest = inst.destination {
+                return handleCallProcedure(dest, stack: &stack)
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
+
+    func handleCallProcedure(_ loc: Location, stack: inout StackSimulator) -> String? {
+        let lookupKey = "\(loc.segment):\(loc.procedure ?? -1)"
+        guard let called = procLookup[lookupKey] else {
+            return nil
+        }
+
+        let parmCount = called.parameters.count
+        var aParams: [String] = []
+        if called.isFunction {
+            _ = stack.pop()
+            _ = stack.pop()
+        }
+        for _ in 0..<parmCount {
+            aParams.append(stack.pop())
+        }
+
+        let callSignature =
+            "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
+
+        if called.isFunction {
+            stack.push(callSignature)
+            return nil
+        } else {
+            return callSignature
+        }
+    }
+
+    func generateControlFlow(
+        _ inst: OpcodeDecoder.DecodedInstruction, ic: Int, stack: inout StackSimulator
+    ) -> String? {
+        switch inst.mnemonic {
+        case "FJP":
+            guard let dest = inst.params.first else { return nil }
+            if dest > ic {
+                return "IF \(stack.pop()) THEN BEGIN"
+            } else {
+                return "UNTIL \(stack.pop())"
+            }
+        case "UJP":
+            guard let dest = inst.params.first else { return nil }
+            return "GOTO LAB\(dest)"
+        default:
+            return nil
+        }
+    }
+}
+
+// MARK: - Pascal Procedure Decoder
 func decodePascalProcedure(
-    currSeg: Segment, proc: inout Procedure, knownNames: inout [Int: Name], code: Data, addr: Int,
+    currSeg: Segment, 
+    proc: inout Procedure, 
+    code: Data, 
+    addr: Int,
     callers: inout Set<Call>,
-    globals: inout Set<Int>,
-    baseLocs: inout Set<Int>,
-    allLocations: inout Set<Location>, allProcedures: inout [ProcIdentifier],
+    allLocations: inout Set<Location>, 
+    allProcedures: inout [ProcIdentifier],
     allLabels: inout Set<LocationTwo>
 ) {
     // Early validation: ensure addr and the procedure header bytes are present
@@ -93,7 +739,6 @@ func decodePascalProcedure(
     }
 
     // by using strings, we can store and manipulate symbolic data rather than just locations/ints
-    var currentStack: [String] = []
     var flagForEnd: Set<Int> = []
     var flagForLabel: Set<Int> = []
     var ic = proc.enterIC
@@ -108,292 +753,295 @@ func decodePascalProcedure(
         let key = "\(p.segmentNumber):\(p.procNumber)"
         procLookup[key] = p
     }
-    
+
     var labelLookup: [String: LocationTwo] = [:]
     for label in allLabels {
         let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr)"
         labelLookup[key] = label
     }
-    
+
+    // Initialize components for clean separation of concerns
+    let decoder = OpcodeDecoder(cd: cd)  // TODO: Use decoder.decode() in refactored loop
+    var simulator = StackSimulator()
+    let pseudoGen = PseudoCodeGenerator(procLookup: procLookup, labelLookup: labelLookup)
+
+    // Alias for backward compatibility during refactoring
+    var currentStack: [String] {
+        get { simulator.stack }
+        set { simulator.stack = newValue }
+    }
+
     // Helper to lookup label by Location
     func findLabel(_ loc: Location) -> String? {
         let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
         return labelLookup[key]?.name
     }
-    
-    // Helper to handle call procedure opcodes - handles parameter popping and pseudo-code generation
-    // Returns (pseudoCode: String?, didModifyStack: Bool)
-    func handleCallProcedure(loc: Location, stack: inout [String]) -> String? {
-        let lookupKey = "\(loc.segment):\(loc.procedure ?? -1)"
-        guard let called = procLookup[lookupKey] else {
-            return nil
-        }
-        
-        // found called procedure, remove its parameters from stack
-        let parmCount = called.parameters.count
-        var aParams: [String] = []
-        if called.isFunction {
-            // pop the extra two return words off the stack
-            _ = stack.popLast()
-            _ = stack.popLast()
-        }
-        for _ in 0..<parmCount {
-            aParams.append(stack.popLast() ?? "underflow!")
-        }
-        
-        let callSignature = "\(called.shortDescription)(\(aParams.reversed().joined(separator:", ")))"
-        
-        if called.isFunction {
-            // if function, push return value onto stack
-            stack.append(callSignature)
-            return nil  // no pseudo-code, value goes on stack
-        } else {
-            return callSignature  // procedure call as pseudo-code
-        }
-    }
 
-    // Decode loop: perform all CodeData reads inside a single do/catch so any
-    // bounds/EOF error will abort decoding cleanly rather than crashing.
+    // Decode loop: uses new architecture for clean separation of decoding, simulation, and generation
     while ic < addr && !done {
         let currentIC = ic
         do {
             let opcode = try cd.readByte(at: ic)
+
+            // Decode the instruction using the new architecture
+            var decoded: OpcodeDecoder.DecodedInstruction
+            if let cachedDecoded = try? decoder.decode(
+                opcode: opcode, at: ic, currSeg: currSeg, proc: proc, addr: addr)
+            {
+                decoded = cachedDecoded
+            } else {
+                // Fallback for any decode errors
+                return
+            }
+
+            // Handle comparator opcodes specially
+            var finalMnemonic = decoded.mnemonic
+            var finalComment = decoded.comment
+            var bytesConsumed = decoded.bytesConsumed
+
+            if decoded.requiresComparator {
+                let (suffix, prefix, inc) = decoder.decodeComparator(at: decoded.comparatorOffset)
+                finalMnemonic += suffix
+                finalComment =
+                    prefix
+                    + " TOS-1 \(decoded.mnemonic == "EQL" ? "=" : decoded.mnemonic == "GEQ" ? ">=" : decoded.mnemonic == "GRT" ? ">" : decoded.mnemonic == "LEQ" ? "<=" : decoded.mnemonic == "LES" ? "<" : "<>") TOS"
+                bytesConsumed = inc + 1
+            }
+
+            // Process stack effects and build instruction using decoded information
+            let memLoc = decoded.memLocation
+            let dest = decoded.destination
+            var pseudoCode: String? = nil  // Set by specific opcodes that generate assignments/control flow
+
+            // Apply stack operations and generate pseudo-code based on mnemonic
             switch opcode {
             case 0x00..<0x80:
-                currentStack.append(String(opcode))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SLDC", params: [Int(opcode)],
-                    comment: "Short load one-word constant \(opcode)", stackState: currentStack)
-                ic += 1
+                simulator.push(String(opcode))
+                ic += bytesConsumed
             case 0x80:
-                currentStack.append("ABI(\(currentStack.popLast() ?? "underflow!"))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "ABI", comment: "Absolute value of integer (TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // ABI: Absolute value of integer (TOS)
+                let a = simulator.pop()
+                simulator.push("ABI(\(a))")
+                ic += bytesConsumed
             case 0x81:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "ABR", comment: "Absolute value of real (TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // ABR: Absolute value of real (TOS)
+                let a = simulator.popReal()
+                simulator.pushReal("ABR(\(a))")
+                ic += bytesConsumed
             case 0x82:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) + \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "ADI", comment: "Add integers (TOS + TOS-1)", stackState: currentStack
-                )
-                ic += 1
+                // ADI: Add integers (TOS + TOS-1)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) + \(a))")
+                ic += bytesConsumed
             case 0x83:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "ADR", comment: "Add reals (TOS + TOS-1)", stackState: currentStack)
-                ic += 1
+                // ADR: Add reals (TOS + TOS-1)
+                let a = simulator.popReal()
+                let b = simulator.popReal()
+                simulator.pushReal("(\(a) + \(b))")
+                ic += bytesConsumed
             case 0x84:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) AND \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LAND", comment: "Logical AND (TOS & TOS-1)", stackState: currentStack
-                )
-                ic += 1
+                // LAND: Logical AND (TOS & TOS-1)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) AND \(a))")
+                ic += bytesConsumed
             case 0x85:
-                let (set1Len, set1) = popSet(stack: &currentStack)
-                let (set2Len, set2) = popSet(stack: &currentStack)
+                // DIF: Set difference (TOS-1 AND NOT TOS)
+                let (set1Len, set1) = simulator.popSet()
+                let (set2Len, set2) = simulator.popSet()
                 let maxLen = max(set1Len, set2Len)
                 for i in 0..<maxLen {
-                    currentStack.append("(\(set2) AND NOT \(set1))[\(i)]")
+                    simulator.push("(\(set2) AND NOT \(set1))[\(i)]")
                 }
-                currentStack.append("\(maxLen)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "DIF", comment: "Set difference (TOS-1 AND NOT TOS)",
-                    stackState: currentStack)
-                ic += 1
+                simulator.push("\(maxLen)")
+                ic += bytesConsumed
             case 0x86:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) / \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "DVI", comment: "Divide integers (TOS-1 / TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // DVI: Divide integers (TOS-1 / TOS)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) / \(a))")
+                ic += bytesConsumed
             case 0x87:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "DVR", comment: "Divide reals (TOS-1 / TOS)", stackState: currentStack
-                )
-                ic += 1
+                // DVR: Divide reals (TOS-1 / TOS)
+                let a = simulator.popReal()
+                let b = simulator.popReal()
+                simulator.pushReal("\(b) / \(a)")
+                ic += bytesConsumed
             case 0x88:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                let c = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) <= \(c) <= \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "CHK", comment: "Check subrange (TOS-1 <= TOS-2 <= TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // CHK: Check subrange (TOS-1 <= TOS-2 <= TOS)
+                let _ = simulator.pop()
+                let _ = simulator.pop()
+                let c = simulator.pop()
+                simulator.push(c)
+                ic += bytesConsumed
             case 0x89:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "FLO", comment: "Float next to TOS (int TOS-1 to real TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // FLO: Float next to TOS (int TOS-1 to real TOS)
+                let a = simulator.pop()  // TOS
+                let b = simulator.pop()  // TOS-1
+                simulator.push(a)  // put previous TOS back
+                simulator.pushReal(b)  // real(TOS-1)->TOS
+                ic += bytesConsumed
             case 0x8A:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "FLT", comment: "Float TOS (int TOS to real TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // FLT: Float TOS (int TOS to real TOS)
+                let a = simulator.pop()
+                simulator.pushReal(a)
+                ic += bytesConsumed
             case 0x8B:
-                let (_, set) = popSet(stack: &currentStack)
-                let chk = currentStack.popLast() ?? "underflow!"
-                currentStack.append("\(chk) IN \(set)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "INN", comment: "Set membership (TOS-1 in set TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // INN: Set membership (TOS-1 in set TOS)
+                let (_, set) = simulator.popSet()
+                let chk = simulator.pop()
+                simulator.push("\(chk) IN \(set)")
+                ic += bytesConsumed
             case 0x8C:
-                let (set1Len, set1) = popSet(stack: &currentStack)
-                let (set2Len, set2) = popSet(stack: &currentStack)
+                // INT: Set intersection (TOS AND TOS-1)
+                let (set1Len, set1) = simulator.popSet()
+                let (set2Len, set2) = simulator.popSet()
                 let maxLen = max(set1Len, set2Len)
                 for i in 0..<maxLen {
-                    currentStack.append("(\(set1) AND \(set2))[\(i)]")
+                    simulator.push("(\(set1) AND \(set2))[\(i)]")
                 }
-                currentStack.append("\(maxLen)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "INT", comment: "Set intersection (TOS AND TOS-1)",
-                    stackState: currentStack)
-                ic += 1
+                simulator.push("\(maxLen)")
+                ic += bytesConsumed
             case 0x8D:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("\(b) OR \(a)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LOR", comment: "Logical OR (TOS | TOS-1)", stackState: currentStack)
-                ic += 1
+                // LOR: Logical OR (TOS | TOS-1)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("\(b) OR \(a)")
+                ic += bytesConsumed
             case 0x8E:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) % \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "MODI", comment: "Modulo integers (TOS-1 % TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // MODI: Modulo integers (TOS-1 % TOS)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) % \(a))")
+                ic += bytesConsumed
             case 0x8F:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) * \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "MPI", comment: "Multiply integers (TOS * TOS-1)",
-                    stackState: currentStack)
-                ic += 1
+                // MPI: Multiply integers (TOS * TOS-1)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) * \(a))")
+                ic += bytesConsumed
             case 0x90:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "MPR", comment: "Multiply reals (TOS * TOS-1)",
-                    stackState: currentStack)
-                ic += 1
+                // MPR: Multiply reals (TOS * TOS-1)
+                let a = simulator.popReal()
+                let b = simulator.popReal()
+                simulator.pushReal("\(b) * \(a)")
+                ic += bytesConsumed
             case 0x91:
-                currentStack.append("-\(currentStack.popLast() ?? "underflow!")")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NGI", comment: "Negate integer", stackState: currentStack)
-                ic += 1
+                // NGI: Negate integer
+                let a = simulator.pop()
+                simulator.push("-\(a)")
+                ic += bytesConsumed
             case 0x92:
-                currentStack.append("-\(currentStack.popLast() ?? "underflow!")")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NGR", comment: "Negate real", stackState: currentStack)
-                ic += 1
+                // NGR: Negate real
+                let a = simulator.popReal()
+                simulator.pushReal("-\(a)")
+                ic += bytesConsumed
             case 0x93:
-                currentStack.append("NOT (\(currentStack.popLast() ?? "underflow!"))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LNOT", comment: "Logical NOT (~TOS)", stackState: currentStack)
-                ic += 1
+                // LNOT: Logical NOT (~TOS)
+                let a = simulator.pop()
+                simulator.push("NOT (\(a))")
+                ic += bytesConsumed
             case 0x94:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SRS", comment: "Subrange set [TOS-1..TOS]", stackState: currentStack)
-                ic += 1
+                // SRS: Subrange set [TOS-1..TOS] (creates set on stack)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                if let av = Int(a) {
+                    let wordsRequired = (av + 1) % 16
+                    for i in 0..<wordsRequired {
+                        simulator.push("(\(b)..\(a))[\(i)]")
+                    }
+                    simulator.push("\(wordsRequired)")
+                } else {
+                    // fudge... no way to know how big it will be!
+                    simulator.push("\(b)..\(a)")
+                    simulator.push("1")
+                }
+                ic += bytesConsumed
             case 0x95:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) - \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SBI", comment: "Subtract integers (TOS-1 - TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // SBI: Subtract integers (TOS-1 - TOS)
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) - \(a))")
+                ic += bytesConsumed
             case 0x96:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SBR", comment: "Subtract reals (TOS-1 - TOS)",
-                    stackState: currentStack)
-                ic += 1
+                // SBR: Subtract reals (TOS-1 - TOS)
+                let a = simulator.popReal()
+                let b = simulator.popReal()
+                simulator.pushReal("(\(b) - \(a))")
+                ic += bytesConsumed
             case 0x97:
-                currentStack.append("[\(currentStack.popLast() ?? "underflow!")]")
-                currentStack.append("1")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SGS", comment: "Build singleton set [TOS]", stackState: currentStack)
-                ic += 1
+                // SGS: Build singleton set [TOS]
+                let a = simulator.pop()
+                if let av = Int(a) {
+                    let wordsRequired = (av + 1) % 16
+                    for i in 0..<wordsRequired {
+                        simulator.push("(\(a))[\(i)]")
+                    }
+                    simulator.push("\(wordsRequired)")
+                } else {
+                    simulator.push("[\(a)]")
+                    simulator.push("1")
+                }
+                ic += bytesConsumed
             case 0x98:
-                let a = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(a) * \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SQI", comment: "Square integer (TOS * TOS)", stackState: currentStack
-                )
-                ic += 1
+                // SQI: Square integer (TOS * TOS)
+                let a = simulator.pop()
+                simulator.push("(\(a) * \(a))")
+                ic += bytesConsumed
             case 0x99:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SQR", comment: "Square real (TOS * TOS)", stackState: currentStack)
-                ic += 1
+                // SQR: Square real (TOS * TOS)
+                let a = simulator.popReal()
+                simulator.pushReal("(\(a) * \(a))")
+                ic += bytesConsumed
             case 0x9A:
-                let src = currentStack.popLast() ?? "underflow!"
-                let dest = currentStack.popLast() ?? "underflow!"
-                let pseudoCode = "\(dest) := \(src)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STO", comment: "Store indirect word (TOS into TOS-1)",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += 1
+                // STO: Store indirect word (TOS into TOS-1)
+                pseudoCode = pseudoGen.generateForInstruction(decoded, stack: &simulator, loc: nil)
+                ic += bytesConsumed
             case 0x9B:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "IXS", comment: "Index string array (check 1<=TOS<=len of str TOS-1)",
-                    stackState: currentStack)
-                ic += 1
+                // IXS: Index string array (check 1 <= TOS <= len of str byte ptr TOS-1)
+                // doesn't store anything on the stack - it would throw exec error if it fails
+                _ = simulator.pop()  // discard index
+                _ = simulator.pop()  // discard byte ptr offset
+                _ = simulator.pop()  // discard byte ptr base
+                ic += bytesConsumed
             case 0x9C:
-                let (set1Len, set1) = popSet(stack: &currentStack)
-                let (set2Len, set2) = popSet(stack: &currentStack)
+                // UNI: Set union (TOS OR TOS-1)
+                let (set1Len, set1) = simulator.popSet()
+                let (set2Len, set2) = simulator.popSet()
                 let maxLen = max(set1Len, set2Len)
                 for i in 0..<maxLen {
-                    currentStack.append("(\(set1) OR \(set2))[\(i)]")
+                    simulator.push("(\(set1) OR \(set2))[\(i)]")
                 }
-                currentStack.append("\(maxLen)")
+                simulator.push("\(maxLen)")
                 proc.instructions[ic] = Instruction(
                     mnemonic: "UNI", comment: "Set union (TOS OR TOS-1)", stackState: currentStack)
-                ic += 1
+                ic += bytesConsumed
             case 0x9D:
-                let seg = Int(try cd.readByte(at: ic + 1))
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDE", params: [seg, val],
-                    comment: "Load extended word (word offset \(val) in data seg \(seg))",
-                    stackState: currentStack)
-                ic += (2 + inc)
+                // LDE: Load extended word (pushes value onto stack)
+                let seg = decoded.params[0]
+                let val = decoded.params[1]
+                simulator.push("LDE[\(seg):\(val)]")
+                ic += bytesConsumed
             case 0x9E:
+                // CSP: Call standard procedure
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 var pseudoCode: String? = nil
                 if let (cspName, parms, ret) = cspProcs[procNum] {
                     var callParms: [String] = []
                     for p in parms {
                         if p.type == "REAL" {
-                            var rParm: [String] = []
-                            for _ in 1..<4 {
-                                rParm.append(currentStack.popLast() ?? "underflow!")
-                            }
-                            callParms.append("R\(rParm.joined(separator:":"))")
+                            callParms.append("\(simulator.popReal())")
                         } else {
-                            callParms.append(currentStack.popLast() ?? "underflow!")
+                            callParms.append("\(simulator.pop())")
                         }
                     }
                     if !ret.isEmpty {
                         if ret == "REAL" {
-                            for i in 1..<4 {
-                                currentStack.append(
-                                    "\(cspName)(\(callParms.reversed().joined(separator:", ")))_R\(i)"
-                                )
-                            }
+                            simulator.pushReal(
+                                "\(cspName)(\(callParms.reversed().joined(separator:", ")))")
                         } else {
-                            currentStack.append(
+                            simulator.push(
                                 "\(cspName)(\(callParms.reversed().joined(separator:", ")))")
                         }
                     } else {
@@ -408,187 +1056,129 @@ func decodePascalProcedure(
                     stackState: currentStack, pseudoCode: pseudoCode)
                 ic += 2
             case 0x9F:
-                currentStack.append("NIL")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDCN", comment: "Load constant NIL", stackState: currentStack)
-                ic += 1
+                simulator.push("NIL")
+                ic += bytesConsumed
             case 0xA0:
-                let count = Int(try cd.readByte(at: ic + 1))
-                let (_, set) = popSet(stack: &currentStack)
+                let count = decoded.params[0]
+                let (_, set) = simulator.popSet()
                 for i in 0..<count {
-                    currentStack.append("\(set)[\(i)]")
+                    simulator.push("\(set)[\(i)]")
                 }
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "ADJ", params: [count], comment: "Adjust set to \(count) words",
-                    stackState: currentStack)
-                ic += 2
+                ic += bytesConsumed
             case 0xA1:
-                var dest: Int = 0
-                let offset = Int(try cd.readByte(at: ic + 1))
-                var pseudoCode = ""
-                if offset > 0x7f {
-                    let jte = addr + offset - 256
-                    dest = jte - Int(try cd.readWord(at: jte))
-                } else {
-                    dest = ic + offset + 2
-                }
+                let dest = decoded.params[0]
                 if dest > ic {  // jumping forward so an IF
                     flagForEnd.insert(dest)
-                    pseudoCode = "IF \(currentStack.popLast() ?? "underflow!") THEN BEGIN"
+                    pseudoCode = "IF \(simulator.pop()) THEN BEGIN"
                 } else {  // jumping backwards so a REPEAT/UNTIL
                     proc.instructions[dest]?.prePseudoCode = "REPEAT"
-                    pseudoCode = "UNTIL \(currentStack.popLast() ?? "underflow!")"
+                    pseudoCode = "UNTIL \(simulator.pop())"
                 }
                 proc.entryPoints.insert(dest)
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "FJP", params: [dest],
-                    comment: "Jump if TOS false to \(String(format: "%04x", dest))",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += 2
+                ic += bytesConsumed
             case 0xA2:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                currentStack.append("(\(currentStack.popLast() ?? "underflow!") + \(val))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "INC", params: [val], comment: "Inc field ptr (TOS+\(val))",
-                    stackState: currentStack)
-                ic += (1 + inc)
+                let val = decoded.params[0]
+                let a = simulator.pop()
+                simulator.push("(\(a) + \(val))")
+                ic += bytesConsumed
             case 0xA3:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                currentStack.append("(\(currentStack.popLast() ?? "underflow!") + \(val))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "IND", params: [val],
-                    comment: "Static index and load word (TOS+\(val))", stackState: currentStack)
-                ic += (1 + inc)
+                let val = decoded.params[0]
+                let a = simulator.pop()
+                simulator.push("(\(a) + \(val))")
+                ic += bytesConsumed
             case 0xA4:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("\(b)[\(a)]")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "IXA", params: [val], comment: "Index array (TOS-1 + TOS * \(val))",
-                    stackState: currentStack)
-                ic += (1 + inc)
+                let _ = decoded.params[0]  // Element size, used for address calculation but not in pseudo-code
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("\(b)[\(a)]")
+                ic += bytesConsumed
             case 0xA5:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
-                currentStack.append(
-                    "^\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LAO", params: [val], memLocation: loc,
-                    comment: "Load global address", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (1 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xA6:
-                let strLen = Int(try cd.readByte(at: ic + 1))
+                let strLen = decoded.params[0]
                 var s: String = ""
                 if strLen > 0 {
                     for i in 1...strLen {
-                        let ch = try cd.readByte(at: ic + 1 + Int(i))
-                        s += String(format: "%c", ch)
+                        if let ch = try? cd.readByte(at: ic + 1 + Int(i)) {
+                            s += String(format: "%c", ch)
+                        }
                     }
                 }
-                currentStack.append("^(\"\(s)\")")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LSA", params: [strLen], comment: "Load string address: '" + s + "'",
-                    stackState: currentStack)
-                ic += 2 + strLen
+                simulator.push("\"\(s)\"")
+                ic += bytesConsumed
             case 0xA7:
-                let seg = Int(try cd.readByte(at: ic + 1))
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
-                currentStack.append(
-                    "^\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LAE", params: [seg, val], memLocation: loc,
-                    comment: "Load extended address", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (2 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xA8:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let src = currentStack.popLast() ?? "underflow!"
-                let dst = currentStack.popLast() ?? "underflow!"
-                let pseudoCode = "\(dst) := \(src)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "MOV", params: [val], comment: "Move \(val) words (TOS to TOS-1)",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += (1 + inc)
+                pseudoCode = pseudoGen.generateForInstruction(decoded, stack: &simulator, loc: nil)
+                ic += bytesConsumed
             case 0xA9:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
-                currentStack.append(
-                    "\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDO", params: [val], memLocation: loc, comment: "Load global word",
-                    stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (1 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xAA:
-                let sasCount = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SAS", params: [sasCount],
-                    comment: "String assign (TOS to TOS-1, \(sasCount) chars)",
-                    stackState: currentStack)
-                ic += 2
+                // SAS: String assign (pops source and dest from stack)
+                _ = simulator.pop()  // source
+                _ = simulator.pop()  // dest
+                ic += bytesConsumed
             case 0xAB:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
-                let src = currentStack.popLast() ?? "underflow!"
-                let pseudoCode =
-                    "\(findLabel(loc) ?? loc.description) := \(src)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SRO", params: [val], memLocation: loc, comment: "Store global word",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                allLocations.insert(loc)
-                ic += (1 + inc)
+                if let loc = decoded.memLocation {
+                    allLocations.insert(loc)
+                    pseudoCode = pseudoGen.generateForInstruction(
+                        decoded, stack: &simulator, loc: loc)
+                }
+                ic += bytesConsumed
             case 0xAC:
-                let _ = currentStack.popLast()  // remove the case index value
-                let startIC = ic
-                ic += 1
-                if ic % 2 != 0 { ic += 1 }
-                let first = Int(try cd.readWord(at: ic))
-                ic += 2
-                let last = Int(try cd.readWord(at: ic))
-                ic += 2
+                _ = simulator.pop()  // remove the case index value
+                var tempIC = ic + 1
+                if tempIC % 2 != 0 { tempIC += 1 }
+                let first = Int(try cd.readWord(at: tempIC))
+                tempIC += 2
+                let last = Int(try cd.readWord(at: tempIC))
+                tempIC += 2
                 var dest: Int = 0
-                let offset = Int(try cd.readByte(at: ic + 1))
+                let offset = Int(try cd.readByte(at: tempIC + 1))
                 if offset > 0x7f {
                     let jte = addr + offset - 256
                     dest = jte - Int(try cd.readWord(at: jte))
                 } else {
-                    dest = ic + offset + 2
+                    dest = tempIC + offset + 2
                 }
                 proc.entryPoints.insert(dest)
-                var s = Instruction(
-                    mnemonic: "XJP", params: [first, last, dest], comment: "Case jump\n",
-                    stackState: currentStack)
-                ic += 2
+                var extraComment = "Case jump\n"
+                tempIC += 2
                 var c1 = 0
                 for c in first...last {
-                    if c1 == 0 { s.comment! += String(repeating: " ", count: 14) }
-                    let caseDest = try cd.getSelfRefPointer(at: ic)
-                    s.comment! += String(format: "   %04x -> %04x", c, caseDest)
+                    if c1 == 0 { extraComment += String(repeating: " ", count: 14) }
+                    let caseDest = try cd.getSelfRefPointer(at: tempIC)
+                    extraComment += String(format: "   %04x -> %04x", c, caseDest)
                     proc.entryPoints.insert(caseDest)
-                    ic += 2
+                    tempIC += 2
                     c1 += 1
                     if c1 == 4 {
                         c1 = 0
-                        s.comment! += "\n"
+                        extraComment += "\n"
                     }
                 }
-                if c1 != 0 { s.comment! += "\n" }
-                s.comment! += String(repeating: " ", count: 17)
-                s.comment! += String(format: "dflt -> %04x", dest)
-                proc.instructions[startIC] = s
+                if c1 != 0 { extraComment += "\n" }
+                extraComment += String(repeating: " ", count: 17)
+                extraComment += String(format: "dflt -> %04x", dest)
+                finalComment = extraComment
+                bytesConsumed = tempIC - ic
+                ic += bytesConsumed
             case 0xAD:
-                let retCount = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "RNP", params: [retCount], comment: "Return from nonbase procedure",
-                    stackState: currentStack)
+                let retCount = decoded.params[0]
                 proc.procType?.isFunction = (retCount > 0)
-                ic += 2
+                ic += bytesConsumed
                 done = true
             case 0xAE:
                 let procNum = Int(try cd.readByte(at: ic + 1))
@@ -596,7 +1186,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
+                let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CIP", params: [procNum], destination: loc,
                     comment: "Call intermediate procedure", stackState: currentStack,
@@ -604,220 +1194,134 @@ func decodePascalProcedure(
                 allLocations.insert(loc)
                 ic += 2
             case 0xAF:
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) = \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "EQL" + opSfx, comment: commentPfx + " TOS-1 = TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) = \(a))")
+                ic += bytesConsumed
             case 0xB0:
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) >= \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "GEQ" + opSfx, comment: commentPfx + " TOS-1 >= TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) >= \(a))")
+                ic += bytesConsumed
             case 0xB1:
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) > \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "GRT" + opSfx, comment: commentPfx + " TOS-1 > TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) > \(a))")
+                ic += bytesConsumed
             case 0xB2:
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                let byte1 = try cd.readByte(at: ic + 1)
-                let refLexLevel = proc.lexicalLevel - Int(byte1)
-                let loc = Location(
-                    segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
-                currentStack.append(
-                    "^\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDA", params: [Int(byte1), val], memLocation: loc,
-                    comment: "Load intermediate address", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (2 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xB3:
-                let startIC = ic
-                let count = Int(try cd.readByte(at: ic + 1))
-                ic += 2
-                if ic % 2 != 0 { ic += 1 }  // word aligned data
-                var comment = String(repeating: " ", count: 17)
+                // LDC is special: needs manual size calculation due to variable-length word-aligned data
+                let count = decoded.params[0]
+                var tempIC = ic + 2
+                if tempIC % 2 != 0 { tempIC += 1 }  // word aligned data
+                var extraComment = String(repeating: " ", count: 17)
                 for i in (0..<count).reversed() {  // words are in reverse order
-                    let val = Int(try cd.readWord(at: ic + i * 2))
-                    currentStack.append("\(val)")
-                    comment += String(format: "%04x ", val)
+                    let val = Int(try cd.readWord(at: tempIC + i * 2))
+                    simulator.push("\(val)")
+                    extraComment += String(format: "%04x ", val)
                 }
-                proc.instructions[startIC] = Instruction(
-                    mnemonic: "LDC", params: [count], comment: "Load multiple-word constant\n" + comment,
-                    stackState: currentStack)
-                ic += count * 2
+                // Override comment with word data
+                finalComment = "Load multiple-word constant\n" + extraComment
+                // Calculate actual bytes consumed including alignment
+                bytesConsumed = 2 + (ic % 2 == 0 ? 0 : 1) + count * 2
+                ic += bytesConsumed
             case 0xB4:
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) <= \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LEQ" + opSfx, comment: commentPfx + " TOS-1 <= TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) <= \(a))")
+                ic += bytesConsumed
             case 0xB5:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) < \(a))")
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LES" + opSfx, comment: commentPfx + " TOS-1 < TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) < \(a))")
+                ic += bytesConsumed
             case 0xB6:
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                let byte1 = try cd.readByte(at: ic + 1)
-                let refLexLevel = proc.lexicalLevel - Int(byte1)
-                let loc = Location(
-                    segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
-                currentStack.append(
-                    "\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LOD", params: [Int(byte1), val], memLocation: loc,
-                    comment: "Load intermediate word", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (2 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xB7:
-                let (opSfx, commentPfx, inc) = decodeComparator(index: ic + 1)
-                if opSfx != "SET" {
-                    let a = currentStack.popLast() ?? "underflow!"
-                    let b = currentStack.popLast() ?? "underflow!"
-                    currentStack.append("(\(b) <> \(a))")
-
+                if finalMnemonic.hasSuffix("SET") {
+                    let (_, a) = simulator.popSet()
+                    let (_, b) = simulator.popSet()
+                    simulator.push("(\(b) <> \(a))")
                 } else {
-                    let (_, a) = popSet(stack: &currentStack)
-                    let (_, b) = popSet(stack: &currentStack)
-                    currentStack.append("(\(b) <> \(a))")
+                    let a = simulator.pop()
+                    let b = simulator.pop()
+                    simulator.push("(\(b) <> \(a))")
                 }
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NEQ" + opSfx, comment: commentPfx + " TOS-1 <> TOS",
-                    stackState: currentStack)
-                ic += inc + 1
+                ic += bytesConsumed
             case 0xB8:
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                let byte1 = try cd.readByte(at: ic + 1)
-                let refLexLevel = proc.lexicalLevel - Int(byte1)
-                let loc = Location(
-                    segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
-                let src = currentStack.popLast() ?? "underflow!"
-                let pseudoCode =
-                    "\(findLabel(loc) ?? loc.description) := \(src)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STR", params: [Int(byte1), val], memLocation: loc,
-                    comment: "Store intermediate word", stackState: currentStack,
-                    pseudoCode: pseudoCode)
-                allLocations.insert(loc)
-                ic += (2 + inc)
-            case 0xB9:
-                var dest: Int = 0
-                let offset = Int(try cd.readByte(at: ic + 1))
-                var pseudoCode = ""
-                if offset > 0x7f {
-                    let jte = addr + offset - 256
-                    dest = jte - Int(try cd.readWord(at: jte))  // find entry in jump table
-                } else {
-                    dest = ic + offset + 2
+                if let loc = decoded.memLocation {
+                    allLocations.insert(loc)
+                    pseudoCode = pseudoGen.generateForInstruction(
+                        decoded, stack: &simulator, loc: loc)
                 }
+                ic += bytesConsumed
+            case 0xB9:
+                let dest = decoded.params[0]
                 if dest > ic {  // jumping forward so an IF
                     flagForLabel.insert(dest)
                     pseudoCode = "GOTO LAB\(dest)"
                 } else {
-                    // jumping backwards, likely a loop - probably a while. TODO, handle that
+                    // jumping backwards, likely a loop - probably a while.
+                    // TODO, handle that
                     flagForLabel.insert(dest)
                     pseudoCode = "GOTO LAB\(dest)"
                 }
                 proc.entryPoints.insert(dest)
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "UJP", params: [dest],
-                    comment: "Unconditional jump to \(String(format: "%04x", dest))",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += 2
+                ic += bytesConsumed
             case 0xBA:
-                let abit = currentStack.popLast() ?? "underflow!"
-                let awid = currentStack.popLast() ?? "underflow!"
-                let a = currentStack.popLast() ?? "underflow!"
-                currentStack.append("\(a):\(awid):\(abit)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDP", comment: "Load packed field (TOS)", stackState: currentStack)
-                ic += 1
+                let abit = simulator.pop()
+                let awid = simulator.pop()
+                let a = simulator.pop()
+                simulator.push("\(a):\(awid):\(abit)")
+                ic += bytesConsumed
             case 0xBB:
-                let a = currentStack.popLast() ?? "underflow!"
-                let bbit = currentStack.popLast() ?? "underflow!"
-                let bwid = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                let pseudoCode = "\(b):\(bwid):\(bbit) := \(a)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STP", comment: "Store packed field (TOS into TOS-1)",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += 1
+                pseudoCode = pseudoGen.generateForInstruction(decoded, stack: &simulator, loc: nil)
+                ic += bytesConsumed
             case 0xBC:
-                let ldmCount = Int(try cd.readByte(at: ic + 1))
-                let wdOrigin = currentStack.popLast() ?? "underflow!"
+                let ldmCount = decoded.params[0]
+                let wdOrigin = simulator.pop()
                 for i in 0..<ldmCount {
-                    currentStack.append("\(wdOrigin)[\(i)]")
+                    simulator.push("\(wdOrigin)[\(i)]")
                 }
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDM", params: [ldmCount],
-                    comment: "Load \(ldmCount) words from (TOS)", stackState: currentStack)
-                ic += 2
+                ic += bytesConsumed
             case 0xBD:
-                let stmCount = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STM", params: [stmCount],
-                    comment: "Store \(stmCount) words at TOS to TOS-1", stackState: currentStack)
-                ic += 2
+                // STM: Store multiple words (pops from stack)
+                let stmCount = decoded.params[0]
+                for _ in 0..<stmCount {
+                    _ = simulator.pop()
+                }
+                _ = simulator.pop()  // destination address
+                ic += bytesConsumed
             case 0xBE:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("byteptr(\(b) + \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDB", comment: "Load byte at byte ptr TOS-1 + TOS",
-                    stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("byteptr(\(b) + \(a))")
+                ic += bytesConsumed
             case 0xBF:
-                let src = currentStack.popLast() ?? "underflow!"
-                let dstoffs = currentStack.popLast() ?? "underflow!"
-                let dstaddr = currentStack.popLast() ?? "underflow!"
-                let pseudoCode = "byteptr(\(dstaddr) + \(dstoffs)) := \(src)"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STB", comment: "Store byte at TOS to byte ptr TOS-2 + TOS-1",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                ic += 1
+                pseudoCode = pseudoGen.generateForInstruction(decoded, stack: &simulator, loc: nil)
+                ic += bytesConsumed
             case 0xC0:
-                let elementsPerWord = Int(try cd.readByte(at: ic + 1))
-                let fieldWidth = Int(try cd.readByte(at: ic + 2))
-                let idx = currentStack.popLast() ?? "underflow!"
-                let basePtr = currentStack.popLast() ?? "underflow!"
-                currentStack.append(basePtr)
-                currentStack.append("\(fieldWidth)")
-                currentStack.append("\(idx)*\(elementsPerWord)")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "IXP", params: [elementsPerWord, fieldWidth],
-                    comment:
-                        "Index packed array TOS-1[TOS], \(elementsPerWord) elts/word, \(fieldWidth) field width",
-                    stackState: currentStack)
-                ic += 3
+                let elementsPerWord = decoded.params[0]
+                let fieldWidth = decoded.params[1]
+                let idx = simulator.pop()
+                let basePtr = simulator.pop()
+                simulator.push(basePtr)
+                simulator.push("\(fieldWidth)")
+                simulator.push("\(idx)*\(elementsPerWord)")
+                ic += bytesConsumed
             case 0xC1:
-                let retCount = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "RBP", params: [retCount], comment: "Return from base procedure",
-                    stackState: currentStack)
+                let retCount = decoded.params[0]
                 proc.procType?.isFunction = (retCount > 0)
-                ic += 2
+                ic += bytesConsumed
                 done = true
             case 0xC2:
                 let procNum = Int(try cd.readByte(at: ic + 1))
@@ -825,7 +1329,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
+                let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CBP", params: [procNum], destination: loc,
                     comment: "Call base procedure", stackState: currentStack, pseudoCode: pseudoCode
@@ -833,23 +1337,19 @@ func decodePascalProcedure(
                 allLocations.insert(loc)
                 ic += 2
             case 0xC3:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) = \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "EQUI", comment: "Integer TOS-1 = TOS", stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) = \(a))")
+                ic += bytesConsumed
             case 0xC4:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) >= \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "GEQI", comment: "Integer TOS-1 >= TOS", stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) >= \(a))")
+                ic += bytesConsumed
             case 0xC5:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) > \(a))")
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) > \(a))")
                 proc.instructions[ic] = Instruction(
                     mnemonic: "GRTI", comment: "Integer TOS-1 > TOS", stackState: currentStack)
                 ic += 1
@@ -867,58 +1367,59 @@ func decodePascalProcedure(
                 allLocations.insert(loc)
                 ic += (1 + inc)
             case 0xC7:
-                let val = Int(try cd.readWord(at: ic + 1))
-                currentStack.append(String(val))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDCI", params: [val], comment: "Load one-word constant \(val)",
-                    stackState: currentStack)
-                ic += 3
+                let val = decoded.params[0]
+                simulator.push(String(val))
+                ic += bytesConsumed
             case 0xC8:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) <= \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LEQI", comment: "Integer TOS-1 <= TOS", stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) <= \(a))")
+                ic += bytesConsumed
             case 0xC9:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) < \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LESI", comment: "Integer TOS-1 < TOS", stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                if a.contains("_") {
+                    let sa = a.split(separator: "_")
+                    var proc: Int?
+                    var seg: Int?
+                    var addr: Int?
+                    for sai in sa {
+                        if sai.starts(with: "P") {
+                            proc = Int(sai.dropFirst())
+                        } else if sai.starts(with: "S") {
+                            seg = Int(sai.dropFirst())
+                        } else if sai.starts(with: "A") {
+                            addr = Int(sai.dropFirst())
+                        }
+                    }
+                    if var l = allLabels.first(where: {
+                        $0.addr == addr && $0.segment == seg && $0.procedure == proc
+                    }) {
+                        allLabels.remove(l)
+                        l.type = "INTEGER"
+                        allLabels.insert(l)
+                    }
+                }
+                let b = simulator.pop()
+                simulator.push("(\(b) < \(a))")
+                ic += bytesConsumed
             case 0xCA:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let loc = Location(
-                    segment: currSeg.segNum, procedure: proc.procType?.procNumber,
-                    lexLevel: proc.lexicalLevel, addr: val)
-                currentStack.append(
-                    "\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LDL", params: [val], memLocation: loc, comment: "Load local word",
-                    stackState: currentStack)
-                allLocations.insert(loc)
-                ic += (1 + inc)
+                if let loc = decoded.memLocation {
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xCB:
-                let a = currentStack.popLast() ?? "underflow!"
-                let b = currentStack.popLast() ?? "underflow!"
-                currentStack.append("(\(b) <> \(a))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NEQI", comment: "Integer TOS-1 <> TOS", stackState: currentStack)
-                ic += 1
+                let a = simulator.pop()
+                let b = simulator.pop()
+                simulator.push("(\(b) <> \(a))")
+                ic += bytesConsumed
             case 0xCC:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                let loc = Location(
-                    segment: currSeg.segNum, procedure: proc.procType?.procNumber,
-                    lexLevel: proc.lexicalLevel, addr: val)
-                let pseudoCode =
-                    "\(findLabel(loc) ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STL", params: [val], memLocation: loc, comment: "Store local word",
-                    stackState: currentStack, pseudoCode: pseudoCode)
-                allLocations.insert(loc)
-                ic += (1 + inc)
+                if let loc = decoded.memLocation {
+                    allLocations.insert(loc)
+                    pseudoCode = pseudoGen.generateForInstruction(
+                        decoded, stack: &simulator, loc: loc)
+                }
+                ic += bytesConsumed
             case 0xCD:
                 let seg = Int(try cd.readByte(at: ic + 1))
                 let procNum = Int(try cd.readByte(at: ic + 2))
@@ -926,7 +1427,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber || seg != currSeg.segNum {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
+                let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CXP", params: [seg, procNum], destination: loc,
                     comment: "Call external procedure", stackState: currentStack,
@@ -939,7 +1440,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
+                let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CLP", params: [procNum], destination: loc,
                     comment: "Call local procedure", stackState: currentStack,
@@ -952,7 +1453,7 @@ func decodePascalProcedure(
                 if procNum != proc.procType?.procNumber {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                let pseudoCode = handleCallProcedure(loc: loc, stack: &currentStack)
+                let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CGP", params: [procNum], destination: loc,
                     comment: "Call global procedure", stackState: currentStack,
@@ -960,104 +1461,84 @@ func decodePascalProcedure(
                 allLocations.insert(loc)
                 ic += 2
             case 0xD0:
-                let count = Int(try cd.readByte(at: ic + 1))
-                var comment = "Load packed array\n"
-                comment += String(repeating: " ", count: 17)
+                let count = decoded.params[0]
                 var txtRep = ""
                 for i in 1...count {
-                    let c = Int(try cd.readByte(at: ic + 1 + i))
-                    comment += String(format: "%02x ", c)
-                    if c >= 0x20 && c <= 0x7e {
-                        txtRep.append(Character(UnicodeScalar(c)!))
-                    } else {
-                        txtRep.append(".")
+                    if let c = try? cd.readByte(at: ic + 1 + i) {
+                        if c >= 0x20 && c <= 0x7e {
+                            txtRep.append(Character(UnicodeScalar(Int(c))!))
+                        } else {
+                            txtRep.append(".")
+                        }
                     }
                 }
-                comment += (" | " + txtRep)
-                currentStack.append("'\(txtRep)'")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "LPA", params: [count], comment: comment, stackState: currentStack)
-                ic += (2 + count)
+                simulator.push("'\(txtRep)'")
+                ic += bytesConsumed
             case 0xD1:
-                let seg = Int(try cd.readByte(at: ic + 1))
-                let (val, inc) = try cd.readBig(at: ic + 2)
-                let loc = Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
-                let pseudoCode =
-                    "\(findLabel(loc) ?? loc.description) := \(currentStack.popLast() ?? "underflow!")"
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "STE", params: [seg, val], memLocation: loc,
-                    comment: "Store extended word TOS into", stackState: currentStack,
-                    pseudoCode: pseudoCode)
-                allLocations.insert(loc)
-                ic += (2 + inc)
+                if let loc = decoded.memLocation {
+                    allLocations.insert(loc)
+                    pseudoCode = pseudoGen.generateForInstruction(
+                        decoded, stack: &simulator, loc: loc)
+                }
+                ic += bytesConsumed
             case 0xD2:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NOP", comment: "No operation", stackState: currentStack)
-                ic += 1
+                // NOP: No operation
+                ic += bytesConsumed
             case 0xD3:
-                let p = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "---", params: [p], stackState: currentStack)
-                ic += 2
+                // Unknown opcode
+                ic += bytesConsumed
             case 0xD4:
-                let p2 = Int(try cd.readByte(at: ic + 1))
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "---", params: [p2], stackState: currentStack)
-                ic += 2
+                // Unknown opcode
+                ic += bytesConsumed
             case 0xD5:
-                let (val, inc) = try cd.readBig(at: ic + 1)
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "BPT", params: [val], comment: "Breakpoint", stackState: currentStack)
-                ic += (1 + inc)
+                // BPT: Breakpoint
+                ic += bytesConsumed
             case 0xD6:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "XIT", comment: "Exit the operating system", stackState: currentStack)
-                ic += 1
-                done = true
+                // XIT: Exit the operating system
                 proc.procType?.isFunction = false  // AFAIK only the PASCALSYSTEM.PASCALSYSTEM procedure ever calls this
+                ic += bytesConsumed
+                done = true
             case 0xD7:
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "NOP", comment: "No operation", stackState: currentStack)
-                ic += 1
+                // NOP: No operation
+                ic += bytesConsumed
             case 0xD8...0xE7:
-                let b = Int(try cd.readByte(at: ic))
-                let val = b - 0xd7
-                let loc = Location(
-                    segment: currSeg.segNum, procedure: proc.procType?.procNumber,
-                    lexLevel: proc.lexicalLevel, addr: val)
-                currentStack.append(
-                    "\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SLDL", params: [val], memLocation: loc,
-                    comment: "Short load local word", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += 1
+                if let loc = decoded.memLocation {
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xE8...0xF7:
-                let b2 = Int(try cd.readByte(at: ic))
-                let val = b2 - 0xe7
-                let loc = Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
-                currentStack.append(
-                    "\(findLabel(loc) ?? loc.description)"
-                )
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SLDO", params: [val], memLocation: loc,
-                    comment: "Short load global word", stackState: currentStack)
-                allLocations.insert(loc)
-                ic += 1
+                if let loc = decoded.memLocation {
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
+                    allLocations.insert(loc)
+                }
+                ic += bytesConsumed
             case 0xF8...0xFF:
-                let b3 = Int(try cd.readByte(at: ic))
-                let offs = b3 - 0xf8
-                let a = currentStack.popLast() ?? "underflow!"
-                currentStack.append("*(\(a) + \(offs))")
-                proc.instructions[ic] = Instruction(
-                    mnemonic: "SIND", params: [offs],
-                    comment: "Short index and load word *TOS+\(offs)", stackState: currentStack)
-                ic += 1
+                let offs = decoded.params[0]
+                let a = simulator.pop()
+                simulator.push("*(\(a) + \(offs))")
+                ic += bytesConsumed
             default:
-                // Unexpected opcode — stop decoding this procedure to avoid crashes.
-                return
+                // Unexpected opcode — stop decoding
+                if decoded.mnemonic.isEmpty {
+                    return
+                }
+                ic += bytesConsumed
             }
+
+            // Build instruction from decoded data (after switch, before applying markers)
+            if proc.instructions[ic - bytesConsumed] == nil {
+                proc.instructions[ic - bytesConsumed] = Instruction(
+                    mnemonic: finalMnemonic,
+                    params: decoded.params,
+                    memLocation: memLoc,
+                    destination: dest,
+                    comment: finalComment,
+                    stackState: currentStack,
+                    pseudoCode: pseudoCode)
+            }
+
+            // Apply control flow markers
             if flagForEnd.contains(currentIC) {
                 if proc.instructions[currentIC]?.prePseudoCode == nil {
                     proc.instructions[currentIC]?.prePseudoCode = "END"
@@ -1092,28 +1573,10 @@ func decodePascalProcedure(
     }
 
     if let p = proc.procType {
-        if allProcedures.contains(where: {
+        if !allProcedures.contains(where: {
             $0.procNumber == p.procNumber && $0.segmentNumber == p.segmentNumber
         }) {
-            print("Procedure already exists")
-            print("New version: \(p.description)")
-            let original = allProcedures.first(where: {
-                $0.procNumber == p.procNumber && $0.segmentNumber == p.segmentNumber
-            })!
-            print("Original: \(original.description)")
-            if original.procName == nil || original.procName!.isEmpty {
-                print("Original has no name.")
-            }
-            if p.procName == nil || p.procName!.isEmpty {
-                print("New version has no name.")
-            }
-        } else {  
-            print("Adding procedure: \(p.shortDescription)")
             allProcedures.append(p)
         }
     }
-    // Legacy: older code previously generated string-based proc headers and populated
-    // `proc.variables`. That logic has been replaced by `ProcIdentifier`, `allLocations`
-    // and `allProcedures`. If you need variable summaries re-introduced, prefer
-    // constructing them from `allLocations` so they remain consistent across output.
 }

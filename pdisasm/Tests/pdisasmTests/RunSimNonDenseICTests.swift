@@ -9,10 +9,10 @@ final class RunSimNonDenseICTests: XCTestCase {
         proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 1)
 
         // Non-dense instruction layout: 100, 110, 120, 130
-        proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [1])
-        proc.instructions[110] = Instruction(mnemonic: "SLDC", params: [2])
-        proc.instructions[120] = Instruction(mnemonic: "ADI", params: [])
-        proc.instructions[130] = Instruction(mnemonic: "RNP", params: [])
+        proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [1], stackState: [])
+        proc.instructions[110] = Instruction(mnemonic: "SLDC", params: [2], stackState: [])
+        proc.instructions[120] = Instruction(mnemonic: "ADI", params: [], stackState: [])
+        proc.instructions[130] = Instruction(mnemonic: "RNP", params: [], stackState: [])
 
         let insns = simInsns(from: proc)
         let sortedICs = insns.map { $0.ic }.sorted()

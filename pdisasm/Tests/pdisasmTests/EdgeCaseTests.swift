@@ -4,7 +4,7 @@ import XCTest
 final class EdgeCaseTests: XCTestCase {
     func testBigBoundaryValues() {
         // single-byte BIG (127)
-        let data1 = CodeData(data: Data())
+        let data1 = CodeData(data: Data([0x7F]))
         XCTAssertEqual(try data1.readBig(at: 0).0, 127)
 
         // two-byte BIG: 0xFF, 0xEE -> (0xFF - 128) << 8 | 0xEE = 0x7FEE

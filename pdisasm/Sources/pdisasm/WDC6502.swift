@@ -183,8 +183,6 @@ let wdc6502: [UInt8: Wdc6502OpInfo] = [
 
 func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inout Procedure, code: Data, addr: Int) throws {
                     proc.procType = ProcIdentifier(isFunction: false, isAssembly: true, segmentNumber: segmentNumber, procNumber: procedureNumber, procName: "ASMPROC\(procedureNumber)")
-                    // proc.name = "ASMPROC\(procedureNumber)"
-                    // proc.procedureNumber = procedureNumber
                     let cd = CodeData(data: code, ipc: 0, header: 0)
                     proc.enterIC = try cd.getSelfRefPointer(at: addr - 2)
                     proc.entryPoints.insert(proc.enterIC)

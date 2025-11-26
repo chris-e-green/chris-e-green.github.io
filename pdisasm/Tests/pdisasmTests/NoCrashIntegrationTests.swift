@@ -56,7 +56,6 @@ final class NoCrashIntegrationTests: XCTestCase {
     // allLabels was previously used for name mapping; no longer required in the test
     // so remove the variable to avoid an unused-variable warning.
         var allCallers: Set<Call> = []
-        var names: [Int: Name] = [:]
 
         for segment in segDict.segTable.sorted(by: { $0.key < $1.key }) {
             let seg = segment.value
@@ -93,8 +92,6 @@ final class NoCrashIntegrationTests: XCTestCase {
             // Exercise decode paths safely by attempting to decode but ensuring we don't crash.
             for (_, procPtr) in codeSeg.procedureDictionary.procedurePointers.enumerated() {
                 var proc = Procedure()
-                var procGlobalLocs: Set<Int> = []
-                var procBaseLocs: Set<Int> = []
                 var inCode: Data
                 var addr = procPtr
                 if addr < 0 { inCode = extraCode; addr = addr + offset } else { inCode = code }
@@ -105,7 +102,8 @@ final class NoCrashIntegrationTests: XCTestCase {
                 if minNeededIndex < 0 || maxNeededIndex >= inCode.count { continue }
 
                 // call decoder; should not crash due to prior guards
-                decodePascalProcedure(currSeg: seg, proc: &proc, knownNames: &names, code: inCode, addr: addr, callers: &allCallers, globals: &procGlobalLocs, baseLocs: &procBaseLocs, allLocations: &allLocations, allProcedures: &allProcedures)
+                var allLabels: Set<LocationTwo> = []
+                decodePascalProcedure(currSeg: seg, proc: &proc, code: inCode, addr: addr, callers: &allCallers, allLocations: &allLocations, allProcedures: &allProcedures, allLabels: &allLabels)
             }
 
             allCodeSegs[Int(seg.segNum)] = codeSeg

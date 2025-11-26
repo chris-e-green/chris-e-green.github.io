@@ -16,31 +16,38 @@ final class GenerateDisasmSnapshot: XCTestCase {
         let data = try Data(contentsOf: fileURL)
 
         // Minimal segment parsing similar to main
-        let diskInfo = data.subdata(in: 0..<64)
+        let diskInfo = CodeData(data: data.subdata(in: 0..<64))
         let segName = data.subdata(in: 64..<192)
-        let segKind = data.subdata(in: 192..<224)
-        let textAddr = data.subdata(in: 224..<256)
+        let segKind = CodeData(data: data.subdata(in: 192..<224))
+        let textAddr = CodeData(data: data.subdata(in: 224..<256))
         let segInfo = data.subdata(in: 256..<288)
         let intrinsSegs = data.subdata(in: 288..<296)
         let comment = data.subdata(in: 433..<512)
 
         var segTable: [Int: Segment] = [:]
         for i in 0...15 {
-            let codeaddr = diskInfo.readWord(at: i * 4)
-            let codeleng = diskInfo.readWord(at: i * 4 + 2)
+            let codeaddr = try diskInfo.readWord(at: i * 4)
+            let codeleng = try diskInfo.readWord(at: i * 4 + 2)
             var name = ""
             for j in 0...7 {
                 name.append(String(UnicodeScalar(Int(segName[i * 8 + j]))!))
             }
             name = name.trimmingCharacters(in: [" "])
-            let kind = SegmentKind(rawValue: segKind.readWord(at: i * 2))
+            let kind = SegmentKind(rawValue: Int(try segKind.readWord(at: i * 2)))
             var segNum = Int(segInfo[i * 2])
             if segNum == 0 { segNum = i }
             let mType = Int(segInfo[i * 2 + 1] & 0x0F)
             let version = Int((segInfo[i * 2 + 1] & 0xE0) >> 5)
-            let text = textAddr.readWord(at: i * 2)
+            let text = try textAddr.readWord(at: i * 2)
             if codeleng > 0 {
-                segTable[i] = Segment(codeaddr: codeaddr, codeleng: codeleng, name: name, segkind: kind ?? .dataseg, textaddr: text, segNum: segNum, mType: mType, version: version)
+                segTable[i] = Segment(codeaddr: Int(codeaddr), 
+                                      codeleng: Int(codeleng), 
+                                      name: name, 
+                                      segkind: kind ?? .dataseg, 
+                                      textaddr: Int(text), 
+                                      segNum: segNum, 
+                                      mType: mType, 
+                                      version: version)
             }
         }
 
@@ -61,7 +68,7 @@ final class GenerateDisasmSnapshot: XCTestCase {
         let names: [Int: Name] = [:]
         let codeSegs: [Int: CodeSegment] = [:]
         let allLocations: Set<Location> = []
-        let allLabels: [Location: LocInfo] = [:]
+        let allLabels: Set<LocationTwo> = []
         let allProcedures: [ProcIdentifier] = []
         let allCallers: Set<Call> = []
 

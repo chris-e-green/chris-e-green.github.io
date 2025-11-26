@@ -33,15 +33,12 @@ final class SkippedProcedureTests: XCTestCase {
             }
         }
 
-        var names: [Int: Name] = [:]
         var allCallers: Set<Call> = []
         var allLocations: Set<Location> = []
         var allProcedures: [ProcIdentifier] = []
 
         for (_, procPtr) in codeSeg.procedureDictionary.procedurePointers.enumerated() {
             var proc = Procedure()
-            var procGlobalLocs: Set<Int> = []
-            var procBaseLocs: Set<Int> = []
             let inCode: Data = codeBlock
             let addr = procPtr
 
@@ -50,7 +47,8 @@ final class SkippedProcedureTests: XCTestCase {
             let maxNeededIndex = addr + 1
             if minNeededIndex < 0 || maxNeededIndex >= inCode.count { continue }
 
-            decodePascalProcedure(currSeg: seg, proc: &proc, knownNames: &names, code: inCode, addr: addr, callers: &allCallers, globals: &procGlobalLocs, baseLocs: &procBaseLocs, allLocations: &allLocations, allProcedures: &allProcedures)
+            var allLabels: Set<LocationTwo> = []
+            decodePascalProcedure(currSeg: seg, proc: &proc, code: inCode, addr: addr, callers: &allCallers, allLocations: &allLocations, allProcedures: &allProcedures, allLabels: &allLabels)
         }
 
         // No procedures should have been decoded for the out-of-range pointer

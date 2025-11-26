@@ -24,12 +24,10 @@ final class FunctionalProcedureTests: XCTestCase {
         var proc = Procedure()
         proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 1, procNumber: 1)
 
-        var knownNames: [Int: Name] = [:]
         var callers: Set<Call> = []
-        var globals: Set<Int> = []
-        var baseLocs: Set<Int> = []
         var allLocations: Set<Location> = []
         var allProcedures: [ProcIdentifier] = []
+        var allLabels: Set<LocationTwo> = []
 
         let seg = Segment(codeaddr: 0, codeleng: code.count, name: "SEGT", segkind: .dataseg, textaddr: 0, segNum: 1, mType: 0, version: 0)
 
@@ -39,14 +37,12 @@ final class FunctionalProcedureTests: XCTestCase {
         decodePascalProcedure(
             currSeg: seg,
             proc: &proc,
-            knownNames: &knownNames,
             code: code,
             addr: addr,
             callers: &callers,
-            globals: &globals,
-            baseLocs: &baseLocs,
             allLocations: &allLocations,
-            allProcedures: &allProcedures
+            allProcedures: &allProcedures,
+            allLabels: &allLabels
         )
 
         // Validate that the header was parsed correctly

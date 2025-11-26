@@ -9,7 +9,7 @@ final class SnapshotTests: XCTestCase {
         let knownNames: [Int: Name] = [:]
         let codeSegs: [Int: CodeSegment] = [:]
         let allLocations: Set<Location> = []
-        let allLabels: [Location: LocInfo] = [:]
+        let allLabels: Set<LocationTwo> = []
         let allProcedures: [ProcIdentifier] = []
         let allCallers: Set<Call> = []
 

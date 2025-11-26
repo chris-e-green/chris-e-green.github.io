@@ -5,11 +5,9 @@ func prettyStack(_ s: [String]) -> String { "[" + s.joined(separator: ", ") + "]
 func outputResults(
     sourceFilename: String,
     segDictionary: SegDictionary,
-    // globals: Set<Int>,
     knownNames: [Int: Name],
     codeSegs: [Int: CodeSegment],
     allLocations: Set<Location>,
-    // allLabels: [Location: LocInfo],
     allLabels: Set<LocationTwo>,
     allProcedures: [ProcIdentifier],
     allCallers: Set<Call>
@@ -62,11 +60,13 @@ func outputResults(
                 }
 
                 print("```")
+
+                // print variables declared in this procedure
                 allLocations.filter({
                     $0.procedure == proc.procType?.procNumber && $0.segment == s && $0.addr != nil
                 }).sorted().forEach({ loc in
-                    if let pName = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
-                        print("L\(loc.addr ?? -1)=\(pName.name)")
+                    if let pName: LocationTwo = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
+                        print("L\(loc.addr ?? -1)=\(pName.name):\(pName.type)")
                     } else {
                         print("L\(loc.addr ?? -1)=\(loc.description)")
                     }

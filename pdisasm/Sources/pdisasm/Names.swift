@@ -27,8 +27,8 @@ let cspProcs: [Int: (String, [LocInfo], String)] = [
     4: ("EXIT", [LocInfo(name:"SEGMENT", type:"INTEGER"), LocInfo(name:"PROCEDURE", type:"INTEGER")], ""),
     5: ("UNITREAD",[LocInfo(name:"MODE", type:"INTEGER"), LocInfo(name:"BLOCKNUM", type:"INTEGER"), LocInfo(name:"BYTCOUNT", type:"INTEGER"), LocInfo(name:"BUFFADDR", type:"POINTER"), LocInfo(name:"BUFFOFFS", type:"INTEGER"), LocInfo(name:"UNIT", type:"INTEGER")], ""),
     6: ("UNITWRITE", [LocInfo(name:"MODE", type:"INTEGER"), LocInfo(name:"BLOCKNUM", type:"INTEGER"), LocInfo(name:"BYTCOUNT", type:"INTEGER"), LocInfo(name:"BUFFADDR", type:"POINTER"), LocInfo(name:"BUFFOFFS", type:"INTEGER"), LocInfo(name:"UNIT", type:"INTEGER")], ""),
-    7: ("IDS", [], ""),
-    8: ("TRS", [], ""),
+    7: ("IDSEARCH", [LocInfo(name:"SYMCURSOR", type: "0..1023"), LocInfo(name:"SYMBUF", type:"PACKED ARRAY[0..1023] OF CHAR")], ""),
+    8: ("TREESEARCH", [LocInfo(name:"ROOTP", type: "^NODE"), LocInfo(name:"FOUNDP", type:"^NODE"), LocInfo(name:"TARGET", type:"PACKED ARRAY [1..8] OF CHAR")], "INTEGER"),
     9: ("TIME", [LocInfo(name: "TIME1", type: "INTEGER"), LocInfo(name: "TIME2", type: "INTEGER")], ""),
     10: ("FLCH", [LocInfo(name:"DESTADDR", type:"POINTER"), LocInfo(name:"DESTOFFS", type:"INTEGER"), LocInfo(name:"COUNT", type:"INTEGER"), LocInfo(name:"SRC", type:"CHAR")], ""),
     11: ("SCAN", [

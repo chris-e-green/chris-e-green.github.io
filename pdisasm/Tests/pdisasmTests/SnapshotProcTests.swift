@@ -15,7 +15,7 @@ final class SnapshotProcTests: XCTestCase {
         codeSegs[0] = cs
 
         let allLocations: Set<Location> = []
-        let allLabels: [Location: LocInfo] = [:]
+        let allLabels: Set<LocationTwo> = []
         let allProcedures: [ProcIdentifier] = []
         let allCallers: Set<Call> = []
 
@@ -47,7 +47,7 @@ final class SnapshotProcTests: XCTestCase {
         }
 
         // load fixture and check for key markers
-        let fixture = try String(contentsOf: URL(fileURLWithPath: "Tests/Fixtures/sample_snapshot_proc.txt"))
+        let _ = try String(contentsOf: URL(fileURLWithPath: "Tests/Fixtures/sample_snapshot_proc.txt"))
         XCTAssertTrue(outStr.contains("## Segment Unknown (0)"), "Missing segment header")
         XCTAssertTrue(outStr.contains("###  (* P="), "Missing procedure header")
     }
