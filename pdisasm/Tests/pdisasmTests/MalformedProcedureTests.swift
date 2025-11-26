@@ -13,7 +13,7 @@ final class MalformedProcedureTests: XCTestCase {
 
         // Calling decodePascalProcedure with addr=2 should not crash even though the
         // header is incomplete; the function should return early due to validation.
-    var allLabels: Set<LocationTwo> = []
+    var allLabels: Set<Location> = []
     decodePascalProcedure(currSeg: Segment(codeaddr: 0, codeleng: smallCode.count, name: "TST", segkind: .dataseg, textaddr: 0, segNum: 0, mType: 0, version: 0), proc: &proc, code: smallCode, addr: 2, callers: &callers, allLocations: &allLocations, allProcedures: &allProcedures, allLabels: &allLabels)
 
         // If we reach here, the function did not crash. Ensure procedure remains empty.

@@ -27,7 +27,7 @@ final class FunctionalProcedureTests: XCTestCase {
         var callers: Set<Call> = []
         var allLocations: Set<Location> = []
         var allProcedures: [ProcIdentifier] = []
-        var allLabels: Set<LocationTwo> = []
+        var allLabels: Set<Location> = []
 
         let seg = Segment(codeaddr: 0, codeleng: code.count, name: "SEGT", segkind: .dataseg, textaddr: 0, segNum: 1, mType: 0, version: 0)
 

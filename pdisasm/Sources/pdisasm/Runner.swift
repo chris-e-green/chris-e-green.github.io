@@ -1,7 +1,7 @@
 import CodableCSV
 import Foundation
 
-fileprivate func exportLabels(_ CSVfile: String, _ labels: [LocationTwo]) {
+fileprivate func exportLabels(_ CSVfile: String, _ labels: [Location]) {
 do {
             // create backup first
             let backupURL = URL(fileURLWithPath: CSVfile + ".bak")
@@ -119,8 +119,8 @@ public func runPdisasm(filename: String, verbose: Bool = false) throws {
     var allLocations: Set<Location> = []
     var allProcedures: [ProcIdentifier] = []
     var sysProcedures: [ProcIdentifier] = []
-    var allLabels: Set<LocationTwo> = []
-    var sysLabels: Set<LocationTwo> = []
+    var allLabels: Set<Location> = []
+    var sysLabels: Set<Location> = []
     var allCallers: Set<Call> = []
 
     // Try loading name maps (optional files in repo)
@@ -140,7 +140,7 @@ public func runPdisasm(filename: String, verbose: Bool = false) throws {
                 let dec = CSVDecoder()
                 dec.headerStrategy = .firstLine
                 if let labelsData = try? Data(contentsOf: URL(fileURLWithPath: allLabelsCSVFile)) {
-                    allLabels = try dec.decode(Set<LocationTwo>.self, from: labelsData)
+                    allLabels = try dec.decode(Set<Location>.self, from: labelsData)
                 }
             }
         } catch {
@@ -152,7 +152,7 @@ public func runPdisasm(filename: String, verbose: Bool = false) throws {
                 let dec = CSVDecoder()
                 dec.headerStrategy = .firstLine
                 if let labelsData = try? Data(contentsOf: URL(fileURLWithPath: sysLabelsCSVFile)) {
-                    sysLabels = try dec.decode(Set<LocationTwo>.self, from: labelsData)
+                    sysLabels = try dec.decode(Set<Location>.self, from: labelsData)
                 }
             }
         } catch {
@@ -346,8 +346,9 @@ public func runPdisasm(filename: String, verbose: Bool = false) throws {
     allLocations.filter({ $0.segment == 0 && $0.lexLevel == -1 }).forEach({ loc in
         if let addr = loc.addr {
             allLabels.insert(
-                LocationTwo(
-                    segment: 0, lexLevel: -1, addr: addr, name: globalNames[addr]?.name ?? "",
+                Location(
+                    segment: 0, lexLevel: -1, addr: addr, 
+                    name: globalNames[addr]?.name ?? "",
                     type: globalNames[addr]?.type ?? ""))
         }
     })

@@ -8,7 +8,7 @@ func outputResults(
     knownNames: [Int: Name],
     codeSegs: [Int: CodeSegment],
     allLocations: Set<Location>,
-    allLabels: Set<LocationTwo>,
+    allLabels: Set<Location>,
     allProcedures: [ProcIdentifier],
     allCallers: Set<Call>
 ) {
@@ -65,7 +65,7 @@ func outputResults(
                 allLocations.filter({
                     $0.procedure == proc.procType?.procNumber && $0.segment == s && $0.addr != nil
                 }).sorted().forEach({ loc in
-                    if let pName: LocationTwo = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
+                    if let pName: Location = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
                         print("L\(loc.addr ?? -1)=\(pName.name):\(pName.type)")
                     } else {
                         print("L\(loc.addr ?? -1)=\(loc.description)")

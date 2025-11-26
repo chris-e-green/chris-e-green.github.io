@@ -68,7 +68,7 @@ final class GenerateDisasmSnapshot: XCTestCase {
         let names: [Int: Name] = [:]
         let codeSegs: [Int: CodeSegment] = [:]
         let allLocations: Set<Location> = []
-        let allLabels: Set<LocationTwo> = []
+        let allLabels: Set<Location> = []
         let allProcedures: [ProcIdentifier] = []
         let allCallers: Set<Call> = []
 

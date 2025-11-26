@@ -43,7 +43,7 @@ final class ExpandedFunctionalTests: XCTestCase {
         let seg = Segment(codeaddr: 0, codeleng: code.count, name: "SEGT", segkind: .dataseg, textaddr: 0, segNum: 1, mType: 0, version: 0)
         let addr = code.count - 2
 
-        var allLabels: Set<LocationTwo> = []
+        var allLabels: Set<Location> = []
         decodePascalProcedure(
             currSeg: seg,
             proc: &proc,

@@ -47,7 +47,7 @@ final class SkippedProcedureTests: XCTestCase {
             let maxNeededIndex = addr + 1
             if minNeededIndex < 0 || maxNeededIndex >= inCode.count { continue }
 
-            var allLabels: Set<LocationTwo> = []
+            var allLabels: Set<Location> = []
             decodePascalProcedure(currSeg: seg, proc: &proc, code: inCode, addr: addr, callers: &allCallers, allLocations: &allLocations, allProcedures: &allProcedures, allLabels: &allLabels)
         }
 

@@ -578,7 +578,7 @@ struct StackSimulator {
 /// Generates high-level pseudo-code from decoded instructions and stack states
 struct PseudoCodeGenerator {
     let procLookup: [String: ProcIdentifier]
-    let labelLookup: [String: LocationTwo]
+    let labelLookup: [String: Location]
 
     func findLabel(_ loc: Location) -> String? {
         let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
@@ -682,7 +682,7 @@ func decodePascalProcedure(
     callers: inout Set<Call>,
     allLocations: inout Set<Location>, 
     allProcedures: inout [ProcIdentifier],
-    allLabels: inout Set<LocationTwo>
+    allLabels: inout Set<Location>
 ) {
     // Early validation: ensure addr and the procedure header bytes are present
     // Many subsequent reads assume bytes at addr+1 and at addr-2..addr-8. If
@@ -754,9 +754,9 @@ func decodePascalProcedure(
         procLookup[key] = p
     }
 
-    var labelLookup: [String: LocationTwo] = [:]
+    var labelLookup: [String: Location] = [:]
     for label in allLabels {
-        let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr)"
+        let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr ?? -1)"
         labelLookup[key] = label
     }
 

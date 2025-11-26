@@ -15,7 +15,7 @@ final class SnapshotProcTests: XCTestCase {
         codeSegs[0] = cs
 
         let allLocations: Set<Location> = []
-        let allLabels: Set<LocationTwo> = []
+        let allLabels: Set<Location> = []
         let allProcedures: [ProcIdentifier] = []
         let allCallers: Set<Call> = []
 

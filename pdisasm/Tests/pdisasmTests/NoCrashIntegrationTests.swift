@@ -102,7 +102,7 @@ final class NoCrashIntegrationTests: XCTestCase {
                 if minNeededIndex < 0 || maxNeededIndex >= inCode.count { continue }
 
                 // call decoder; should not crash due to prior guards
-                var allLabels: Set<LocationTwo> = []
+                var allLabels: Set<Location> = []
                 decodePascalProcedure(currSeg: seg, proc: &proc, code: inCode, addr: addr, callers: &allCallers, allLocations: &allLocations, allProcedures: &allProcedures, allLabels: &allLabels)
             }
 
