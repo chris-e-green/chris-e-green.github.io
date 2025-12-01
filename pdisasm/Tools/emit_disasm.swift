@@ -56,11 +56,10 @@ let commentStr = comment.filter({ $0 > 0 }).compactMap({ UnicodeScalar($0) }).ma
 let segDict = SegDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
 
 // For snapshot we create empty collections and call outputResults directly
-let names: [Int: Name] = [:]
 let codeSegs: [Int: CodeSegment] = [:]
 let allLocations: Set<Location> = []
-let allLabels: [Location: LocInfo] = [:]
+let allLabels: Set<Location> = []
 let allProcedures: [ProcIdentifier] = []
 let allCallers: Set<Call> = []
 
-outputResults(sourceFilename: fileURL.lastPathComponent, segDictionary: segDict, knownNames: names, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
+outputResults(sourceFilename: fileURL.lastPathComponent, segDictionary: segDict, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)

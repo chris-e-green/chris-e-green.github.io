@@ -6,7 +6,7 @@ final class CallReturnNonDenseTests: XCTestCase {
         var proc = Procedure()
         proc.enterIC = 100
         proc.exitIC = 120
-        proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 1)
+        proc.procType = ProcIdentifier(isFunction: false, segment: 0, segmentName: "PASCALSY", procedure: 1)
 
         // Non-dense caller: 100,110,120
         proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [7], stackState: [])
@@ -44,7 +44,7 @@ final class CallReturnNonDenseTests: XCTestCase {
         var proc = Procedure()
         proc.enterIC = 200
         proc.exitIC = 210
-        proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 2)
+        proc.procType = ProcIdentifier(isFunction: false, segment: 0, segmentName: "PASCALSY", procedure: 2)
 
         proc.instructions[200] = Instruction(mnemonic: "SLDC", params: [3], stackState: [])
         proc.instructions[210] = Instruction(mnemonic: "RNP", params: [], stackState: [])

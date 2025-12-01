@@ -65,7 +65,6 @@ final class GenerateDisasmSnapshot: XCTestCase {
         let segDict = SegDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
 
         // Prepare empty contexts to call outputResults
-        let names: [Int: Name] = [:]
         let codeSegs: [Int: CodeSegment] = [:]
         let allLocations: Set<Location> = []
         let allLabels: Set<Location> = []
@@ -74,7 +73,7 @@ final class GenerateDisasmSnapshot: XCTestCase {
 
         // Redirect stdout to the output file
         freopen(outPath, "w", stdout)
-        outputResults(sourceFilename: fileURL.lastPathComponent, segDictionary: segDict, knownNames: names, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
+        outputResults(sourceFilename: fileURL.lastPathComponent, segDictionary: segDict, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
         fflush(stdout)
     }
 }

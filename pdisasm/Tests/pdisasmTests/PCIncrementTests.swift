@@ -55,7 +55,7 @@ final class PCIncrementTests: XCTestCase {
         // Caller procedure (procNumber 1) in segment 1
         var caller = Procedure()
         caller.enterIC = 0
-        caller.procType = ProcIdentifier(isFunction: false, isAssembly: false, segmentNumber: 1, segmentName: nil, procNumber: 1, procName: nil)
+        caller.procType = ProcIdentifier(isFunction: false, isAssembly: false, segment: 1, segmentName: nil, procedure: 1, procName: nil)
         caller.instructions[0] = Instruction(mnemonic: "SLDC", params: [7], stackState: [])
         // CIP uses a procedure number (2) which simulateProcedure will resolve via procMap
         caller.instructions[10] = Instruction(mnemonic: "CIP", params: [2], stackState: [])
@@ -64,11 +64,11 @@ final class PCIncrementTests: XCTestCase {
         // Callee procedure (procNumber 2) simply returns immediately
         var callee = Procedure()
         callee.enterIC = 0
-        callee.procType = ProcIdentifier(isFunction: false, isAssembly: false, segmentNumber: 1, segmentName: nil, procNumber: 2, procName: nil)
+        callee.procType = ProcIdentifier(isFunction: false, isAssembly: false, segment: 1, segmentName: nil, procedure: 2, procName: nil)
         callee.instructions[0] = Instruction(mnemonic: "RNP", stackState: [])
 
         // Build procMap keyed by (segment<<16)|procNumber using caller's segment
-        let key = (caller.procType!.segmentNumber << 16) | 2
+        let key = (caller.procType!.segment << 16) | 2
         let procMap: [Int: Procedure] = [ key: callee ]
 
         let seg = Segment(codeaddr: 0, codeleng: 0, name: "test", segkind: .dataseg, textaddr: 0, segNum: 1, mType: 0, version: 0)

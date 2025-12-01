@@ -22,8 +22,8 @@ final class SkippedProcedureTests: XCTestCase {
 
         // Run the minimal processing loop: build codeSeg and ensure procedure pointer is skipped
         let codeBlock = code
-        var codeSeg = CodeSegment(procedureDictionary: ProcedureDictionary(segmentNumber: 0, procedureCount: 0, procedurePointers: []), procedures: [])
-        codeSeg.procedureDictionary = ProcedureDictionary(segmentNumber: Int(codeBlock[codeBlock.endIndex - 2]), procedureCount: Int(codeBlock[codeBlock.endIndex - 1]), procedurePointers: [])
+        var codeSeg = CodeSegment(procedureDictionary: ProcedureDictionary(segment: 0, procedureCount: 0, procedurePointers: []), procedures: [])
+        codeSeg.procedureDictionary = ProcedureDictionary(segment: Int(codeBlock[codeBlock.endIndex - 2]), procedureCount: Int(codeBlock[codeBlock.endIndex - 1]), procedurePointers: [])
         for i in 1...codeSeg.procedureDictionary.procedureCount {
             let ptrIndex = codeBlock.endIndex - i * 2 - 2
             if let ptr = try? CodeData(data: codeBlock, ipc: 0, header: 0).getSelfRefPointer(at: ptrIndex) {

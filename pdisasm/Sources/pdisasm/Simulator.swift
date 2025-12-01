@@ -44,7 +44,7 @@ public func simulateProcedure(currSeg: Segment, proc: Procedure, procMap: [Int: 
         let (nextPC, callProc, returned) = try machine.executeStep(ins: ins, currentPC: currentPC, defaultNextPC: defaultNextPC)
         if let callProc = callProc {
             // resolve callee
-            let key = (proc.procType?.segmentNumber ?? 0) << 16 | callProc
+            let key = (proc.procType?.segment ?? 0) << 16 | callProc
             if let callee = procMap[key] {
                 // push current context
                 callStack.append((currentIns, nextPC))

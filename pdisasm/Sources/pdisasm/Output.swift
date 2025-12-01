@@ -5,7 +5,6 @@ func prettyStack(_ s: [String]) -> String { "[" + s.joined(separator: ", ") + "]
 func outputResults(
     sourceFilename: String,
     segDictionary: SegDictionary,
-    knownNames: [Int: Name],
     codeSegs: [Int: CodeSegment],
     allLocations: Set<Location>,
     allLabels: Set<Location>,
@@ -29,27 +28,29 @@ func outputResults(
     print()
 
     for (s, codeSeg) in codeSegs.sorted(by: { $0.key < $1.key }) {
-        print("## Segment \(knownNames[Int(s)]?.segName ?? "Unknown") (\(s))\n")
+        segDictionary.segTable.first(where: { $0.value.segNum == s }).map { print($0.value) }
+        let segName = segDictionary.segTable.first(where: { $0.value.segNum == s })?.value.name ?? "Unknown"
+        print("## Segment \(segName) (\(s))\n")
         if codeSeg.procedures.count > 0 {
             for proc in codeSeg.procedures {
                 // print proc/func header and procedure attributes
                 let procDesc = allProcedures.first(where: {
-                    $0.segmentNumber == s && $0.procNumber == proc.procType?.procNumber
+                    $0.segment == s && $0.procedure == proc.procType?.procedure
                 })
                 print(
                     "### " + (procDesc?.description ?? proc.procType?.description ?? "")
-                        + " (* P=\(proc.procType?.procNumber ?? -99), LL=\(proc.lexicalLevel), D=\(proc.dataSize) *)"
+                        + " (* P=\(proc.procType?.procedure ?? -99), LL=\(proc.lexicalLevel), D=\(proc.dataSize) *)"
                 )
 
                 // print callers
                 var callerNames: [String] = []
                 allCallers.filter(
-                    { $0.target.procedure == proc.procType?.procNumber && $0.target.segment == s }
+                    { $0.target.procedure == proc.procType?.procedure && $0.target.segment == s }
                 ).forEach(
                     { callerEntry in
                         if let callerName = allProcedures.first(where: {
-                            $0.segmentNumber == callerEntry.origin.segment
-                                && $0.procNumber == callerEntry.origin.procedure
+                            $0.segment == callerEntry.origin.segment
+                                && $0.procedure == callerEntry.origin.procedure
                         }) {
                             callerNames.append(callerName.shortDescription)
                         }
@@ -63,7 +64,7 @@ func outputResults(
 
                 // print variables declared in this procedure
                 allLocations.filter({
-                    $0.procedure == proc.procType?.procNumber && $0.segment == s && $0.addr != nil
+                    $0.procedure == proc.procType?.procedure && $0.segment == s && $0.addr != nil
                 }).sorted().forEach({ loc in
                     if let pName: Location = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
                         print("L\(loc.addr ?? -1)=\(pName.name):\(pName.type)")
@@ -118,7 +119,7 @@ func outputResults(
                         }
                         if let d = inst.destination {
                             if let dest = allProcedures.first(where: {
-                                $0.segmentNumber == d.segment && $0.procNumber == d.procedure
+                                $0.segment == d.segment && $0.procedure == d.procedure
                             }) {
                                 print(" \(dest.shortDescription)", terminator: "")
                             } else {

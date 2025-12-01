@@ -6,7 +6,6 @@ final class SnapshotTests: XCTestCase {
     func testOutputResultsSnapshot() throws {
         // Build minimal inputs to outputResults
         let segDict = SegDictionary(segTable: [:], intrinsics: Set<UInt8>(), comment: "")
-        let knownNames: [Int: Name] = [:]
         let codeSegs: [Int: CodeSegment] = [:]
         let allLocations: Set<Location> = []
         let allLabels: Set<Location> = []
@@ -21,7 +20,7 @@ final class SnapshotTests: XCTestCase {
         dup2(pipefds[1], STDOUT_FILENO)
 
         // call the function
-        outputResults(sourceFilename: "sample.bin", segDictionary: segDict, knownNames: knownNames, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
+        outputResults(sourceFilename: "sample.bin", segDictionary: segDict, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
 
         // restore stdout and read pipe
         fflush(stdout)

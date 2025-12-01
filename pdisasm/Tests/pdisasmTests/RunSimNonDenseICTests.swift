@@ -6,7 +6,7 @@ final class RunSimNonDenseICTests: XCTestCase {
         var proc = Procedure()
         proc.enterIC = 100
         proc.exitIC = 130
-        proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 1)
+        proc.procType = ProcIdentifier(isFunction: false, segment: 0, segmentName: "PASCALSY", procedure: 1)
 
         // Non-dense instruction layout: 100, 110, 120, 130
         proc.instructions[100] = Instruction(mnemonic: "SLDC", params: [1], stackState: [])

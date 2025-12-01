@@ -22,7 +22,7 @@ final class FunctionalProcedureTests: XCTestCase {
         let code = Data(arr)
 
         var proc = Procedure()
-        proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 1, procNumber: 1)
+        proc.procType = ProcIdentifier(isFunction: false, segment: 1, procedure: 1)
 
         var callers: Set<Call> = []
         var allLocations: Set<Location> = []

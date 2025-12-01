@@ -5,7 +5,7 @@ import pdisasm
 var proc = Procedure()
 proc.enterIC = 0
 proc.exitIC = 3
-proc.procType = ProcIdentifier(isFunction: false, segmentNumber: 0, segmentName: "PASCALSY", procNumber: 1)
+proc.procType = ProcIdentifier(isFunction: false, segment: 0, segmentName: "PASCALSY", procedure: 1)
 
 proc.instructions[0] = Instruction(mnemonic: "SLDC", params: [5], stackState: [])
 proc.instructions[1] = Instruction(mnemonic: "SLDC", params: [3], stackState: [])

@@ -1,23 +1,23 @@
 public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(segmentNumber)
-        hasher.combine(procNumber)
+        hasher.combine(segment)
+        hasher.combine(procedure)
     }
 
     public static func == (lhs: ProcIdentifier, rhs: ProcIdentifier) -> Bool {
-        return lhs.segmentNumber == rhs.segmentNumber && lhs.procNumber == rhs.procNumber
+        return lhs.segment == rhs.segment && lhs.procedure == rhs.procedure
     }
 
     public init(
-        isFunction: Bool, isAssembly: Bool = false, segmentNumber: Int, segmentName: String? = nil,
-        procNumber: Int, procName: String? = nil, parameters: [LocInfo] = [],
+        isFunction: Bool, isAssembly: Bool = false, segment: Int, segmentName: String? = nil,
+        procedure: Int, procName: String? = nil, parameters: [Identifier] = [],
         returnType: String? = nil 
     ) {
         self.isFunction = isFunction
         self.isAssembly = isAssembly
-        self.segmentNumber = segmentNumber
+        self.segment = segment
         self.segmentName = segmentName
-        self.procNumber = procNumber
+        self.procedure = procedure
         self.procName = procName
         self.parameters = parameters
         if isFunction {
@@ -29,8 +29,8 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
         var s =
             (isFunction
             ? "FUNCTION "
-            : "PROCEDURE ") + (segmentName ?? "SEG" + String(segmentNumber)) + "."
-                + (procName ?? (isFunction ? "FUNC" : "PROC") + String(procNumber))
+            : "PROCEDURE ") + (segmentName ?? "SEG" + String(segment)) + "."
+                + (procName ?? (isFunction ? "FUNC" : "PROC") + String(procedure))
         if !parameters.isEmpty {
             s += "(" + parameters.map({ $0.description }).joined(separator: "; ") + ")"
         }
@@ -42,13 +42,13 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
     public var shortDescription: String {
         var result = ""
         if segmentName == nil || segmentName!.isEmpty {
-            result += "SEG" + String(segmentNumber)
+            result += "SEG" + String(segment)
         } else {
             result += segmentName!
         }
         result += "."
         if procName == nil || procName!.isEmpty {
-            result += (isFunction ? "FUNC" : "PROC") + String(procNumber)
+            result += (isFunction ? "FUNC" : "PROC") + String(procedure)
         } else {
             result += procName!
         }
@@ -57,17 +57,17 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
 
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.segmentNumber = try container.decode(Int.self, forKey: CodingKeys.segmentNumber)
-        self.procNumber = try container.decode(Int.self, forKey: CodingKeys.procNumber)
+        self.segment = try container.decode(Int.self, forKey: CodingKeys.segmentNumber)
+        self.procedure = try container.decode(Int.self, forKey: CodingKeys.procNumber)
         self.segmentName = try container.decodeIfPresent(String.self, forKey: CodingKeys.segmentName)
         self.procName = try container.decodeIfPresent(String.self, forKey: CodingKeys.procName)
         let paramStr = try container.decode(String.self, forKey: CodingKeys.parameters)
         self.parameters = paramStr.split(separator: ";").map {
             let parts = $0.split(separator: ":", maxSplits: 1).map { String($0) }
             if parts.count == 2 {
-                return LocInfo(name: parts[0], type: parts[1])
+                return Identifier(name: parts[0], type: parts[1])
             } else {
-                return LocInfo(name: parts[0], type: "")
+                return Identifier(name: parts[0], type: "")
             }
         }
         self.returnType = try container.decode(String.self, forKey: CodingKeys.returnType)
@@ -80,8 +80,8 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.segmentNumber, forKey: CodingKeys.segmentNumber)
-        try container.encode(self.procNumber, forKey: CodingKeys.procNumber)
+        try container.encode(self.segment, forKey: CodingKeys.segmentNumber)
+        try container.encode(self.procedure, forKey: CodingKeys.procNumber)
         try container.encode(self.segmentName, forKey: CodingKeys.segmentName)
         try container.encode(self.procName, forKey: CodingKeys.procName)
         try container.encode(self.parameters.map { $0.description}.joined(separator:";"), forKey: CodingKeys.parameters)
@@ -102,10 +102,10 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
     }
     public var isFunction: Bool
     public var isAssembly: Bool = false
-    public var segmentNumber: Int
+    public var segment: Int
     public var segmentName: String?
-    public var procNumber: Int
+    public var procedure: Int
     public var procName: String?
-    public var parameters: [LocInfo] = []
+    public var parameters: [Identifier] = []
     public var returnType: String?
 }

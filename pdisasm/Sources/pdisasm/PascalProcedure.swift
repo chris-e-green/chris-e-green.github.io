@@ -1,5 +1,89 @@
 import Foundation
 
+let cspProcs: [Int: (String, [Identifier], String)] = [
+    0: ("IOC", [], ""),
+    1: ("NEW", [
+        Identifier(name:"PTR", type:"POINTER"), 
+        Identifier(name:"SIZE", type:"INTEGER")], ""), 
+    2: ("MOVL",[
+        Identifier(name:"SRCADDR", type:"POINTER"), 
+        Identifier(name:"SRCOFFS", type:"INTEGER"), 
+        Identifier(name:"DESTADDR", type:"POINTER"), 
+        Identifier(name:"DESTOFFS", type:"INTEGER"), 
+        Identifier(name:"COUNT", type:"INTEGER")], ""),
+    3: ("MOVR", [
+        Identifier(name:"SRCADDR", type:"POINTER"), 
+        Identifier(name:"SRCOFFS", type:"INTEGER"), 
+        Identifier(name:"DESTADDR", type:"POINTER"), 
+        Identifier(name:"DESTOFFS", type:"INTEGER"), 
+        Identifier(name:"COUNT", type:"INTEGER")], ""),
+    4: ("EXIT", [
+        Identifier(name:"SEGMENT", type:"INTEGER"), 
+        Identifier(name:"PROCEDURE", type:"INTEGER")], ""),
+    5: ("UNITREAD",[
+        Identifier(name:"MODE", type:"INTEGER"), 
+        Identifier(name:"BLOCKNUM", type:"INTEGER"), 
+        Identifier(name:"BYTCOUNT", type:"INTEGER"), 
+        Identifier(name:"BUFFADDR", type:"POINTER"), 
+        Identifier(name:"BUFFOFFS", type:"INTEGER"), 
+        Identifier(name:"UNIT", type:"INTEGER")], ""),
+    6: ("UNITWRITE", [
+        Identifier(name:"MODE", type:"INTEGER"), 
+        Identifier(name:"BLOCKNUM", type:"INTEGER"), 
+        Identifier(name:"BYTCOUNT", type:"INTEGER"), 
+        Identifier(name:"BUFFADDR", type:"POINTER"), 
+        Identifier(name:"BUFFOFFS", type:"INTEGER"), 
+        Identifier(name:"UNIT", type:"INTEGER")], ""),
+    7: ("IDSEARCH", [
+        Identifier(name:"SYMCURSOR", type: "0..1023"), 
+        Identifier(name:"SYMBUF", type:"PACKED ARRAY[0..1023] OF CHAR")], ""),
+    8: ("TREESEARCH", [
+        Identifier(name:"ROOTP", type: "^NODE"), 
+        Identifier(name:"FOUNDP", type:"^NODE"), 
+        Identifier(name:"TARGET", type:"PACKED ARRAY [1..8] OF CHAR")], "INTEGER"),
+    9: ("TIME", [
+        Identifier(name: "TIME1", type: "INTEGER"), 
+        Identifier(name: "TIME2", type: "INTEGER")], ""),
+    10: ("FLCH", [
+        Identifier(name:"DESTADDR", type:"POINTER"), 
+        Identifier(name:"DESTOFFS", type:"INTEGER"), 
+        Identifier(name:"COUNT", type:"INTEGER"), 
+        Identifier(name:"SRC", type:"CHAR")], ""),
+    11: ("SCAN", [
+        Identifier(name:"JUNK", type:"INTEGER"), 
+        Identifier(name:"DESTADDR", type:"POINTER"), 
+        Identifier(name:"DESTOFFS", type:"INTEGER"), 
+        Identifier(name:"CH", type:"CHAR"), 
+        Identifier(name:"CHECK", type:"INTEGER"), 
+        Identifier(name:"COUNT", type:"INTEGER")], "INTEGER"),
+    12: ("UNITSTATUS", [
+        Identifier(name: "CTRLWORD", type: "INTEGER"), 
+        Identifier(name: "STATADDR", type: "POINTER"),
+        Identifier(name: "STATOFFS", type: "INTEGER"), 
+        Identifier(name: "UNIT", type: "INTEGER")], ""),
+    // skipping 13-20 (reserved)
+    21: ("LOADSEGMENT", [Identifier(name:"SEGMENT", type:"INTEGER")], ""),
+    22: ("UNLOADSEGMENT", [Identifier(name:"SEGMENT", type:"INTEGER")], ""),
+    23: ("TRUNC", [Identifier(name: "NUM", type: "REAL")], "INTEGER"), 
+    24: ("ROUND", [Identifier(name: "NUM", type: "REAL")], "INTEGER"), 
+    25: ("SIN", [], ""), // not implemented
+    26: ("COS", [], ""), // not implemented
+    27: ("LOG", [], ""), // not implemented
+    28: ("ATAN", [], ""), // not implemented
+    29: ("LN", [], ""), // not implemented
+    30: ("EXP", [], ""), // not implemented
+    31: ("SQRT", [], ""), // not implemented
+    32: ("MARK", [Identifier(name: "NP", type: "POINTER")], ""),
+    33: ("RELEASE", [Identifier(name: "NP", type: "POINTER")], ""),
+    34: ("IORESULT", [], "INTEGER"),
+    35: ("UNITBUSY", [Identifier(name:"UNIT", type:"INTEGER")], "BOOLEAN"),
+    36: ("POT", [Identifier(name:"NUM", type:"INTEGER")], "REAL"),  
+    37: ("UNITWAIT", [Identifier(name:"UNIT", type:"INTEGER")], ""),
+    38: ("UNITCLEAR", [Identifier(name:"UNIT", type:"INTEGER")], ""),
+    39: ("HALT", [], ""),
+    40: ("MEMAVAIL", [], "INTEGER"),
+]
+
 // MARK: - Opcode Decoder
 
 /// Handles decoding of P-code opcodes and extracting instruction parameters
@@ -144,7 +228,7 @@ struct OpcodeDecoder {
                 mnemonic: "CSP",
                 params: [procNum],
                 bytesConsumed: 2,
-                comment: "Call standard procedure \(cspNames[procNum] ?? String(procNum))")
+                comment: "Call standard procedure \(cspProcs[procNum]?.0 ?? String(procNum))")
         case 0x9F:
             return DecodedInstruction(
                 mnemonic: "LDCN", bytesConsumed: 1, comment: "Load constant NIL")
@@ -371,7 +455,7 @@ struct OpcodeDecoder {
         case 0xC6:
             let (val, inc) = try cd.readBig(at: ic + 1)
             let loc = Location(
-                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                segment: currSeg.segNum, procedure: proc.procType?.procedure,
                 lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 mnemonic: "LLA", params: [val], bytesConsumed: 1 + inc,
@@ -390,7 +474,7 @@ struct OpcodeDecoder {
         case 0xCA:
             let (val, inc) = try cd.readBig(at: ic + 1)
             let loc = Location(
-                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                segment: currSeg.segNum, procedure: proc.procType?.procedure,
                 lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 mnemonic: "LDL", params: [val], bytesConsumed: 1 + inc, comment: "Load local word",
@@ -401,7 +485,7 @@ struct OpcodeDecoder {
         case 0xCC:
             let (val, inc) = try cd.readBig(at: ic + 1)
             let loc = Location(
-                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                segment: currSeg.segNum, procedure: proc.procType?.procedure,
                 lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 mnemonic: "STL", params: [val], bytesConsumed: 1 + inc, comment: "Store local word",
@@ -452,7 +536,7 @@ struct OpcodeDecoder {
             let b = Int(opcode)
             let val = b - 0xd7
             let loc = Location(
-                segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                segment: currSeg.segNum, procedure: proc.procType?.procedure,
                 lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 mnemonic: "SLDL", params: [val], bytesConsumed: 1, comment: "Short load local word",
@@ -591,7 +675,7 @@ struct PseudoCodeGenerator {
         loc: Location?
     ) -> String? {
         switch inst.mnemonic {
-        case "STO":
+        case "STO", "SAS":
             let src = stack.pop()
             let dest = stack.pop()
             return "\(dest) := \(src)"
@@ -682,7 +766,8 @@ func decodePascalProcedure(
     callers: inout Set<Call>,
     allLocations: inout Set<Location>, 
     allProcedures: inout [ProcIdentifier],
-    allLabels: inout Set<Location>
+    allLabels: inout Set<Location>,
+    verbose: Bool = false
 ) {
     // Early validation: ensure addr and the procedure header bytes are present
     // Many subsequent reads assume bytes at addr+1 and at addr-2..addr-8. If
@@ -745,12 +830,12 @@ func decodePascalProcedure(
     var done: Bool = false
     proc.entryPoints.insert(proc.enterIC)
     proc.entryPoints.insert(proc.exitIC)
-    let myLoc = Location(segment: currSeg.segNum, procedure: proc.procType?.procNumber)
+    let myLoc = Location(segment: currSeg.segNum, procedure: proc.procType?.procedure)
 
     // Build lookup dictionaries for O(1) access instead of O(n) linear searches
     var procLookup: [String: ProcIdentifier] = [:]
     for p in allProcedures {
-        let key = "\(p.segmentNumber):\(p.procNumber)"
+        let key = "\(p.segment):\(p.procedure)"
         procLookup[key] = p
     }
 
@@ -791,6 +876,9 @@ func decodePascalProcedure(
                 decoded = cachedDecoded
             } else {
                 // Fallback for any decode errors
+                if verbose {
+                    print("Decode error at IC \(String(format: "%04x", ic)) in proc \(proc.procType?.shortDescription ?? "unknown")")
+                }
                 return
             }
 
@@ -1052,7 +1140,7 @@ func decodePascalProcedure(
                 }
                 proc.instructions[ic] = Instruction(
                     mnemonic: "CSP", params: [procNum],
-                    comment: "Call standard procedure \(cspNames[procNum] ?? String(procNum))",
+                    comment: "Call standard procedure \(cspProcs[procNum]?.0 ?? String(procNum))",
                     stackState: currentStack, pseudoCode: pseudoCode)
                 ic += 2
             case 0x9F:
@@ -1094,7 +1182,7 @@ func decodePascalProcedure(
                 ic += bytesConsumed
             case 0xA5:
                 if let loc = decoded.memLocation {
-                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
                     allLocations.insert(loc)
                 }
                 ic += bytesConsumed
@@ -1112,7 +1200,7 @@ func decodePascalProcedure(
                 ic += bytesConsumed
             case 0xA7:
                 if let loc = decoded.memLocation {
-                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
                     allLocations.insert(loc)
                 }
                 ic += bytesConsumed
@@ -1126,9 +1214,8 @@ func decodePascalProcedure(
                 }
                 ic += bytesConsumed
             case 0xAA:
-                // SAS: String assign (pops source and dest from stack)
-                _ = simulator.pop()  // source
-                _ = simulator.pop()  // dest
+                // SAS: String assign
+                pseudoCode = pseudoGen.generateForInstruction(decoded, stack: &simulator, loc: nil)
                 ic += bytesConsumed
             case 0xAB:
                 if let loc = decoded.memLocation {
@@ -1183,7 +1270,7 @@ func decodePascalProcedure(
             case 0xAE:
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc = Location(segment: currSeg.segNum, procedure: procNum)
-                if procNum != proc.procType?.procNumber {  // don't add if recursive
+                if procNum != proc.procType?.procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
                 let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
@@ -1210,7 +1297,7 @@ func decodePascalProcedure(
                 ic += bytesConsumed
             case 0xB2:
                 if let loc = decoded.memLocation {
-                    simulator.push("^\(findLabel(loc) ?? loc.description)")
+                    simulator.push("\(findLabel(loc) ?? loc.description)")
                     allLocations.insert(loc)
                 }
                 ic += bytesConsumed
@@ -1326,7 +1413,7 @@ func decodePascalProcedure(
             case 0xC2:
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc = Location(segment: currSeg.segNum, procedure: procNum)
-                if procNum != proc.procType?.procNumber {  // don't add if recursive
+                if procNum != proc.procType?.procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
                 let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
@@ -1356,10 +1443,10 @@ func decodePascalProcedure(
             case 0xC6:
                 let (val, inc) = try cd.readBig(at: ic + 1)
                 let loc = Location(
-                    segment: currSeg.segNum, procedure: proc.procType?.procNumber,
+                    segment: currSeg.segNum, procedure: proc.procType?.procedure,
                     lexLevel: proc.lexicalLevel, addr: val)
                 currentStack.append(
-                    "^\(findLabel(loc) ?? loc.description)"
+                    "\(findLabel(loc) ?? loc.description)"
                 )
                 proc.instructions[ic] = Instruction(
                     mnemonic: "LLA", params: [val], memLocation: loc, comment: "Load local address",
@@ -1391,7 +1478,7 @@ func decodePascalProcedure(
                             addr = Int(sai.dropFirst())
                         }
                     }
-                    if var l = allLabels.first(where: {
+                    if let l = allLabels.first(where: {
                         $0.addr == addr && $0.segment == seg && $0.procedure == proc
                     }) {
                         allLabels.remove(l)
@@ -1424,7 +1511,7 @@ func decodePascalProcedure(
                 let seg = Int(try cd.readByte(at: ic + 1))
                 let procNum = Int(try cd.readByte(at: ic + 2))
                 let loc = Location(segment: seg, procedure: procNum)
-                if procNum != proc.procType?.procNumber || seg != currSeg.segNum {  // don't add if recursive
+                if procNum != proc.procType?.procedure || seg != currSeg.segNum {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
                 let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
@@ -1437,7 +1524,7 @@ func decodePascalProcedure(
             case 0xCE:
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc: Location = Location(segment: currSeg.segNum, procedure: procNum)
-                if procNum != proc.procType?.procNumber {  // don't add if recursive
+                if procNum != proc.procType?.procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
                 let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
@@ -1450,7 +1537,7 @@ func decodePascalProcedure(
             case 0xCF:
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc = Location(segment: currSeg.segNum, procedure: procNum)
-                if procNum != proc.procType?.procNumber {  // don't add if recursive
+                if procNum != proc.procType?.procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
                 let pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
@@ -1567,14 +1654,14 @@ func decodePascalProcedure(
         }
         if paramCount > 0 {
             for parmnum in 1...paramCount {
-                proc.procType?.parameters.append(LocInfo(name: "PARAM\(parmnum)", type: "UNKNOWN"))
+                proc.procType?.parameters.append(Identifier(name: "PARAM\(parmnum)", type: "UNKNOWN"))
             }
         }
     }
 
     if let p = proc.procType {
         if !allProcedures.contains(where: {
-            $0.procNumber == p.procNumber && $0.segmentNumber == p.segmentNumber
+            $0.procedure == p.procedure && $0.segment == p.segment
         }) {
             allProcedures.append(p)
         }

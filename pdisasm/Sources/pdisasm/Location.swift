@@ -1,4 +1,20 @@
-public struct Location: Hashable, CustomStringConvertible, Comparable, Codable, Sendable {
+public final class Location: Hashable, CustomStringConvertible, Comparable, Codable {
+    public var segment: Int
+    public var procedure: Int?
+    public var lexLevel: Int?
+    public var addr: Int?
+    public var name: String
+    public var type: String
+
+    enum CodingKeys: String, CodingKey {
+        case segment = "segment"
+        case procedure = "procedure"
+        case lexLevel = "lexLevel"
+        case addr = "addr"
+        case name = "name"
+        case type = "type"
+    }
+
     public static func < (lhs: Location, rhs: Location) -> Bool {
         if lhs.segment != rhs.segment {
             return lhs.segment < rhs.segment
@@ -9,16 +25,19 @@ public struct Location: Hashable, CustomStringConvertible, Comparable, Codable, 
         if lhs.lexLevel != rhs.lexLevel {
             return (lhs.lexLevel ?? -1) < (rhs.lexLevel ?? -1)
         }
-        return (lhs.addr ?? -1) < (rhs.addr ?? -1)
+        return (lhs.addr ?? -1) < (rhs.addr ?? -1)    
     }
-    
-    public var segment: Int
-    public var procedure: Int?
-    public var lexLevel: Int?
-    public var addr: Int?
-    public var name: String
-    public var type: String
-    
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.segment = try container.decode(Int.self, forKey: CodingKeys.segment)
+        self.procedure = try container.decodeIfPresent(Int.self, forKey: CodingKeys.procedure)
+        self.lexLevel = try container.decodeIfPresent(Int.self, forKey: CodingKeys.lexLevel)
+        self.addr = try container.decodeIfPresent(Int.self, forKey: CodingKeys.addr)
+        self.name = try container.decode(String.self, forKey: CodingKeys.name)
+        self.type = try container.decode(String.self, forKey: CodingKeys.type)
+    }
+
     public init(segment: Int, procedure: Int? = nil, lexLevel: Int? = nil, addr: Int? = nil, 
                 name: String = "", type: String = "") {
         self.segment = segment
@@ -28,15 +47,24 @@ public struct Location: Hashable, CustomStringConvertible, Comparable, Codable, 
         self.name = name
         self.type = type
     }
-    
-    // Equality and hashing exclude name/type to match LocationTwo behavior
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.segment, forKey: CodingKeys.segment)
+        try container.encode(self.procedure, forKey: CodingKeys.procedure)
+        try container.encode(self.lexLevel, forKey: CodingKeys.lexLevel)
+        try container.encode(self.addr, forKey: CodingKeys.addr)
+        try container.encode(self.name, forKey: CodingKeys.name)
+        try container.encode(self.type, forKey: CodingKeys.type)
+    }
+
     public static func == (lhs: Location, rhs: Location) -> Bool {
         return lhs.segment == rhs.segment &&
             lhs.procedure == rhs.procedure &&
             lhs.lexLevel == rhs.lexLevel &&
             lhs.addr == rhs.addr
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(segment)
         hasher.combine(procedure)
@@ -60,7 +88,7 @@ public struct Location: Hashable, CustomStringConvertible, Comparable, Codable, 
         }
         return locationString
     }
-    
+
     public var longDescription: String {
         var s = "S\(segment)"
         if let procedure = procedure {
@@ -77,5 +105,4 @@ public struct Location: Hashable, CustomStringConvertible, Comparable, Codable, 
         }
         return s
     }
-
 }

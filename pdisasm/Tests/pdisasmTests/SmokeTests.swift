@@ -25,7 +25,7 @@ final class SmokeTests: XCTestCase {
         XCTAssertEqual(proc.entryPoints.count, 0)
         // set some values and ensure they persist
         proc.lexicalLevel = 1
-        proc.procType = ProcIdentifier(isFunction: false, isAssembly: false, segmentNumber: 1, procNumber: 1, procName: "TEST")
-        XCTAssertEqual(proc.procType?.procNumber, 1)
+        proc.procType = ProcIdentifier(isFunction: false, isAssembly: false, segment: 1, procedure: 1, procName: "TEST")
+        XCTAssertEqual(proc.procType?.procedure, 1)
     }
 }

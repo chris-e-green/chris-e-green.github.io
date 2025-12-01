@@ -6,11 +6,10 @@ final class SnapshotProcTests: XCTestCase {
     func testOutputResultsWithProcedureSnapshot() throws {
         // Build a minimal seg dictionary and one code segment with an empty procedure
         let segDict = SegDictionary(segTable: [:], intrinsics: Set<UInt8>(), comment: "")
-        let knownNames: [Int: Name] = [:]
         var codeSegs: [Int: CodeSegment] = [:]
 
         let proc = Procedure()
-        let procDict = ProcedureDictionary(segmentNumber: 0, procedureCount: 0, procedurePointers: [])
+        let procDict = ProcedureDictionary(segment: 0, procedureCount: 0, procedurePointers: [])
         let cs = CodeSegment(procedureDictionary: procDict, procedures: [proc])
         codeSegs[0] = cs
 
@@ -26,7 +25,7 @@ final class SnapshotProcTests: XCTestCase {
         fflush(stdout)
         dup2(pipefds[1], STDOUT_FILENO)
 
-        outputResults(sourceFilename: "sample.bin", segDictionary: segDict, knownNames: knownNames, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
+        outputResults(sourceFilename: "sample.bin", segDictionary: segDict, codeSegs: codeSegs, allLocations: allLocations, allLabels: allLabels, allProcedures: allProcedures, allCallers: allCallers)
 
         fflush(stdout)
         dup2(originalStdout, STDOUT_FILENO)

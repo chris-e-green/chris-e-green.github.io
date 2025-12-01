@@ -1,0 +1,11 @@
+# TODO
+
+- Put the metadata files in a separate (configurable?) directory
+- Check whether there's a more 'swiftian' equivalent to FileManager
+- Find out if there's a clean way to check for the existence of a directory
+- Auto-map proc/func parameters to their memory locations
+- Auto-detect the datatype of memory locations based on the operations called and from that info it should be possible to extrapolate it to populate the types of derived variables too (integer, real, char should be fairly simple, boolean might be a bit harder)
+- make sure all opcodes are doing what they need to in terms of either pseudo-code or stack
+- tidy up parentheses when they end up being duplicated unneccessarily
+- finish checking for and removing unnecessary structures that are relics of 
+  earlier approaches and data structures
