@@ -174,7 +174,7 @@ private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
 /// so the `pdisasm-cli` executable can delegate to it.
 public func runPdisasm(
     filename: String, verbose: Bool = false, rewrite: Bool = false,
-    metadataPrefix: String = "metadata"
+    metadataPrefix: String = "/Users/chris/Repos/chris-e-green.github.io/pdisasm/metadata"
 )
     throws
 {
@@ -192,10 +192,11 @@ public func runPdisasm(
 
     var allCodeSegs: [Int: CodeSegment] = [:]
     var allLocations: Set<Location> = []
+    var sysLocations: Set<Location> = []
     var allProcedures: [ProcIdentifier] = []
     var sysProcedures: [ProcIdentifier] = []
-    var allLabels: Set<Location> = []
-    var sysLabels: Set<Location> = []
+    // var allLabels: Set<Location> = []
+    // var sysLabels: Set<Location> = []
     var allCallers: Set<Call> = []
 
     // Try loading name maps (optional files in repo)
@@ -208,10 +209,11 @@ public func runPdisasm(
     let sysProceduresCSVFile = "procedures_ver_\(version).csv"
     let globalsFile = "globals_ver_\(version).json"
 
-    importLabels(fromCSV: allLabelsCSVFile, to: &allLabels, metadataPrefix: metadataPrefix)
-    importLabels(fromCSV: sysLabelsCSVFile, to: &sysLabels, metadataPrefix: metadataPrefix)
+    importLabels(fromCSV: allLabelsCSVFile, to: &allLocations, metadataPrefix: metadataPrefix)
+    importLabels(fromCSV: sysLabelsCSVFile, to: &sysLocations, metadataPrefix: metadataPrefix)
 
-    allLabels.formUnion(sysLabels)
+    // allLabels.formUnion(sysLabels)
+    allLocations.formUnion(sysLocations)
 
     importGlobalLabels(fromJson: globalsFile, to: &globalNames, metadataPrefix: metadataPrefix)
 
@@ -221,6 +223,17 @@ public func runPdisasm(
         fromCSV: sysProceduresCSVFile, to: &sysProcedures, metadataPrefix: metadataPrefix)
 
     allProcedures.append(contentsOf: sysProcedures)
+
+// build allLabels from global names
+    // allLocations.filter({ $0.segment == 0 && $0.lexLevel == -1 }).forEach({ loc in
+    //     if let addr = loc.addr {
+    //         allLabels.insert(
+    //             Location(
+    //                 segment: 0, lexLevel: -1, addr: addr,
+    //                 name: globalNames[addr]?.name ?? "",
+    //                 type: globalNames[addr]?.type ?? ""))
+    //     }
+    // })
 
     // For each segment, extract code blocks and decode procedures
     for segment in segDict.segTable.sorted(by: { $0.key < $1.key }) {
@@ -320,29 +333,71 @@ public func runPdisasm(
             }
 
             var procNumber = 0
+            var isAssembler = false
             if addr >= 0 && addr < inCode.count { procNumber = Int(inCode[addr]) }
 
-            proc.procType = ProcIdentifier(
-                isFunction: false, segment: seg.segNum, segmentName: seg.name,
-                procedure: procNumber)
+            // if it's assembler, proc# is based on the index alone.
+            if procNumber == 0 && seg.mType == 7 {
+                procNumber = procIdx + 1
+                isAssembler = true
+            }
 
-            if proc.procType?.procedure == 0 && seg.mType == 7 {
+            // set proc headers for any procedures we already know about
+            // this will make it easier to assign their memory locations.
+            if let predefinedProc = allProcedures.first(where: {
+                $0.segment == seg.segNum && $0.procedure == procNumber
+            }) {
+                proc.procType = predefinedProc
+            }
+
+            // go through the parameters/function return and set the
+            // allLabels data for predeclared procedures.
+            if let pt = proc.procType {
+                // if it's a function, set locations 1 (and 2 for reals) to retval
+                if pt.isFunction == true {
+                    if let ret = allLocations.first(where: {
+                        $0.segment == seg.segNum && $0.procedure == procNumber && $0.addr == 1
+                    }) {
+                        ret.name = pt.procName ?? pt.shortDescription
+                        ret.type = pt.returnType ?? "UNKNOWN"
+                        allLocations.update(with: ret)
+                    } else {
+                        allLocations.insert(Location(segment: seg.segNum, procedure: procNumber, addr: 1, name: pt.procName ?? pt.shortDescription, type: pt.returnType ?? "UNKNOWN"))
+                    }
+                    if proc.procType?.returnType == "REAL" {
+                        if let ret = allLocations.first(where: {
+                            $0.segment == seg.segNum && $0.procedure == procNumber && $0.addr == 2
+                        }) {
+                            ret.name = pt.procName ?? pt.shortDescription
+                            ret.type = pt.returnType ?? "REAL"
+                            allLocations.update(with: ret)
+                        } else {
+                            allLocations.insert(Location(segment: seg.segNum, procedure: procNumber, addr: 2, name: pt.procName ?? pt.shortDescription, type: pt.returnType ?? "REAL"))
+                        }
+                    }
+                }
+            }
+
+            if isAssembler && seg.mType == 7 {
                 try? decodeAssemblerProcedure(
                     segmentNumber: seg.segNum,
-                    procedureNumber: procIdx + 1,
+                    procedureNumber: procNumber,
                     proc: &proc,
                     code: inCode,
                     addr: addr)
             } else {
                 decodePascalProcedure(
                     currSeg: seg,
+                    procedureNumber: procNumber,
                     proc: &proc,
                     code: inCode,
                     addr: addr,
                     callers: &tempCallers,
                     allLocations: &allLocations,
-                    allProcedures: &allProcedures,
-                    allLabels: &allLabels)
+                    allProcedures: &allProcedures
+                    // ,
+                    // allLabels: &allLabels
+                    )
             }
 
             codeSeg.procedures.append(proc)
@@ -380,28 +435,19 @@ public func runPdisasm(
     //     }
     // }
 
-    // build allLabels from global names
-    allLocations.filter({ $0.segment == 0 && $0.lexLevel == -1 }).forEach({ loc in
-        if let addr = loc.addr {
-            allLabels.insert(
-                Location(
-                    segment: 0, lexLevel: -1, addr: addr,
-                    name: globalNames[addr]?.name ?? "",
-                    type: globalNames[addr]?.type ?? ""))
-        }
-    })
+    
 
     // Output results using the existing helper
     outputResults(
         sourceFilename: fileIdentifier, segDictionary: segDict,
-        codeSegs: allCodeSegs, allLocations: allLocations, allLabels: allLabels,
+        codeSegs: allCodeSegs, allLocations: allLocations, // allLabels: allLabels,
         allProcedures: allProcedures, allCallers: allCallers)
 
     exportLabels(
-        toCSV: allLabelsCSVFile, from: allLabels.filter { $0.segment != 0 }.sorted { $0 < $1 },
+        toCSV: allLabelsCSVFile, from: allLocations.filter { $0.segment != 0 }.sorted { $0 < $1 },
         overwrite: rewrite, metadataPrefix: metadataPrefix)
     exportLabels(
-        toCSV: sysLabelsCSVFile, from: allLabels.filter { $0.segment == 0 }.sorted { $0 < $1 },
+        toCSV: sysLabelsCSVFile, from: allLocations.filter { $0.segment == 0 }.sorted { $0 < $1 },
         overwrite: rewrite, metadataPrefix: metadataPrefix)
 
     exportProcedures(

@@ -72,6 +72,27 @@ public final class Location: Hashable, CustomStringConvertible, Comparable, Coda
         hasher.combine(addr)
     }
 
+    public var dispName: String {
+        if !name.isEmpty {
+            return name
+        }
+        var locationString = "S\(segment)"
+        if let procedure = procedure {
+            locationString += "_P\(procedure)"
+        }
+        if let lexLevel = lexLevel {
+            locationString += "_L\(lexLevel)"
+        }
+        if let addr = addr {
+            locationString += "_A\(addr)"
+        }
+        return locationString
+    }
+
+    public var dispType: String {
+        return type.isEmpty ? "UNKNOWN" : type
+    }
+    
     public var description: String {
         if !name.isEmpty {
             return "\(name):\(type)"
