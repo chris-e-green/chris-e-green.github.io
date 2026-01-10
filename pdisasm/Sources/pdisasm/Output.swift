@@ -7,24 +7,17 @@ func outputResults(
     segDictionary: SegDictionary,
     codeSegs: [Int: CodeSegment],
     allLocations: Set<Location>,
-    // allLabels: Set<Location>,
     allProcedures: [ProcIdentifier],
     allCallers: Set<Call>
 ) {
     print("# ", sourceFilename, "\n")
 
-    // for the moment, print it out to validate it.
     print(segDictionary)
 
     print("## Globals\n")
 
     allLocations.filter({ $0.lexLevel == -1 && $0.segment == 0 }).sorted().forEach({ loc in
         print("G\(loc.addr ?? -1)=\(loc.description)")
-        // if let gName = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
-        //     print("G\(loc.addr ?? -1)=\(gName)")
-        // } else {
-        //     print("G\(loc.addr ?? -1)=\(loc.description)")
-        // }
     })
     print()
 
@@ -67,12 +60,8 @@ func outputResults(
                 allLocations.filter({
                     $0.procedure == proc.procType?.procedure && $0.segment == s && $0.addr != nil
                 }).sorted().forEach({ loc in
-                    // if let pName: Location = allLabels.first(where: { $0.segment == loc.segment && $0.procedure == loc.procedure && $0.addr == loc.addr }) {
-                        print("L\(loc.addr ?? -1)=\(loc.description)")
-                    // } else {
-                        // print("L\(loc.addr ?? -1)=\(loc.description)")
-                    }
-                )
+                    print("L\(loc.addr ?? -1)=\(loc.description)")
+                })
                 print("```")
 
                 // Variable listing is generated from `allLocations` and `allLabels`.
@@ -87,9 +76,6 @@ func outputResults(
                 var indentLevel: Int = 1
 
                 for (address, inst) in proc.instructions.sorted(by: { $0.key < $1.key }) {
-                    // if let pseudo = inst.prePseudoCode {
-                    //     print("\n  \(pseudo)\n")
-                    // }
                     for pseudo in inst.prePseudoCode {
                         if pseudo.code.starts(with: "END") || pseudo.code.starts(with: "UNTIL") {
                             indentLevel -= 1
@@ -124,11 +110,7 @@ func outputResults(
                             print(" ; \(c)", terminator: "")
                         }
                         if let n = inst.memLocation {
-                            // if let label = allLocations.first(where: { $0.segment == n.segment && $0.procedure == n.procedure && $0.addr == n.addr }) {
-                                print(" \(n.name)", terminator: "")
-                            // } else {
-                            //     print(" \(n.description)", terminator: "")
-                            // }
+                            print(" \(n.name)", terminator: "")
                         }
                         if let d = inst.destination {
                             if let dest = allProcedures.first(where: {

@@ -195,8 +195,6 @@ public func runPdisasm(
     var sysLocations: Set<Location> = []
     var allProcedures: [ProcIdentifier] = []
     var sysProcedures: [ProcIdentifier] = []
-    // var allLabels: Set<Location> = []
-    // var sysLabels: Set<Location> = []
     var allCallers: Set<Call> = []
 
     // Try loading name maps (optional files in repo)
@@ -212,7 +210,6 @@ public func runPdisasm(
     importLabels(fromCSV: allLabelsCSVFile, to: &allLocations, metadataPrefix: metadataPrefix)
     importLabels(fromCSV: sysLabelsCSVFile, to: &sysLocations, metadataPrefix: metadataPrefix)
 
-    // allLabels.formUnion(sysLabels)
     allLocations.formUnion(sysLocations)
 
     importGlobalLabels(fromJson: globalsFile, to: &globalNames, metadataPrefix: metadataPrefix)
@@ -223,17 +220,6 @@ public func runPdisasm(
         fromCSV: sysProceduresCSVFile, to: &sysProcedures, metadataPrefix: metadataPrefix)
 
     allProcedures.append(contentsOf: sysProcedures)
-
-// build allLabels from global names
-    // allLocations.filter({ $0.segment == 0 && $0.lexLevel == -1 }).forEach({ loc in
-    //     if let addr = loc.addr {
-    //         allLabels.insert(
-    //             Location(
-    //                 segment: 0, lexLevel: -1, addr: addr,
-    //                 name: globalNames[addr]?.name ?? "",
-    //                 type: globalNames[addr]?.type ?? ""))
-    //     }
-    // })
 
     // For each segment, extract code blocks and decode procedures
     for segment in segDict.segTable.sorted(by: { $0.key < $1.key }) {
@@ -289,7 +275,6 @@ public func runPdisasm(
             // its procedures when we dealt with slot 0.
             continue
         }
-        // }
 
         let codeSeg: CodeSegment = CodeSegment(
             procedureDictionary: ProcedureDictionary(
@@ -362,7 +347,11 @@ public func runPdisasm(
                         ret.type = pt.returnType ?? "UNKNOWN"
                         allLocations.update(with: ret)
                     } else {
-                        allLocations.insert(Location(segment: seg.segNum, procedure: procNumber, addr: 1, name: pt.procName ?? pt.shortDescription, type: pt.returnType ?? "UNKNOWN"))
+                        allLocations.insert(
+                            Location(
+                                segment: seg.segNum, procedure: procNumber, addr: 1,
+                                name: pt.procName ?? pt.shortDescription,
+                                type: pt.returnType ?? "UNKNOWN"))
                     }
                     if proc.procType?.returnType == "REAL" {
                         if let ret = allLocations.first(where: {
@@ -372,7 +361,11 @@ public func runPdisasm(
                             ret.type = pt.returnType ?? "REAL"
                             allLocations.update(with: ret)
                         } else {
-                            allLocations.insert(Location(segment: seg.segNum, procedure: procNumber, addr: 2, name: pt.procName ?? pt.shortDescription, type: pt.returnType ?? "REAL"))
+                            allLocations.insert(
+                                Location(
+                                    segment: seg.segNum, procedure: procNumber, addr: 2,
+                                    name: pt.procName ?? pt.shortDescription,
+                                    type: pt.returnType ?? "REAL"))
                         }
                     }
                 }
@@ -395,9 +388,7 @@ public func runPdisasm(
                     callers: &tempCallers,
                     allLocations: &allLocations,
                     allProcedures: &allProcedures
-                    // ,
-                    // allLabels: &allLabels
-                    )
+                )
             }
 
             codeSeg.procedures.append(proc)
@@ -406,41 +397,43 @@ public func runPdisasm(
 
         allCodeSegs[Int(seg.segNum)] = codeSeg
     }
-    // // this is a bit clunky but we need to amend relative memory locations
-    // // in instructions by lex level (which we can't do until all procedures are decoded
-    // // and we know the procedure calling hierarchy)
-    // for (_, codeSeg) in allCodeSegs {
-    //     for proc in codeSeg.procedures {
-    //         proc.instructions.forEach { (_, inst) in
-    //             if let loc = inst.memLocation  {
-    //                 if loc.procedure == nil { // need to find procedure for this location
-    //                     // var procForLoc: ProcIdentifier? = nil
-    //                     // i want to find the procedure number for the location with
-    //                     // a matching lex level, segment, and address that is in the
-    //                     // calling hierarchy of this procedure, and update the memLocation
-    //                     // to have that procedure number.
-    //                     for caller in allCallers {
-    //                         if caller.target.segment == loc.segment &&
-    //                             caller.target.lexLevel == loc.lexLevel {
-    //                             // procForLoc = ProcIdentifier(
-    //                             //     isFunction: false, segmentNumber: caller.target.segment,
-    //                             //     procNumber: caller.target.procedure)
-    //                             inst.memLocation?.procedure = caller.target.procedure
-    //                             break
-    //                         }
+    // this is a bit clunky but we need to amend relative memory locations
+    // in instructions by lex level (which we can't do until all procedures are decoded
+    // and we know the procedure calling hierarchy)
+    for (_, codeSeg) in allCodeSegs {
+        for proc in codeSeg.procedures {
+            proc.instructions.forEach { (_, inst) in
+                if let loc = inst.memLocation {
+                    // if no procedure is set, but lex level is set to non-system level...
+                    if loc.procedure == nil && loc.lexLevel != -1 {  
+                        // then we need to find procedure for this location
 
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+                        // We want to find the procedure number for the location with
+                        // a matching lex level, segment, and address that is in the
+                        // calling hierarchy of this procedure, and update the memLocation
+                        // to have that procedure number.
+                        for caller in allCallers {
+                            if caller.target.segment == loc.segment
+                                && caller.target.lexLevel == loc.lexLevel
+                            {
+                                // procForLoc = ProcIdentifier(
+                                //     isFunction: false, segmentNumber: caller.target.segment,
+                                //     procNumber: caller.target.procedure)
+                                inst.memLocation?.procedure = caller.target.procedure
+                                break
+                            }
 
-    
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Output results using the existing helper
     outputResults(
         sourceFilename: fileIdentifier, segDictionary: segDict,
-        codeSegs: allCodeSegs, allLocations: allLocations, // allLabels: allLabels,
+        codeSegs: allCodeSegs, allLocations: allLocations,  // allLabels: allLabels,
         allProcedures: allProcedures, allCallers: allCallers)
 
     exportLabels(
