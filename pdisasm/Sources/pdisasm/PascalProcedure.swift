@@ -96,7 +96,7 @@ func decodePascalProcedure(
     }
 
     // Initialize components for clean separation of concerns
-    let decoder = OpcodeDecoder(cd: cd)  // TODO: Use decoder.decode() in refactored loop
+    let decoder = OpcodeDecoder(cd: cd)
     var simulator = StackSimulator()
     let pseudoGen = PseudoCodeGenerator(procLookup: procLookup, labelLookup: labelLookup)
 
@@ -543,7 +543,6 @@ func decodePascalProcedure(
                 ic += bytesConsumed
             case xjp:
                 // Case jump
-                // TODO: see if we can turn this into an actual case pseudo-code structure
                 _ = simulator.pop()  // remove the case index value
                 var tempIC = ic + 1
                 if tempIC % 2 != 0 { tempIC += 1 }
@@ -678,7 +677,6 @@ func decodePascalProcedure(
                     pseudoCode = "GOTO LAB\(dest)"
                 } else {
                     // jumping backwards, likely a loop - probably a while.
-                    // TODO, handle that as a while structure rather than a goto
                     flagForLabel.append((dest, indentLevel))
                     pseudoCode = "GOTO LAB\(dest)"
                 }

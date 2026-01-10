@@ -15,3 +15,5 @@
   instead of replaced - sometimes actually a duplicated remapped entry too (eg L1=Sn_Pn_Ln_An, L1=PROC.FUNCn:UNKNOWN, or even L1=PROC.FUNCn:UNKNOWN,L1=PROC.FUNCn:UNKNOWN)
 - function results are being mapped to memory locations but not the parameters
 - stack isn't always cleared at the end of the procedure, so something's off...
+- see if we can turn the XJP pseudo-code into an actual case structure
+- in UJP, try to handle while structure rather than as a goto
