@@ -20,3 +20,5 @@
 - in UJP, try to handle while structure rather than as a goto
 - move the pseudocode generation to a whole new process, rather than trying to do it in the decode pass.
 - FJP where instruction just before target instruction = UJP is an IF/ELSE. The target is the start of the ELSE clause.
+- add an option to only display the pseudo-code(?)
+- perhaps also an option to not display the pseudo-code at all?

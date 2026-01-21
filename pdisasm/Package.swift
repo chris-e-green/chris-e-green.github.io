@@ -34,5 +34,6 @@ let package = Package(
             name: "pdisasmTests",
             dependencies: ["pdisasm"]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )
