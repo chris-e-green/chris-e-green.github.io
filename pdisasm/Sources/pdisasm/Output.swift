@@ -77,12 +77,12 @@ func outputResults(
 
                 for (address, inst) in proc.instructions.sorted(by: { $0.key < $1.key }) {
                     for pseudo in inst.prePseudoCode {
-                        if pseudo.code.starts(with: "END") || pseudo.code.starts(with: "UNTIL") {
+                        if pseudo.starts(with: "END") || pseudo.starts(with: "UNTIL") {
                             indentLevel -= 1
                         }
                         let indent = String(repeating: " ", count: indentLevel * 2)
-                        print("\(indent)\(pseudo.code)")
-                        if pseudo.code.hasSuffix("BEGIN") || pseudo.code.starts(with: "REPEAT") {
+                        print("\(indent)\(pseudo)")
+                        if pseudo.hasSuffix("BEGIN") || pseudo.starts(with: "REPEAT") {
                             indentLevel += 1
                         }
                     }
@@ -121,18 +121,18 @@ func outputResults(
                                 print(" \(d.description)", terminator: "")
                             }
                         }
-                        print(" " + prettyStack(inst.stackState))
+                        print(" " + prettyStack(inst.stackState ?? []))
                     } else {
                         print(inst.mnemonic)
                     }
                     if let pseudo = inst.pseudoCode {
-                        if pseudo.code.starts(with: "END") || pseudo.code.starts(with: "UNTIL") {
+                        if pseudo.starts(with: "END") || pseudo.starts(with: "UNTIL") {
                             indentLevel -= 1
                         }
                         print()
-                        print(String(repeating: " ", count: indentLevel * 2) + pseudo.code)
+                        print(String(repeating: " ", count: indentLevel * 2) + pseudo)
                         print()
-                        if pseudo.code.hasSuffix("BEGIN") || pseudo.code.starts(with: "REPEAT") {
+                        if pseudo.hasSuffix("BEGIN") || pseudo.starts(with: "REPEAT") {
                             indentLevel += 1
                         }
 

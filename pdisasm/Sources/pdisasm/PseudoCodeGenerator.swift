@@ -18,7 +18,7 @@ struct PseudoCodeGenerator {
     }
 
     func generateForInstruction(
-        _ inst: OpcodeDecoder.DecodedInstruction,
+        _ inst: Instruction,
         stack: inout StackSimulator,
         loc: Location?
     ) -> String? {

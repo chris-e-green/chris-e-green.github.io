@@ -247,7 +247,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                             } else {
                                 machCodeStr += "      "
                             }
-                            proc.instructions[ipc] = Instruction(mnemonic: machCodeStr + String(format: opcode.mnemonic, param), isPascal: false, stackState: [])
+                            proc.instructions[ipc] = Instruction(opcode: op, mnemonic: machCodeStr + String(format: opcode.mnemonic, param), isPascal: false, stackState: [])
                             ipc += 1
                             if procRelocs.contains(ipc) && opcode.paramLength > 0 {
                                 proc.instructions[ipc - 1]?.comment = " <- proc relocated"
@@ -259,7 +259,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                                 break
                             }
                         } else {
-                            proc.instructions[ipc] = Instruction(mnemonic: String(format: "???     %02x", op), isPascal: false, stackState: [])
+                            proc.instructions[ipc] = Instruction(opcode: op, mnemonic: String(format: "???     %02x", op), isPascal: false, stackState: [])
                             ipc += 1
                             if ipc < code.count {
                                 op = try cd.readByte(at: ipc)
@@ -268,6 +268,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                             }
 
                         }
+                        // TODO: fix this because the RTS is ending up in the wrong place
                         if op == 0x60 { done = true }
                         op = code[ipc]
                     } while !done
@@ -276,7 +277,7 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                     var i = ipc
                     while i < (addr - pos) {
                         if i.isMultiple(of: 16) && !s.isEmpty {
-                            proc.instructions[((i - 1) / 16) * 16] = Instruction(mnemonic: s + " | " + sh, isPascal: false, stackState: [])
+                            proc.instructions[((i - 1) / 16) * 16] = Instruction(opcode: op, mnemonic: s + " | " + sh, isPascal: false, stackState: [])
                             s = ""
                             sh = ""
                         } else if i.isMultiple(of: 8) && !s.isEmpty {
@@ -298,6 +299,6 @@ func decodeAssemblerProcedure(segmentNumber:Int, procedureNumber:Int, proc: inou
                         }
                     }
                     if !s.isEmpty {
-                        proc.instructions[((addr - pos - 1) / 16) * 16] = Instruction(mnemonic: s + String(repeating: " ", count: (48 - s.count)) + " | " + sh, isPascal: false, stackState: [])
+                        proc.instructions[((addr - pos - 1) / 16) * 16] = Instruction(opcode: op, mnemonic: s + String(repeating: " ", count: (48 - s.count)) + " | " + sh, isPascal: false, stackState: [])
                     }
 }

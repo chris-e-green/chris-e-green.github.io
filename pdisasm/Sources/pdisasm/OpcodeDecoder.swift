@@ -10,6 +10,7 @@ struct OpcodeDecoder {
         let opcode: UInt8
         let mnemonic: String
         let params: [Int]
+        let stringParameter: String?
         let bytesConsumed: Int
         let comment: String?
         let memLocation: Location?
@@ -18,7 +19,7 @@ struct OpcodeDecoder {
         let comparatorOffset: Int
 
         init(
-            opcode: UInt8, mnemonic: String, params: [Int] = [], bytesConsumed: Int,
+            opcode: UInt8, mnemonic: String, params: [Int] = [], stringParameter: String? = nil, bytesConsumed: Int,
             comment: String? = nil,
             memLocation: Location? = nil, destination: Location? = nil,
             requiresComparator: Bool = false, comparatorOffset: Int = 0
@@ -26,6 +27,7 @@ struct OpcodeDecoder {
             self.opcode = opcode
             self.mnemonic = mnemonic
             self.params = params
+            self.stringParameter = stringParameter
             self.bytesConsumed = bytesConsumed
             self.comment = comment
             self.memLocation = memLocation
@@ -324,6 +326,7 @@ struct OpcodeDecoder {
                 opcode: opcode,
                 mnemonic: "LSA", 
                 params: [strLen], 
+                stringParameter: s,
                 bytesConsumed: 2 + strLen,
                 comment: "Load string address: '" + s + "'")
         case lae:
@@ -461,11 +464,18 @@ struct OpcodeDecoder {
         case ldc:
             // LDC has variable-length data - just return count, actual size calculated in switch
             let count = Int(try cd.readByte(at: ic + 1))
+            var params: [Int] = [count]
+            var tempIC = ic + 2
+            if tempIC % 2 != 0 { tempIC += 1 }  // word aligned data
+            for i in (0..<count).reversed() {  // words are in reverse order
+                let val = Int(try cd.readWord(at: tempIC + i * 2))
+                params.append(val)
+            }
             return DecodedInstruction(
                 opcode: opcode,
                 mnemonic: "LDC", 
-                params: [count], 
-                bytesConsumed: 0,
+                params: params, 
+                bytesConsumed: 2 + (ic % 2 == 0 ? 0 : 1) + count * 2,
                 comment: "Load multiple-word constant")
         case leq:
             // LEQ
@@ -752,10 +762,21 @@ struct OpcodeDecoder {
                 destination: loc)
         case lpa:
             let count = Int(try cd.readByte(at: ic + 1))
+                var txtRep = ""
+                for i in 1...count {
+                    if let c = try? cd.readByte(at: ic + 1 + i) {
+                        if c >= 0x20 && c <= 0x7e {
+                            txtRep.append(Character(UnicodeScalar(Int(c))!))
+                        } else {
+                            txtRep.append(".")
+                        }
+                    }
+                }
             return DecodedInstruction(
                 opcode: opcode,
                 mnemonic: "LPA", 
                 params: [count], 
+                stringParameter: txtRep,
                 bytesConsumed: 2 + count,
                 comment: "Load packed array")
         case ste:

@@ -169,6 +169,34 @@ private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
     return SegDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
 }
 
+fileprivate func normaliseMemoryLocations(_ proc: Procedure, _ allCallers: Set<Call>) {
+proc.instructions.forEach { (_, inst) in
+                if let loc = inst.memLocation {
+                    // if no procedure is set, but lex level is set to non-system level...
+                    if loc.procedure == nil && loc.lexLevel != -1 {  
+                        // then we need to find procedure for this location
+
+                        // We want to find the procedure number for the location with
+                        // a matching lex level, segment, and address that is in the
+                        // calling hierarchy of this procedure, and update the memLocation
+                        // to have that procedure number.
+                        for caller in allCallers {
+                            if caller.target.segment == loc.segment
+                                && caller.target.lexLevel == loc.lexLevel
+                            {
+                                // procForLoc = ProcIdentifier(
+                                //     isFunction: false, segmentNumber: caller.target.segment,
+                                //     procNumber: caller.target.procedure)
+                                inst.memLocation?.procedure = caller.target.procedure
+                                break
+                            }
+
+                        }
+                    }
+                }
+            }
+}
+
 /// Public entrypoint for the library to run the decompiler.
 /// This mirrors the original CLI behaviour but is exposed as a callable function
 /// so the `pdisasm-cli` executable can delegate to it.
@@ -397,36 +425,28 @@ public func runPdisasm(
 
         allCodeSegs[Int(seg.segNum)] = codeSeg
     }
-    // this is a bit clunky but we need to amend relative memory locations
-    // in instructions by lex level (which we can't do until all procedures are decoded
-    // and we know the procedure calling hierarchy)
+
+    // Amend relative memory locations in instructions by lex level (which we 
+    // can't do until all procedures are decoded and we know the procedure calling hierarchy)
     for (_, codeSeg) in allCodeSegs {
         for proc in codeSeg.procedures {
-            proc.instructions.forEach { (_, inst) in
-                if let loc = inst.memLocation {
-                    // if no procedure is set, but lex level is set to non-system level...
-                    if loc.procedure == nil && loc.lexLevel != -1 {  
-                        // then we need to find procedure for this location
+            normaliseMemoryLocations(proc, allCallers)
+        }
+    }
 
-                        // We want to find the procedure number for the location with
-                        // a matching lex level, segment, and address that is in the
-                        // calling hierarchy of this procedure, and update the memLocation
-                        // to have that procedure number.
-                        for caller in allCallers {
-                            if caller.target.segment == loc.segment
-                                && caller.target.lexLevel == loc.lexLevel
-                            {
-                                // procForLoc = ProcIdentifier(
-                                //     isFunction: false, segmentNumber: caller.target.segment,
-                                //     procNumber: caller.target.procedure)
-                                inst.memLocation?.procedure = caller.target.procedure
-                                break
-                            }
-
-                        }
-                    }
-                }
+    // Do stack simulation and pseudocode generation 
+    // once we have all procedures decoded.
+    // This will allow us to have full knowledge of the procedure calling
+    // hierarchy before we try to resolve memory locations.
+    // As the stack plays a role in control flow, we need to handle them at the same time.
+    for (_, codeSeg) in allCodeSegs {
+        for proc in codeSeg.procedures {
+            if proc.procType?.isAssembly == true {
+                // skip assembly procedures
+                continue
             }
+            simulateStackandGeneratePseudocodeForProcedure(
+                proc: proc, allProcedures: &allProcedures, allLocations: &allLocations)
         }
     }
 
