@@ -109,13 +109,23 @@ struct StackSimulator {
     /// - Returns: a tuple with the length of the set and its string representation
     mutating func popSet() -> (Int, String) {
         let (setLen, _) = self.pop()
+        // to hold string set values
         var setData: [String] = []
+        // to hold numeric set values
         var setVals: [Int] = []
         var prevElement: String = ""
+        // if the set length is an integer, it's valid
         if let len = Int(setLen) {
+            // for each element in the set
             for i in 0..<len {
+                // pop the element
                 let (element, _) = self.pop()
+                // we use '{' to indicate words within an array of elements
+                // eg. SETDATA{0}, SETDATA{1}, ... so that counting the words
+                // on the stack still works
                 if element.contains("{") == false {
+                    // if the element is an integer, we extract the bits set
+                    // and add the corresponding values to the numeric set values
                     if let value = UInt64(element) {
                         for j in 0..<16 {
                             if (value >> j) & 1 == 1 {
@@ -123,9 +133,11 @@ struct StackSimulator {
                             }
                         }
                     } else {
+                        // otherwise, we just add the element
                         setData.append(element)
                     }
                 } else {
+                    // if the element is part of an array, we only add the array name
                     let elementParts = element.split(separator: "{")
                     if String(elementParts[0]) != prevElement {
                         prevElement = String(elementParts[0])
@@ -133,21 +145,25 @@ struct StackSimulator {
                     }
                 }
             }
-            if !setVals.isEmpty {
-                while !setVals.isEmpty {
-                    let first = setVals.first!
-                    let group = setVals.prefix(while: {
-                        $0 == setVals.first! + (setVals.firstIndex(of: $0)!)
-                            - (setVals.firstIndex(of: first)!)
-                    })
-                    if group.count == 1 {
-                        setData.append("\(group[0])")
-                    } else {
-                        setData.append("\(group.first!)...\(group.last!)")
-                    }
-                    setVals = Array(setVals.dropFirst(group.count))
+            // if we have numeric set values, we convert them to ranges
+            while !setVals.isEmpty {
+                let first = setVals.first!  // we can force unwrap as we checked above
+                // group consecutive values
+                let group = setVals.prefix(while: {
+                    $0 == setVals.first! + (setVals.firstIndex(of: $0)!)
+                        - (setVals.firstIndex(of: first)!)
+                })
+                // if the group has only one value, add it as is
+                if group.count == 1 {
+                    setData.append("\(group[0])")
+                } else {
+                    // otherwise, add it as a range
+                    setData.append("\(group.first!)...\(group.last!)")
                 }
+                // remove the processed values from the setVals
+                setVals = Array(setVals.dropFirst(group.count))
             }
+
             return (len, "[" + setData.joined(separator: ", ") + "]")
         }
         return (0, "malformed set!")

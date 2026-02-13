@@ -7,10 +7,10 @@ proc.enterIC = 0
 proc.exitIC = 3
 proc.procType = ProcIdentifier(isFunction: false, segment: 0, segmentName: "PASCALSY", procedure: 1)
 
-proc.instructions[0] = Instruction(mnemonic: "SLDC", params: [5], stackState: [])
-proc.instructions[1] = Instruction(mnemonic: "SLDC", params: [3], stackState: [])
-proc.instructions[2] = Instruction(mnemonic: "ADI", params: [], stackState: [])
-proc.instructions[3] = Instruction(mnemonic: "RNP", params: [], stackState: [])
+proc.instructions[0] = Instruction(opcode: 5, mnemonic: "SLDC", params: [5], stackState: [])
+proc.instructions[1] = Instruction(opcode: 3, mnemonic: "SLDC", params: [3], stackState: [])
+proc.instructions[2] = Instruction(opcode: 0x82, mnemonic: "ADI", params: [], stackState: [])
+proc.instructions[3] = Instruction(opcode: 0xad, mnemonic: "RNP", params: [], stackState: [])
 
 // Convert Procedure to SimInsn list and run via Machine.execute so we can capture
 // and display a step-by-step trace with stack and memory diffs.

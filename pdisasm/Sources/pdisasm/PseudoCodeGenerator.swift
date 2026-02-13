@@ -99,6 +99,8 @@ struct PseudoCodeGenerator {
             _ = stack.pop()
         }
         for i in 0..<parmCount {
+            // TODO: SET values contain a length on the stack but not in function parameters,
+            // so we probably need to pop it as a set, not just blindly.
             let (a, _) = stack.pop()
             switch called.parameters[i].type {
             case "CHAR":

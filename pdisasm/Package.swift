@@ -10,7 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-	.package(url: "https://github.com/dehesa/CodableCSV.git", from: "0.6.7"),
+    .package(url: "https://github.com/dehesa/CodableCSV.git", from: "0.6.7"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -19,8 +19,9 @@ let package = Package(
         .target(
             name: "pdisasm",
             dependencies: [
-		.product(name: "CodableCSV", package: "CodableCSV"),
-	    ]
+                .product(name: "CodableCSV", package: "CodableCSV"),
+            ],
+            exclude: ["ModelTwo.swift.old"]
         ),
         .executableTarget(
             name: "pdisasm-cli",

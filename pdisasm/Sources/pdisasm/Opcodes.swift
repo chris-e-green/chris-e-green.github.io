@@ -10,7 +10,7 @@ let cspProcs: [Int: (String, [Identifier], String)] = [
         ], ""
     ),
     2: (
-        "MOVL",
+        "MOVELEFT",
         [
             Identifier(name: "SRCADDR", type: "POINTER"),
             Identifier(name: "SRCOFFS", type: "INTEGER"),
@@ -20,7 +20,7 @@ let cspProcs: [Int: (String, [Identifier], String)] = [
         ], ""
     ),
     3: (
-        "MOVR",
+        "MOVERIGHT",
         [
             Identifier(name: "SRCADDR", type: "POINTER"),
             Identifier(name: "SRCOFFS", type: "INTEGER"),
@@ -81,7 +81,7 @@ let cspProcs: [Int: (String, [Identifier], String)] = [
         ], ""
     ),
     10: (
-        "FLCH",
+        "FILLCHAR",
         [
             Identifier(name: "DESTADDR", type: "POINTER"),
             Identifier(name: "DESTOFFS", type: "INTEGER"),
@@ -125,7 +125,7 @@ let cspProcs: [Int: (String, [Identifier], String)] = [
     33: ("RELEASE", [Identifier(name: "NP", type: "POINTER")], ""),
     34: ("IORESULT", [], "INTEGER"),
     35: ("UNITBUSY", [Identifier(name: "UNIT", type: "INTEGER")], "BOOLEAN"),
-    36: ("POT", [Identifier(name: "NUM", type: "INTEGER")], "REAL"),
+    36: ("PWROFTEN", [Identifier(name: "NUM", type: "INTEGER")], "REAL"),
     37: ("UNITWAIT", [Identifier(name: "UNIT", type: "INTEGER")], ""),
     38: ("UNITCLEAR", [Identifier(name: "UNIT", type: "INTEGER")], ""),
     39: ("HALT", [], ""),

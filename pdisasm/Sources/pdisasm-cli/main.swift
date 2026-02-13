@@ -10,12 +10,21 @@ struct PdisasmCLI: @preconcurrency ParsableCommand {
     var verbose: Bool = true
     @Option(help: "Rewrite reference data.")
     var rewrite: Bool = false
+    @Option(help: "Show markup in output.")
+    var showMarkup: Bool = false
+    @Option(help: "Show pcode in output.")
+    var showPcode: Bool = false
+    @Option(help: "Show pseudocode in output.")
+    var showPseudocode: Bool = false
     @Option(help: "Path to read/write metadata files.")
     var metadata: String = "/Users/chris/Repos/chris-e-green.github.io/pdisasm/metadata"
     @MainActor mutating func run() throws {
         print("pdisasm-cli: running decompiler on \(filename) (verbose=\(verbose))")
         do {
-            try runPdisasm(filename: filename, verbose: verbose, rewrite: rewrite, metadataPrefix: metadata)
+            try runPdisasm(filename: filename, verbose: verbose, rewrite: rewrite,
+                           showMarkup: showMarkup, showPCode: showPcode,
+                           showPseudoCode: showPseudocode,
+                           metadataPrefix: metadata)
         } catch {
             print("Error running pdisasm: \(error)")
             throw error
@@ -23,9 +32,10 @@ struct PdisasmCLI: @preconcurrency ParsableCommand {
     }
 }
 
-@main
 struct Main {
     static func main() throws {
         PdisasmCLI.main()
     }
 }
+try Main.main()
+

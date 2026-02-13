@@ -19,7 +19,8 @@ struct OpcodeDecoder {
         let comparatorOffset: Int
 
         init(
-            opcode: UInt8, mnemonic: String, params: [Int] = [], stringParameter: String? = nil, bytesConsumed: Int,
+            opcode: UInt8, mnemonic: String, params: [Int] = [], stringParameter: String? = nil,
+            bytesConsumed: Int,
             comment: String? = nil,
             memLocation: Location? = nil, destination: Location? = nil,
             requiresComparator: Bool = false, comparatorOffset: Int = 0
@@ -84,152 +85,152 @@ struct OpcodeDecoder {
         case land:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LAND", 
-                bytesConsumed: 1, 
+                mnemonic: "LAND",
+                bytesConsumed: 1,
                 comment: "Logical AND (TOS & TOS-1)")
         case dif:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "DIF", 
-                bytesConsumed: 1, 
+                mnemonic: "DIF",
+                bytesConsumed: 1,
                 comment: "Set difference (TOS-1 AND NOT TOS)")
         case dvi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "DVI", 
-                bytesConsumed: 1, 
+                mnemonic: "DVI",
+                bytesConsumed: 1,
                 comment: "Divide integers (TOS-1 / TOS)")
         case dvr:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "DVR", 
-                bytesConsumed: 1, 
+                mnemonic: "DVR",
+                bytesConsumed: 1,
                 comment: "Divide reals (TOS-1 / TOS)")
         case chk:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CHK", 
-                bytesConsumed: 1, 
+                mnemonic: "CHK",
+                bytesConsumed: 1,
                 comment: "Check subrange (TOS-1 <= TOS-2 <= TOS)")
         case flo:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "FLO", 
+                mnemonic: "FLO",
                 bytesConsumed: 1,
                 comment: "Float next to TOS (int TOS-1 to real TOS)")
         case flt:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "FLT", 
-                bytesConsumed: 1, 
+                mnemonic: "FLT",
+                bytesConsumed: 1,
                 comment: "Float TOS (int TOS to real TOS)")
         case inn:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "INN", 
-                bytesConsumed: 1, 
+                mnemonic: "INN",
+                bytesConsumed: 1,
                 comment: "Set membership (TOS-1 in set TOS)")
         case int:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "INT", 
-                bytesConsumed: 1, 
+                mnemonic: "INT",
+                bytesConsumed: 1,
                 comment: "Set intersection (TOS AND TOS-1)")
         case lor:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LOR", 
-                bytesConsumed: 1, 
+                mnemonic: "LOR",
+                bytesConsumed: 1,
                 comment: "Logical OR (TOS | TOS-1)")
         case modi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "MODI", 
-                bytesConsumed: 1, 
+                mnemonic: "MODI",
+                bytesConsumed: 1,
                 comment: "Modulo integers (TOS-1 % TOS)")
         case mpi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "MPI", 
-                bytesConsumed: 1, 
+                mnemonic: "MPI",
+                bytesConsumed: 1,
                 comment: "Multiply integers (TOS * TOS-1)")
         case mpr:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "MPR", 
-                bytesConsumed: 1, 
+                mnemonic: "MPR",
+                bytesConsumed: 1,
                 comment: "Multiply reals (TOS * TOS-1)")
         case ngi:
             return DecodedInstruction(
-                opcode: opcode, 
-                mnemonic: "NGI", 
-                bytesConsumed: 1, 
+                opcode: opcode,
+                mnemonic: "NGI",
+                bytesConsumed: 1,
                 comment: "Negate integer")
         case ngr:
             return DecodedInstruction(
-                opcode: opcode, 
-                mnemonic: "NGR", 
-                bytesConsumed: 1, 
+                opcode: opcode,
+                mnemonic: "NGR",
+                bytesConsumed: 1,
                 comment: "Negate real")
         case lnot:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LNOT", 
-                bytesConsumed: 1, 
+                mnemonic: "LNOT",
+                bytesConsumed: 1,
                 comment: "Logical NOT (~TOS)")
         case srs:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SRS", 
-                bytesConsumed: 1, 
+                mnemonic: "SRS",
+                bytesConsumed: 1,
                 comment: "Subrange set [TOS-1..TOS]")
         case sbi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SBI", 
-                bytesConsumed: 1, 
+                mnemonic: "SBI",
+                bytesConsumed: 1,
                 comment: "Subtract integers (TOS-1 - TOS)")
         case sbr:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SBR", 
-                bytesConsumed: 1, 
+                mnemonic: "SBR",
+                bytesConsumed: 1,
                 comment: "Subtract reals (TOS-1 - TOS)")
         case sgs:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SGS", 
-                bytesConsumed: 1, 
+                mnemonic: "SGS",
+                bytesConsumed: 1,
                 comment: "Build singleton set [TOS]")
         case sqi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SQI", 
-                bytesConsumed: 1, 
+                mnemonic: "SQI",
+                bytesConsumed: 1,
                 comment: "Square integer (TOS * TOS)")
         case sqr:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SQR", 
-                bytesConsumed: 1, 
+                mnemonic: "SQR",
+                bytesConsumed: 1,
                 comment: "Square real (TOS * TOS)")
         case sto:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STO", 
-                bytesConsumed: 1, 
+                mnemonic: "STO",
+                bytesConsumed: 1,
                 comment: "Store indirect word (TOS into TOS-1)")
         case ixs:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "IXS", 
+                mnemonic: "IXS",
                 bytesConsumed: 1,
                 comment: "Index string array (check 1<=TOS<=len of str TOS-1)")
         case uni:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "UNI", 
-                bytesConsumed: 1, 
+                mnemonic: "UNI",
+                bytesConsumed: 1,
                 comment: "Set union (TOS OR TOS-1)")
         case lde:
             let seg = Int(try cd.readByte(at: ic + 1))
@@ -251,15 +252,15 @@ struct OpcodeDecoder {
         case ldcn:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDCN", 
-                bytesConsumed: 1, 
+                mnemonic: "LDCN",
+                bytesConsumed: 1,
                 comment: "Load constant NIL")
         case adj:
             let count = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "ADJ", 
-                params: [count], 
+                mnemonic: "ADJ",
+                params: [count],
                 bytesConsumed: 2,
                 comment: "Adjust set to \(count) words")
         case fjp:
@@ -281,24 +282,24 @@ struct OpcodeDecoder {
             let (val, inc) = try cd.readBig(at: ic + 1)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "INC", 
-                params: [val], 
+                mnemonic: "INC",
+                params: [val],
                 bytesConsumed: 1 + inc,
                 comment: "Inc field ptr (TOS+\(val))")
         case ind:
             let (val, inc) = try cd.readBig(at: ic + 1)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "IND", 
-                params: [val], 
+                mnemonic: "IND",
+                params: [val],
                 bytesConsumed: 1 + inc,
                 comment: "Static index and load word (TOS+\(val))")
         case ixa:
             let (val, inc) = try cd.readBig(at: ic + 1)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "IXA", 
-                params: [val], 
+                mnemonic: "IXA",
+                params: [val],
                 bytesConsumed: 1 + inc,
                 comment: "Index array (TOS-1 + TOS * \(val))")
         case lao:
@@ -308,10 +309,10 @@ struct OpcodeDecoder {
                 ) ?? Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LAO", 
-                params: [val], 
+                mnemonic: "LAO",
+                params: [val],
                 bytesConsumed: 1 + inc,
-                comment: "Load global address", 
+                comment: "Load global address",
                 memLocation: loc)
         case lsa:
             let strLen = Int(try cd.readByte(at: ic + 1))
@@ -324,8 +325,8 @@ struct OpcodeDecoder {
             }
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LSA", 
-                params: [strLen], 
+                mnemonic: "LSA",
+                params: [strLen],
                 stringParameter: s,
                 bytesConsumed: 2 + strLen,
                 comment: "Load string address: '" + s + "'")
@@ -338,18 +339,18 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LAE", 
-                params: [seg, val], 
+                mnemonic: "LAE",
+                params: [seg, val],
                 bytesConsumed: 2 + inc,
-                comment: "Load extended address", 
+                comment: "Load extended address",
                 memLocation: loc)
         case mov:
             // MOV
             let (val, inc) = try cd.readBig(at: ic + 1)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "MOV", 
-                params: [val], 
+                mnemonic: "MOV",
+                params: [val],
                 bytesConsumed: 1 + inc,
                 comment: "Move \(val) words (TOS to TOS-1)")
         case ldo:
@@ -360,9 +361,9 @@ struct OpcodeDecoder {
                 ) ?? Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDO", 
-                params: [val], 
-                bytesConsumed: 1 + inc, 
+                mnemonic: "LDO",
+                params: [val],
+                bytesConsumed: 1 + inc,
                 comment: "Load global word",
                 memLocation: loc)
         case sas:
@@ -370,8 +371,8 @@ struct OpcodeDecoder {
             let sasCount = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SAS", 
-                params: [sasCount], 
+                mnemonic: "SAS",
+                params: [sasCount],
                 bytesConsumed: 2,
                 comment: "String assign (TOS to TOS-1, \(sasCount) chars)")
         case sro:
@@ -382,26 +383,52 @@ struct OpcodeDecoder {
                 ) ?? Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SRO", 
-                params: [val], 
+                mnemonic: "SRO",
+                params: [val],
                 bytesConsumed: 1 + inc,
-                comment: "Store global word", 
+                comment: "Store global word",
                 memLocation: loc)
         case xjp:
-            // XJP has variable-length jump table - size calculated in switch
+            // Case jump
+            var tempIC = ic + 1
+            var tempParams: [Int] = []
+            if tempIC % 2 != 0 { tempIC += 1 }
+            let first = Int(try cd.readWord(at: tempIC))
+            tempParams.append(first)
+            tempIC += 2
+            let last = Int(try cd.readWord(at: tempIC))
+            tempParams.append(last)
+            tempIC += 2
+            tempParams.append(tempIC)
+
+            var dest: Int = 0
+            let offset = Int(try cd.readByte(at: tempIC + 1))
+            if offset > 0x7f {
+                let jte = addr + offset - 256
+                dest = jte - Int(try cd.readWord(at: jte))
+            } else {
+                dest = tempIC + offset + 2
+            }
+            tempParams.append(dest)
+            tempIC += 2
+            for _ in first...last {
+                let caseDest = try cd.getSelfRefPointer(at: tempIC)
+                tempParams.append(caseDest)
+                tempIC += 2
+            }
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "XJP", 
-                params: [], 
-                bytesConsumed: 0, 
+                mnemonic: "XJP",
+                params: tempParams,
+                bytesConsumed: tempIC - ic,
                 comment: "Case jump")
         case rnp:
             // RNP
             let retCount = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "RNP", 
-                params: [retCount], 
+                mnemonic: "RNP",
+                params: [retCount],
                 bytesConsumed: 2,
                 comment: "Return from nonbase procedure")
         case cip:
@@ -413,33 +440,33 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: currSeg.segNum, procedure: procNum)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CIP", 
-                params: [procNum], 
+                mnemonic: "CIP",
+                params: [procNum],
                 bytesConsumed: 2,
-                comment: "Call intermediate procedure", 
+                comment: "Call intermediate procedure",
                 destination: loc)
         case eql:
             // EQL
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "EQL", 
-                bytesConsumed: 0, 
+                mnemonic: "EQL",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case geq:
             // GEQ
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "GEQ", 
-                bytesConsumed: 0, 
+                mnemonic: "GEQ",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case grt:
             // GRT
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "GRT", 
-                bytesConsumed: 0, 
+                mnemonic: "GRT",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case lda:
@@ -456,10 +483,10 @@ struct OpcodeDecoder {
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDA", 
-                params: [Int(byte1), val], 
+                mnemonic: "LDA",
+                params: [Int(byte1), val],
                 bytesConsumed: 2 + inc,
-                comment: "Load intermediate address", 
+                comment: "Load intermediate address",
                 memLocation: loc)
         case ldc:
             // LDC has variable-length data - just return count, actual size calculated in switch
@@ -473,24 +500,24 @@ struct OpcodeDecoder {
             }
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDC", 
-                params: params, 
+                mnemonic: "LDC",
+                params: params,
                 bytesConsumed: 2 + (ic % 2 == 0 ? 0 : 1) + count * 2,
                 comment: "Load multiple-word constant")
         case leq:
             // LEQ
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LEQ", 
-                bytesConsumed: 0, 
+                mnemonic: "LEQ",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case les:
             // LES
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LES", 
-                bytesConsumed: 0, 
+                mnemonic: "LES",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case lod:
@@ -507,17 +534,17 @@ struct OpcodeDecoder {
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LOD", 
-                params: [Int(byte1), val], 
+                mnemonic: "LOD",
+                params: [Int(byte1), val],
                 bytesConsumed: 2 + inc,
-                comment: "Load intermediate word", 
+                comment: "Load intermediate word",
                 memLocation: loc)
         case neq:
             // NEQ
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "NEQ", 
-                bytesConsumed: 0, 
+                mnemonic: "NEQ",
+                bytesConsumed: 0,
                 requiresComparator: true,
                 comparatorOffset: ic + 1)
         case str:
@@ -534,10 +561,10 @@ struct OpcodeDecoder {
                     segment: refLexLevel < 0 ? 0 : currSeg.segNum, lexLevel: refLexLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STR", 
-                params: [Int(byte1), val], 
+                mnemonic: "STR",
+                params: [Int(byte1), val],
                 bytesConsumed: 2 + inc,
-                comment: "Store intermediate word", 
+                comment: "Store intermediate word",
                 memLocation: loc)
         case ujp:
             let offset = Int(try cd.readByte(at: ic + 1))
@@ -557,41 +584,41 @@ struct OpcodeDecoder {
         case ldp:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDP", 
-                bytesConsumed: 1, 
+                mnemonic: "LDP",
+                bytesConsumed: 1,
                 comment: "Load packed field (TOS)")
         case stp:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STP", 
-                bytesConsumed: 1, 
+                mnemonic: "STP",
+                bytesConsumed: 1,
                 comment: "Store packed field (TOS into TOS-1)")
         case ldm:
             let ldmCount = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDM", 
-                params: [ldmCount], 
+                mnemonic: "LDM",
+                params: [ldmCount],
                 bytesConsumed: 2,
                 comment: "Load \(ldmCount) words from (TOS)")
         case stm:
             let stmCount = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STM", 
-                params: [stmCount], 
+                mnemonic: "STM",
+                params: [stmCount],
                 bytesConsumed: 2,
                 comment: "Store \(stmCount) words at TOS to TOS-1")
         case ldb:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDB", 
-                bytesConsumed: 1, 
+                mnemonic: "LDB",
+                bytesConsumed: 1,
                 comment: "Load byte at byte ptr TOS-1 + TOS")
         case stb:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STB", 
+                mnemonic: "STB",
                 bytesConsumed: 1,
                 comment: "Store byte at TOS to byte ptr TOS-2 + TOS-1")
         case ixp:
@@ -609,8 +636,8 @@ struct OpcodeDecoder {
             let retCount = Int(try cd.readByte(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "RBP", 
-                params: [retCount], 
+                mnemonic: "RBP",
+                params: [retCount],
                 bytesConsumed: 2,
                 comment: "Return from base procedure")
         case cbp:
@@ -621,28 +648,28 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: currSeg.segNum, procedure: procNum)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CBP", 
-                params: [procNum], 
+                mnemonic: "CBP",
+                params: [procNum],
                 bytesConsumed: 2,
-                comment: "Call base procedure", 
+                comment: "Call base procedure",
                 destination: loc)
         case equi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "EQUI", 
-                bytesConsumed: 1, 
+                mnemonic: "EQUI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 = TOS")
         case geqi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "GEQI", 
-                bytesConsumed: 1, 
+                mnemonic: "GEQI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 >= TOS")
         case grti:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "GRTI", 
-                bytesConsumed: 1, 
+                mnemonic: "GRTI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 > TOS")
         case lla:
             let (val, inc) = try cd.readBig(at: ic + 1)
@@ -656,30 +683,30 @@ struct OpcodeDecoder {
                     lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LLA", 
-                params: [val], 
+                mnemonic: "LLA",
+                params: [val],
                 bytesConsumed: 1 + inc,
-                comment: "Load local address", 
+                comment: "Load local address",
                 memLocation: loc)
         case ldci:
             let val = Int(try cd.readWord(at: ic + 1))
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDCI", 
-                params: [val], 
+                mnemonic: "LDCI",
+                params: [val],
                 bytesConsumed: 3,
                 comment: "Load one-word constant \(val)")
         case leqi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LEQI", 
-                bytesConsumed: 1, 
+                mnemonic: "LEQI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 <= TOS")
         case lesi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LESI", 
-                bytesConsumed: 1, 
+                mnemonic: "LESI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 < TOS")
         case ldl:
             let (val, inc) = try cd.readBig(at: ic + 1)
@@ -693,16 +720,16 @@ struct OpcodeDecoder {
                     lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LDL", 
-                params: [val], 
-                bytesConsumed: 1 + inc, 
+                mnemonic: "LDL",
+                params: [val],
+                bytesConsumed: 1 + inc,
                 comment: "Load local word",
                 memLocation: loc)
         case neqi:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "NEQI", 
-                bytesConsumed: 1, 
+                mnemonic: "NEQI",
+                bytesConsumed: 1,
                 comment: "Integer TOS-1 <> TOS")
         case stl:
             let (val, inc) = try cd.readBig(at: ic + 1)
@@ -716,9 +743,9 @@ struct OpcodeDecoder {
                     lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STL", 
-                params: [val], 
-                bytesConsumed: 1 + inc, 
+                mnemonic: "STL",
+                params: [val],
+                bytesConsumed: 1 + inc,
                 comment: "Store local word",
                 memLocation: loc)
         case cxp:
@@ -729,10 +756,10 @@ struct OpcodeDecoder {
                 ?? Location(segment: seg, procedure: procNum)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CXP", 
-                params: [seg, procNum], 
+                mnemonic: "CXP",
+                params: [seg, procNum],
                 bytesConsumed: 3,
-                comment: "Call external procedure", 
+                comment: "Call external procedure",
                 destination: loc)
         case clp:
             let procNum = Int(try cd.readByte(at: ic + 1))
@@ -742,10 +769,10 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: currSeg.segNum, procedure: procNum)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CLP", 
-                params: [procNum], 
+                mnemonic: "CLP",
+                params: [procNum],
                 bytesConsumed: 2,
-                comment: "Call local procedure", 
+                comment: "Call local procedure",
                 destination: loc)
         case cgp:
             let procNum = Int(try cd.readByte(at: ic + 1))
@@ -755,27 +782,27 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: currSeg.segNum, procedure: procNum)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "CGP", 
-                params: [procNum], 
+                mnemonic: "CGP",
+                params: [procNum],
                 bytesConsumed: 2,
-                comment: "Call global procedure", 
+                comment: "Call global procedure",
                 destination: loc)
         case lpa:
             let count = Int(try cd.readByte(at: ic + 1))
-                var txtRep = ""
-                for i in 1...count {
-                    if let c = try? cd.readByte(at: ic + 1 + i) {
-                        if c >= 0x20 && c <= 0x7e {
-                            txtRep.append(Character(UnicodeScalar(Int(c))!))
-                        } else {
-                            txtRep.append(".")
-                        }
+            var txtRep = ""
+            for i in 1...count {
+                if let c = try? cd.readByte(at: ic + 1 + i) {
+                    if c >= 0x20 && c <= 0x7e {
+                        txtRep.append(Character(UnicodeScalar(Int(c))!))
+                    } else {
+                        txtRep.append(".")
                     }
                 }
+            }
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "LPA", 
-                params: [count], 
+                mnemonic: "LPA",
+                params: [count],
                 stringParameter: txtRep,
                 bytesConsumed: 2 + count,
                 comment: "Load packed array")
@@ -788,36 +815,36 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: seg, procedure: 0, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "STE", 
-                params: [seg, val], 
+                mnemonic: "STE",
+                params: [seg, val],
                 bytesConsumed: 2 + inc,
-                comment: "Store extended word TOS into", 
+                comment: "Store extended word TOS into",
                 memLocation: loc)
         case nop:
             return DecodedInstruction(
-                opcode: opcode, 
-                mnemonic: "NOP", 
-                bytesConsumed: 1, 
+                opcode: opcode,
+                mnemonic: "NOP",
+                bytesConsumed: 1,
                 comment: "No operation")
         case bpt:
             let (val, inc) = try cd.readBig(at: ic + 1)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "BPT", 
-                params: [val], 
-                bytesConsumed: 1 + inc, 
+                mnemonic: "BPT",
+                params: [val],
+                bytesConsumed: 1 + inc,
                 comment: "Breakpoint")
         case xit:
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "XIT", 
-                bytesConsumed: 1, 
+                mnemonic: "XIT",
+                bytesConsumed: 1,
                 comment: "Exit the operating system")
         case nop2:
             return DecodedInstruction(
-                opcode: opcode, 
-                mnemonic: "NOP", 
-                bytesConsumed: 1, 
+                opcode: opcode,
+                mnemonic: "NOP",
+                bytesConsumed: 1,
                 comment: "No operation")
         case sldl1...sldl16:
             let b = Int(opcode)
@@ -832,9 +859,9 @@ struct OpcodeDecoder {
                     lexLevel: proc.lexicalLevel, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SLDL", 
-                params: [val], 
-                bytesConsumed: 1, 
+                mnemonic: "SLDL",
+                params: [val],
+                bytesConsumed: 1,
                 comment: "Short load local word",
                 memLocation: loc)
         case sldo1...sldo16:
@@ -846,18 +873,18 @@ struct OpcodeDecoder {
                 }) ?? Location(segment: 1, procedure: 1, lexLevel: 0, addr: val)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SLDO", 
-                params: [val], 
+                mnemonic: "SLDO",
+                params: [val],
                 bytesConsumed: 1,
-                comment: "Short load global word", 
+                comment: "Short load global word",
                 memLocation: loc)
         case sind0...sind7:
             let b3 = Int(opcode)
             let offs = b3 - Int(sind0)
             return DecodedInstruction(
                 opcode: opcode,
-                mnemonic: "SIND", 
-                params: [offs], 
+                mnemonic: "SIND",
+                params: [offs],
                 bytesConsumed: 1,
                 comment: "Short index and load word *TOS+\(offs)")
         default:

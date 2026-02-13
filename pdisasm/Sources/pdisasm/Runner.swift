@@ -184,9 +184,6 @@ proc.instructions.forEach { (_, inst) in
                             if caller.target.segment == loc.segment
                                 && caller.target.lexLevel == loc.lexLevel
                             {
-                                // procForLoc = ProcIdentifier(
-                                //     isFunction: false, segmentNumber: caller.target.segment,
-                                //     procNumber: caller.target.procedure)
                                 inst.memLocation?.procedure = caller.target.procedure
                                 break
                             }
@@ -201,7 +198,8 @@ proc.instructions.forEach { (_, inst) in
 /// This mirrors the original CLI behaviour but is exposed as a callable function
 /// so the `pdisasm-cli` executable can delegate to it.
 public func runPdisasm(
-    filename: String, verbose: Bool = false, rewrite: Bool = false,
+    filename: String, verbose: Bool = false, rewrite: Bool = false, showMarkup: Bool = false,
+    showPCode: Bool = false, showPseudoCode: Bool = false,
     metadataPrefix: String = "/Users/chris/Repos/chris-e-green.github.io/pdisasm/metadata"
 )
     throws
@@ -282,7 +280,6 @@ public func runPdisasm(
         // into a positive address within the slot 15 part.
 
         var extraCode: Data = Data()
-        // if seg.segNum == 0 || seg.segNum == 15 {
         // slots 0 and 15 may need to be handled differently - IF they are
         // part of the PASCALSY segment.
         if seg.segNum == 0 && seg.name == "PASCALSY" {
@@ -453,8 +450,9 @@ public func runPdisasm(
     // Output results using the existing helper
     outputResults(
         sourceFilename: fileIdentifier, segDictionary: segDict,
-        codeSegs: allCodeSegs, allLocations: allLocations,  // allLabels: allLabels,
-        allProcedures: allProcedures, allCallers: allCallers)
+        codeSegs: allCodeSegs, allLocations: allLocations,
+        allProcedures: allProcedures, allCallers: allCallers,
+        verbose: verbose, showMarkup: showMarkup, showPCode: showPCode, showPseudoCode: showPseudoCode)
 
     exportLabels(
         toCSV: allLabelsCSVFile, from: allLocations.filter { $0.segment != 0 }.sorted { $0 < $1 },
