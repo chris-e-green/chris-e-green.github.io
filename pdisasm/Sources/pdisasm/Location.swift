@@ -1,4 +1,6 @@
-public final class Location: Hashable, CustomStringConvertible, Comparable, Codable {
+public final class Location: Hashable, CustomStringConvertible, Comparable,
+    Codable
+{
     public var segment: Int
     public var procedure: Int?
     public var lexLevel: Int?
@@ -25,21 +27,39 @@ public final class Location: Hashable, CustomStringConvertible, Comparable, Coda
         if lhs.lexLevel != rhs.lexLevel {
             return (lhs.lexLevel ?? -1) < (rhs.lexLevel ?? -1)
         }
-        return (lhs.addr ?? -1) < (rhs.addr ?? -1)    
+        return (lhs.addr ?? -1) < (rhs.addr ?? -1)
     }
 
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.segment = try container.decode(Int.self, forKey: CodingKeys.segment)
-        self.procedure = try container.decodeIfPresent(Int.self, forKey: CodingKeys.procedure)
-        self.lexLevel = try container.decodeIfPresent(Int.self, forKey: CodingKeys.lexLevel)
-        self.addr = try container.decodeIfPresent(Int.self, forKey: CodingKeys.addr)
+        self.segment = try container.decode(
+            Int.self,
+            forKey: CodingKeys.segment
+        )
+        self.procedure = try container.decodeIfPresent(
+            Int.self,
+            forKey: CodingKeys.procedure
+        )
+        self.lexLevel = try container.decodeIfPresent(
+            Int.self,
+            forKey: CodingKeys.lexLevel
+        )
+        self.addr = try container.decodeIfPresent(
+            Int.self,
+            forKey: CodingKeys.addr
+        )
         self.name = try container.decode(String.self, forKey: CodingKeys.name)
         self.type = try container.decode(String.self, forKey: CodingKeys.type)
     }
 
-    public init(segment: Int, procedure: Int? = nil, lexLevel: Int? = nil, addr: Int? = nil, 
-                name: String = "", type: String = "") {
+    public init(
+        segment: Int,
+        procedure: Int? = nil,
+        lexLevel: Int? = nil,
+        addr: Int? = nil,
+        name: String = "",
+        type: String = ""
+    ) {
         self.segment = segment
         self.procedure = procedure
         self.lexLevel = lexLevel
@@ -59,10 +79,8 @@ public final class Location: Hashable, CustomStringConvertible, Comparable, Coda
     }
 
     public static func == (lhs: Location, rhs: Location) -> Bool {
-        return lhs.segment == rhs.segment &&
-            lhs.procedure == rhs.procedure &&
-            lhs.lexLevel == rhs.lexLevel &&
-            lhs.addr == rhs.addr
+        return lhs.segment == rhs.segment && lhs.procedure == rhs.procedure
+            && lhs.lexLevel == rhs.lexLevel && lhs.addr == rhs.addr
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -92,7 +110,7 @@ public final class Location: Hashable, CustomStringConvertible, Comparable, Coda
     public var dispType: String {
         return type.isEmpty ? "UNKNOWN" : type
     }
-    
+
     public var description: String {
         if !name.isEmpty {
             return "\(name):\(type)"

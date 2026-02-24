@@ -2,7 +2,9 @@ import Foundation
 
 // MARK: - Pascal Procedure Decoder
 private func handleComparison(
-    _ dataType: String, _ simulator: inout StackSimulator, _ opString: String
+    _ dataType: String,
+    _ simulator: inout StackSimulator,
+    _ opString: String
 ) {
     if dataType == "SET" {
         let (_, a) = simulator.popSet()
@@ -58,7 +60,8 @@ func decodePascalProcedure(
     }
 
     // Validate computed entry/exit ICs
-    if proc.enterIC < 0 || proc.exitIC < 0 || proc.enterIC >= addr || proc.exitIC >= addr
+    if proc.enterIC < 0 || proc.exitIC < 0 || proc.enterIC >= addr
+        || proc.exitIC >= addr
         || proc.enterIC >= code.count || proc.exitIC >= code.count
     {
         return
@@ -74,66 +77,14 @@ func decodePascalProcedure(
     var done: Bool = false
     proc.entryPoints.insert(proc.enterIC)
     proc.entryPoints.insert(proc.exitIC)
-    let myLoc =
-        allLocations.first(where: {
-            $0.segment == segment && $0.procedure == procedure && $0.addr == nil
-        }) ?? Location(segment: segment, procedure: procedure)
-
-    // Build lookup dictionaries for O(1) access instead of O(n) linear searches
-    var procLookup: [String: ProcIdentifier] = [:]
-    for p in allProcedures {
-        let key = "\(p.segment):\(p.procedure)"
-        procLookup[key] = p
-    }
-
-    var labelLookup: [String: Location] = [:]
-    for label in allLocations {
-        let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr ?? -1)"
-        labelLookup[key] = label
-    }
+    let myLoc = Location(
+        segment: segment,
+        procedure: procedure,
+        lexLevel: proc.lexicalLevel
+    )
 
     // Initialize components for clean separation of concerns
     let decoder = OpcodeDecoder(cd: cd)
-
-    func locStringToKey(_ locString: String) -> Location {
-        if locString.contains("_") {
-            let sa = locString.split(separator: "_")
-            var proc: Int?
-            var seg: Int?
-            var addr: Int?
-            for sai in sa {
-                if sai.starts(with: "P") {
-                    proc = Int(sai.dropFirst())
-                } else if sai.starts(with: "S") {
-                    seg = Int(sai.dropFirst())
-                } else if sai.starts(with: "A") {
-                    addr = Int(sai.dropFirst())
-                }
-            }
-            return Location(segment: seg ?? -1, procedure: proc, addr: addr)
-        }
-        return Location(segment: -1)
-    }
-
-    // Helper to lookup label by Location
-    func findLabel(_ loc: Location) -> (String?, String?) {
-        let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
-        if let ll = labelLookup[key] {
-            return (ll.dispName, ll.dispType)
-        } else {
-            return (nil, nil)
-        }
-    }
-
-    // Helper to lookup label by Location
-    func findStackLabel(_ loc: Location) -> (String, String?) {
-        let key = "\(loc.segment):\(loc.procedure ?? -1):\(loc.addr ?? -1)"
-        if let ll = labelLookup[key] {
-            return (ll.dispName, ll.dispType)
-        } else {
-            return (loc.dispName, loc.dispType)
-        }
-    }
 
     // Decode loop: uses new architecture for clean separation of decoding, simulation, and generation
     while ic < addr && !done {
@@ -143,9 +94,14 @@ func decodePascalProcedure(
             // Decode the instruction using the new architecture
             var decoded: OpcodeDecoder.DecodedInstruction
             if let cachedDecoded = try? decoder.decode(
-                opcode: opcode, at: ic, currSeg: currSeg, segment: segment, procedure: procedure,
-                proc: proc, addr: addr, allLocations: &allLocations)
-            {
+                opcode: opcode,
+                at: ic,
+                currSeg: currSeg,
+                segment: segment,
+                procedure: procedure,
+                proc: proc,
+                addr: addr
+            ) {
                 decoded = cachedDecoded
             } else {
                 // Fallback for any decode errors
@@ -165,7 +121,8 @@ func decodePascalProcedure(
 
             if decoded.requiresComparator {
                 let (suffix, prefix, inc, dataType) = decoder.decodeComparator(
-                    at: decoded.comparatorOffset)
+                    at: decoded.comparatorOffset
+                )
                 finalMnemonic += suffix
                 comparatorDataType = dataType
                 finalComment =
@@ -281,8 +238,11 @@ func decodePascalProcedure(
                 // Call intermediate procedure
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc =
-                    allLocations.first(where: { $0.segment == segment && $0.procedure == procNum })
-                    ?? Location(segment: segment, procedure: procNum)
+                    allLocations.first(where: {
+                        $0.segment == segment && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: segment, procedure: procNum, addr: nil)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
@@ -340,8 +300,11 @@ func decodePascalProcedure(
                 // Call base procedure
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc =
-                    allLocations.first(where: { $0.segment == segment && $0.procedure == procNum })
-                    ?? Location(segment: segment, procedure: procNum)
+                    allLocations.first(where: {
+                        $0.segment == segment && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: segment, procedure: procNum, addr: nil)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
@@ -371,8 +334,11 @@ func decodePascalProcedure(
                 let seg = Int(try cd.readByte(at: ic + 1))
                 let procNum = Int(try cd.readByte(at: ic + 2))
                 let loc =
-                    allLocations.first(where: { $0.segment == seg && $0.procedure == procNum })
-                    ?? Location(segment: seg, procedure: procNum)
+                    allLocations.first(where: {
+                        $0.segment == seg && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: seg, procedure: procNum, addr: nil)
                 if procNum != procedure || seg != segment {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
@@ -381,8 +347,11 @@ func decodePascalProcedure(
                 // Call local procedure
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc: Location =
-                    allLocations.first(where: { $0.segment == segment && $0.procedure == procNum })
-                    ?? Location(segment: segment, procedure: procNum)
+                    allLocations.first(where: {
+                        $0.segment == segment && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: segment, procedure: procNum, addr: nil)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
@@ -391,8 +360,11 @@ func decodePascalProcedure(
                 // Call global procedure
                 let procNum = Int(try cd.readByte(at: ic + 1))
                 let loc =
-                    allLocations.first(where: { $0.segment == segment && $0.procedure == procNum })
-                    ?? Location(segment: segment, procedure: procNum)
+                    allLocations.first(where: {
+                        $0.segment == segment && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: segment, procedure: procNum, addr: nil)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
@@ -439,7 +411,8 @@ func decodePascalProcedure(
                     comparatorDataType: comparatorDataType,
                     memLocation: memLoc,
                     destination: dest,
-                    comment: finalComment)
+                    comment: finalComment
+                )
             }
         } catch {
             // Any read error (out of range, EOF) aborts decoding this procedure.
@@ -449,8 +422,12 @@ func decodePascalProcedure(
 
     if proc.procType == nil {
         proc.procType = ProcIdentifier(
-            isFunction: isFunction, isAssembly: false, segment: segment, segmentName: currSeg.name,
-            procedure: procedure)
+            isFunction: isFunction,
+            isAssembly: false,
+            segment: segment,
+            segmentName: currSeg.name,
+            procedure: procedure
+        )
         if proc.parameterSize > 0 {
             var paramCount = proc.parameterSize
             if proc.procType?.isFunction == true {
@@ -460,35 +437,38 @@ func decodePascalProcedure(
             if paramCount > 0 {
                 for parmnum in 1...paramCount {
                     proc.procType?.parameters.append(
-                        Identifier(name: "PARAM\(parmnum)", type: "UNKNOWN"))
+                        Identifier(name: "PARAM\(parmnum)", type: "UNKNOWN")
+                    )
                 }
             }
         }
     }
 
-    // go through the parameters/function return and update the
-    // allLabels data after processing the procedure.
-    if let pt = proc.procType {
-        // if it's a function, set locations 1 (and 2 for reals) to retval
-        if pt.isFunction == true {
-            if let ret = allLocations.first(where: {
-                $0.segment == segment && $0.procedure == procedure && $0.addr == 1
-            }) {
-                ret.name = pt.procName ?? pt.shortDescription
-                ret.type = pt.returnType ?? "UNKNOWN"
-                allLocations.update(with: ret)
-            }
-            if proc.procType?.returnType == "REAL" {
-                if let ret = allLocations.first(where: {
-                    $0.segment == segment && $0.procedure == procedure && $0.addr == 2
-                }) {
-                    ret.name = pt.procName ?? pt.shortDescription
-                    ret.type = pt.returnType ?? "REAL"
-                    allLocations.update(with: ret)
-                }
-            }
-        }
-    }
+//    // go through the parameters/function return and update the
+//    // labels for locations after processing the procedure.
+//    if let pt = proc.procType {
+//        // if it's a function, set locations 1 (and 2 for reals) to retval
+//        if pt.isFunction == true {
+//            if let ret = allLocations.first(where: {
+//                $0.segment == segment && $0.procedure == procedure
+//                    && $0.addr == 1
+//            }) {
+//                ret.name = pt.procName ?? pt.shortDescription
+//                ret.type = pt.returnType ?? "UNKNOWN"
+//                allLocations.update(with: ret)
+//            }
+//            if proc.procType?.returnType == "REAL" {
+//                if let ret = allLocations.first(where: {
+//                    $0.segment == segment && $0.procedure == procedure
+//                        && $0.addr == 2
+//                }) {
+//                    ret.name = pt.procName ?? pt.shortDescription
+//                    ret.type = pt.returnType ?? "REAL"
+//                    allLocations.update(with: ret)
+//                }
+//            }
+//        }
+//    }
 
     if let p = proc.procType {
         if !allProcedures.contains(where: {
@@ -524,13 +504,17 @@ func simulateStackandGeneratePseudocodeForProcedure(
 
     var labelLookup: [String: Location] = [:]
     for label in allLocations {
-        let key = "\(label.segment):\(label.procedure ?? -1):\(label.addr ?? -1)"
+        let key =
+            "\(label.segment):\(label.procedure ?? -1):\(label.addr ?? -1)"
         labelLookup[key] = label
     }
 
     // Initialize components for clean separation of concerns
     var simulator = StackSimulator()
-    let pseudoGen = PseudoCodeGenerator(procLookup: procLookup, labelLookup: labelLookup)
+    let pseudoGen = PseudoCodeGenerator(
+        procLookup: procLookup,
+        labelLookup: labelLookup
+    )
 
     // Alias for backward compatibility during refactoring
     var currentStack: [String] {
@@ -745,7 +729,11 @@ func simulateStackandGeneratePseudocodeForProcedure(
             simulator.pushReal("\(a) * \(a)")
         case sto:
             // Store indirect word (TOS into TOS-1)
-            pseudoCode = pseudoGen.generateForInstruction(inst, stack: &simulator, loc: nil)
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case ixs:
             // Index string array (check 1 <= TOS <= len of str byte ptr TOS-1)
             //
@@ -787,25 +775,31 @@ func simulateStackandGeneratePseudocodeForProcedure(
                 if !ret.isEmpty {
                     if ret == "REAL" {
                         simulator.pushReal(
-                            "\(cspName)(\(callParms.reversed().joined(separator:", ")))")
+                            "\(cspName)(\(callParms.reversed().joined(separator:", ")))"
+                        )
                     } else {
                         simulator.push(
-                            ("\(cspName)(\(callParms.reversed().joined(separator:", ")))", ret))
+                            (
+                                "\(cspName)(\(callParms.reversed().joined(separator:", ")))",
+                                ret
+                            )
+                        )
                     }
                 } else {
                     // no return value so just generate pseudo-code
-                    pseudoCode = "\(cspName)(\(callParms.reversed().joined(separator:", ")))"
+                    pseudoCode =
+                        "\(cspName)(\(callParms.reversed().joined(separator:", ")))"
 
                 }
             }
         case ldcn:
             simulator.push(("NIL", "POINTER"))
         case adj:
-            // Adjust set to count words
+            // Adjust set to count words (expanding or compressing), discard length and push set data
             let count = inst.params[0]
             let (_, set) = simulator.popSet()
             for i in 0..<count {
-                simulator.push(("\(set){\(i)}", "SET"))
+                simulator.push(("\(set){\(i)}", "INTEGER"))
             }
             simulator.push(("\(count)", "INTEGER"))
         case fjp:
@@ -817,7 +811,9 @@ func simulateStackandGeneratePseudocodeForProcedure(
                 cond = "ODD(\(cond))"
             }
             if dest > address {  // jumping forward so an IF
-                if let targetIdx = sortedInstructions.firstIndex(where: { $0.key == dest }) {
+                if let targetIdx = sortedInstructions.firstIndex(where: {
+                    $0.key == dest
+                }) {
                     let prevIdx = sortedInstructions.index(before: targetIdx)
                     if prevIdx >= sortedInstructions.startIndex {
                         let prev = sortedInstructions[prevIdx]
@@ -826,25 +822,36 @@ func simulateStackandGeneratePseudocodeForProcedure(
                             // if it's forward it's likely an IF/ELSE
                             if prev.value.params[0] > prev.key {
                                 let elseDest = prev.value.params[0]
-                                if let elseEndIdx = sortedInstructions.firstIndex(where: {
-                                    $0.key == elseDest
-                                }) {
-                                    sortedInstructions[elseEndIdx].value.prePseudoCode.append("END (* ELSE \(cond) *)")
+                                if let elseEndIdx =
+                                    sortedInstructions.firstIndex(where: {
+                                        $0.key == elseDest
+                                    })
+                                {
+                                    sortedInstructions[elseEndIdx].value
+                                        .prePseudoCode.append(
+                                            "END (* ELSE \(cond) *)"
+                                        )
                                 }
                                 pseudoCode = "IF \(cond) THEN BEGIN"
-                                sortedInstructions[targetIdx].value.prePseudoCode.append(
-                                    "END ELSE BEGIN")
+                                sortedInstructions[targetIdx].value
+                                    .prePseudoCode.append(
+                                        "END ELSE BEGIN"
+                                    )
                                 ujpToSkipSet.insert(prevIdx)
                             } else {
                                 // WHILE
                                 pseudoCode = "WHILE \(cond) DO BEGIN"
-                                sortedInstructions[targetIdx].value.prePseudoCode.append("END (* WHILE \(cond) *)")
+                                sortedInstructions[targetIdx].value
+                                    .prePseudoCode.append(
+                                        "END (* WHILE \(cond) *)"
+                                    )
                                 ujpToSkipSet.insert(prevIdx)
                             }
 
                         } else {
                             // likely an IF without ELSE
-                            sortedInstructions[targetIdx].value.prePseudoCode.append("END (* IF \(cond) *)")
+                            sortedInstructions[targetIdx].value.prePseudoCode
+                                .append("END (* IF \(cond) *)")
                             flagForEnd.append((dest, indentLevel))
                             pseudoCode = "IF \(cond) THEN BEGIN"
                         }
@@ -855,8 +862,12 @@ func simulateStackandGeneratePseudocodeForProcedure(
                     //     pseudoCode = "IF \(cond) THEN BEGIN"
                 }
             } else {  // jumping backwards so a REPEAT/UNTIL
-                if let targetIdx = sortedInstructions.firstIndex(where: { $0.key == dest }) {
-                    sortedInstructions[targetIdx].value.prePseudoCode.append("REPEAT")
+                if let targetIdx = sortedInstructions.firstIndex(where: {
+                    $0.key == dest
+                }) {
+                    sortedInstructions[targetIdx].value.prePseudoCode.append(
+                        "REPEAT"
+                    )
                     pseudoCode = "UNTIL \(cond)"
                 }
             }
@@ -896,7 +907,11 @@ func simulateStackandGeneratePseudocodeForProcedure(
             }
         case mov:
             // Move words from TOS to TOS-1
-            pseudoCode = pseudoGen.generateForInstruction(inst, stack: &simulator, loc: nil)
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case ldo:
             // Load global word
             if let loc = inst.memLocation {
@@ -905,13 +920,20 @@ func simulateStackandGeneratePseudocodeForProcedure(
             }
         case sas:
             // String assign
-            pseudoCode = pseudoGen.generateForInstruction(inst, stack: &simulator, loc: nil)
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case sro:
             // Store global word
             if let loc = inst.memLocation {
                 allLocations.insert(loc)
                 pseudoCode = pseudoGen.generateForInstruction(
-                    inst, stack: &simulator, loc: loc)
+                    inst,
+                    stack: &simulator,
+                    loc: loc
+                )
             }
         // case xjp:
         //     // Case jump
@@ -922,7 +944,10 @@ func simulateStackandGeneratePseudocodeForProcedure(
         case cip:
             // Call intermediate procedure
             if let loc = inst.destination {
-                pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
+                pseudoCode = pseudoGen.handleCallProcedure(
+                    loc,
+                    stack: &simulator
+                )
             }
         case eql:
             // Equal (TOS-1 = TOS)
@@ -964,14 +989,19 @@ func simulateStackandGeneratePseudocodeForProcedure(
             // Store TOS
             if let loc = inst.memLocation {
                 pseudoCode = pseudoGen.generateForInstruction(
-                    inst, stack: &simulator, loc: loc)
+                    inst,
+                    stack: &simulator,
+                    loc: loc
+                )
             }
         case ujp:
             if ujpToSkipSet.contains(idx) {
                 // This UJP was already handled as part of an IF/ELSE structure
                 break
             }
-            if ujpCaseDest.contains(inst.params[0]) || ujpCaseDefaultDest.contains(inst.params[0]) {
+            if ujpCaseDest.contains(inst.params[0])
+                || ujpCaseDefaultDest.contains(inst.params[0])
+            {
                 // This UJP is part of a CASE structure
                 pseudoCode = "END (* CASE *)"
                 break
@@ -980,7 +1010,9 @@ func simulateStackandGeneratePseudocodeForProcedure(
             let dest = inst.params[0]
             // check the destination to see if it's forward, and pointing to an XJP (a CASE)
             if dest > address,
-                let targetIdx = sortedInstructions.firstIndex(where: { $0.key == dest })
+                let targetIdx = sortedInstructions.firstIndex(where: {
+                    $0.key == dest
+                })
             {
                 let target = sortedInstructions[targetIdx]
                 if target.value.opcode == xjp {
@@ -1000,7 +1032,9 @@ func simulateStackandGeneratePseudocodeForProcedure(
                     // go through them once to group by destination
                     for caseValue in low...high {
                         // get the destination for this case
-                        let cDestAddr = target.value.params[4 + (caseValue - low)]
+                        let cDestAddr = target.value.params[
+                            4 + (caseValue - low)
+                        ]
                         if addrToCaseValue[cDestAddr] == nil {
                             addrToCaseValue[cDestAddr] = []
                         }
@@ -1013,7 +1047,8 @@ func simulateStackandGeneratePseudocodeForProcedure(
                             let first = caseValues.first!  // we can force unwrap as we checked above
                             // group consecutive values
                             let group = caseValues.prefix(while: {
-                                $0 == caseValues.first! + (caseValues.firstIndex(of: $0)!)
+                                $0 == caseValues.first!
+                                    + (caseValues.firstIndex(of: $0)!)
                                     - (caseValues.firstIndex(of: first)!)
                             })
                             // if the group has only one value, add it as is
@@ -1021,15 +1056,22 @@ func simulateStackandGeneratePseudocodeForProcedure(
                                 caseLabel.append("\(group[0])")
                             } else {
                                 // otherwise, add it as a range
-                                caseLabel.append("\(group.first!)...\(group.last!)")
+                                caseLabel.append(
+                                    "\(group.first!)...\(group.last!)"
+                                )
                             }
                             // remove the processed values from the caseValues
-                            caseValues = Array(caseValues.dropFirst(group.count))
+                            caseValues = Array(
+                                caseValues.dropFirst(group.count)
+                            )
                         }
-                        if let cDest = sortedInstructions.firstIndex(where: { $0.key == cDestAddr })
-                        {
-                            sortedInstructions[cDest].value.prePseudoCode.append(
-                                "\(caseLabel.joined(separator: ", ")): BEGIN")
+                        if let cDest = sortedInstructions.firstIndex(where: {
+                            $0.key == cDestAddr
+                        }) {
+                            sortedInstructions[cDest].value.prePseudoCode
+                                .append(
+                                    "\(caseLabel.joined(separator: ", ")): BEGIN"
+                                )
                         }
 
                     }
@@ -1053,7 +1095,11 @@ func simulateStackandGeneratePseudocodeForProcedure(
             simulator.push(("\(a):\(awid):\(abit)", "INTEGER"))
         case stp:
             // Store packed field (TOS into TOS-1)
-            pseudoCode = pseudoGen.generateForInstruction(inst, stack: &simulator, loc: nil)
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case ldm:
             // Load multiple words (pushes onto stack)
             let ldmCount = inst.params[0]
@@ -1063,11 +1109,11 @@ func simulateStackandGeneratePseudocodeForProcedure(
             }
         case stm:
             // Store multiple words (pops from stack)
-            let stmCount = inst.params[0]
-            for _ in 0..<stmCount {
-                _ = simulator.pop()
-            }
-            _ = simulator.pop()  // destination address
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case ldb:
             // Load byte at byte ptr TOS-1 + TOS
             let (a, _) = simulator.pop()
@@ -1075,7 +1121,11 @@ func simulateStackandGeneratePseudocodeForProcedure(
             simulator.push(("\(b)[\(a)]", "BYTE"))
         case stb:
             // Store byte at byte ptr TOS-1 + TOS
-            pseudoCode = pseudoGen.generateForInstruction(inst, stack: &simulator, loc: nil)
+            pseudoCode = pseudoGen.generateForInstruction(
+                inst,
+                stack: &simulator,
+                loc: nil
+            )
         case ixp:
             // Index packed array TOS-1[TOS]
             let elementsPerWord = inst.params[0]
@@ -1088,7 +1138,10 @@ func simulateStackandGeneratePseudocodeForProcedure(
         case cbp:
             // Call base procedure
             if let loc = inst.destination {
-                pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
+                pseudoCode = pseudoGen.handleCallProcedure(
+                    loc,
+                    stack: &simulator
+                )
             }
         case equi:
             // Integer TOS-1 = TOS
@@ -1149,22 +1202,34 @@ func simulateStackandGeneratePseudocodeForProcedure(
             if let loc = inst.memLocation {
                 allLocations.insert(loc)
                 pseudoCode = pseudoGen.generateForInstruction(
-                    inst, stack: &simulator, loc: loc)
+                    inst,
+                    stack: &simulator,
+                    loc: loc
+                )
             }
         case cxp:
             // Call external procedure
             if let loc = inst.destination {
-                pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
+                pseudoCode = pseudoGen.handleCallProcedure(
+                    loc,
+                    stack: &simulator
+                )
             }
         case clp:
             // Call local procedure
             if let loc = inst.destination {
-                pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
+                pseudoCode = pseudoGen.handleCallProcedure(
+                    loc,
+                    stack: &simulator
+                )
             }
         case cgp:
             // Call global procedure
             if let loc = inst.destination {
-                pseudoCode = pseudoGen.handleCallProcedure(loc, stack: &simulator)
+                pseudoCode = pseudoGen.handleCallProcedure(
+                    loc,
+                    stack: &simulator
+                )
             }
         case lpa:
             // Load packed array
@@ -1175,17 +1240,22 @@ func simulateStackandGeneratePseudocodeForProcedure(
             if let loc = inst.memLocation {
                 allLocations.insert(loc)
                 pseudoCode = pseudoGen.generateForInstruction(
-                    inst, stack: &simulator, loc: loc)
+                    inst,
+                    stack: &simulator,
+                    loc: loc
+                )
             }
         case sldl1...sldl16:
             // Short load local word
             if let loc = inst.memLocation {
                 simulator.push(findStackLabel(loc))
+                allLocations.insert(loc)
             }
         case sldo1...sldo16:
             // Short load global word
             if let loc = inst.memLocation {
                 simulator.push(findStackLabel(loc))
+                allLocations.insert(loc)
             }
         case sind0...sind7:
             // Short index load (word *TOS+offset)
@@ -1199,9 +1269,10 @@ func simulateStackandGeneratePseudocodeForProcedure(
         inst.pseudoCode = pseudoCode
         inst.stackState = currentStack
     }
-    
+
     flagForLabel.forEach {
         proc.instructions[$0]?.prePseudoCode.append(
-            "LAB\($0):")
+            "LAB\($0):"
+        )
     }
 }

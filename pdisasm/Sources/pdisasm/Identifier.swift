@@ -7,7 +7,7 @@ public struct Identifier: CustomStringConvertible, Hashable, Codable, Sendable {
         hasher.combine(name)
         hasher.combine(type)
     }
-    
+
     public var name: String
     public var type: String
     public var description: String {

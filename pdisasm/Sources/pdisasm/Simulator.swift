@@ -18,7 +18,11 @@ public struct SimInsn {
 ///   - proc: the Procedure to simulate
 ///   - procMap: dictionary keyed by (segment<<16)|procNumber -> Procedure for resolving calls
 /// - Returns: ExecutionResult from the top-level call
-public func simulateProcedure(currSeg: Segment, proc: Procedure, procMap: [Int: Procedure]) throws -> ExecutionResult {
+public func simulateProcedure(
+    currSeg: Segment,
+    proc: Procedure,
+    procMap: [Int: Procedure]
+) throws -> ExecutionResult {
     let machine = Machine()
     // Build instruction maps for procedures as SimInsn arrays
     func insns(for p: Procedure) -> [SimInsn] { simInsns(from: p) }
@@ -30,18 +34,26 @@ public func simulateProcedure(currSeg: Segment, proc: Procedure, procMap: [Int: 
 
     while true {
         // Build map for quick lookup
-        let insMap: [Int: SimInsn] = Dictionary(uniqueKeysWithValues: currentIns.map { ($0.ic, $0) })
+        let insMap: [Int: SimInsn] = Dictionary(
+            uniqueKeysWithValues: currentIns.map { ($0.ic, $0) }
+        )
         // Compute the default next IC (the next instruction's IC) so stepping uses correct PC increments
         let sortedICs = currentIns.map { $0.ic }.sorted()
         guard let ins = insMap[currentPC] else { break }
         let defaultNextPC: Int? = {
-            if let idx = sortedICs.firstIndex(of: currentPC), idx + 1 < sortedICs.count {
+            if let idx = sortedICs.firstIndex(of: currentPC),
+                idx + 1 < sortedICs.count
+            {
                 return sortedICs[idx + 1]
             }
             return nil
         }()
 
-        let (nextPC, callProc, returned) = try machine.executeStep(ins: ins, currentPC: currentPC, defaultNextPC: defaultNextPC)
+        let (nextPC, callProc, returned) = try machine.executeStep(
+            ins: ins,
+            currentPC: currentPC,
+            defaultNextPC: defaultNextPC
+        )
         if let callProc = callProc {
             // resolve callee
             let key = (proc.procType?.segment ?? 0) << 16 | callProc
@@ -89,7 +101,12 @@ public func simulateProcedure(currSeg: Segment, proc: Procedure, procMap: [Int: 
     }
     let filteredStack = machine.stack.filter { !allICs.contains($0) }
 
-    return ExecutionResult(stack: filteredStack, trace: machine.currentTrace(), memory: machine.currentMemory(), halted: true)
+    return ExecutionResult(
+        stack: filteredStack,
+        trace: machine.currentTrace(),
+        memory: machine.currentMemory(),
+        halted: true
+    )
 }
 
 public struct ExecutionResult {
@@ -115,7 +132,7 @@ public enum SimulatorError: Error, CustomStringConvertible {
 
 public final class Machine {
     public private(set) var stack: [Int] = []
-    private var memory: [Int: Int] = [:]      // simple flat memory by integer address
+    private var memory: [Int: Int] = [:]  // simple flat memory by integer address
     private var pc: Int = 0
     private var trace: [(Int, String)] = []
     // Frame stack: each frame has an id and a base address used when resolving lex addresses
@@ -142,7 +159,7 @@ public final class Machine {
     // it as lexical-level addressing and resolve against the current top frame base.
     private func flatKey(forEncoded encoded: Int) -> Int {
         // Interpret as three-field encoding [segment:8][procOrLex:8][addr:16]
-        if encoded & 0xffff0000 != 0 {
+        if encoded & 0xffff_0000 != 0 {
             let seg8 = (encoded >> 24) & 0xff
             let p8 = (encoded >> 16) & 0xff
             let a = encoded & 0xffff
@@ -208,10 +225,16 @@ public final class Machine {
     public func currentMemory() -> [Int: Int] { return memory }
 
     /// Execute a list of instructions (SimInsn). Entry starts at entryIC.
-    public func execute(instructions: [SimInsn], entryIC: Int = 0, maxSteps: Int = 10_000) throws -> ExecutionResult {
+    public func execute(
+        instructions: [SimInsn],
+        entryIC: Int = 0,
+        maxSteps: Int = 10_000
+    ) throws -> ExecutionResult {
         reset()
         pc = entryIC
-        let insMap: [Int: SimInsn] = Dictionary(uniqueKeysWithValues: instructions.map { ($0.ic, $0) })
+        let insMap: [Int: SimInsn] = Dictionary(
+            uniqueKeysWithValues: instructions.map { ($0.ic, $0) }
+        )
         // Precompute the sorted instruction ICs so the "next" PC is the next instruction's IC
         let sortedICs = instructions.map { $0.ic }.sorted()
 
@@ -228,7 +251,8 @@ public final class Machine {
             trace.append((pc, ins.mnemonic))
             // Default to the next instruction IC if present; otherwise halt
             var nextPC: Int
-            if let idx = sortedICs.firstIndex(of: pc), idx + 1 < sortedICs.count {
+            if let idx = sortedICs.firstIndex(of: pc), idx + 1 < sortedICs.count
+            {
                 nextPC = sortedICs[idx + 1]
             } else {
                 // no next instruction -> treat as halt
@@ -238,46 +262,58 @@ public final class Machine {
 
             switch ins.mnemonic.uppercased() {
             case "SLDC", "LDC", "LDCI", "LDCN":
-                if let v = ins.args.first { stack.append(v) } else { stack.append(0) }
+                if let v = ins.args.first {
+                    stack.append(v)
+                } else {
+                    stack.append(0)
+                }
             case "LDA", "LLA":
                 // Load an address (LDA/LLA) - push resolved flat key
                 var aaddr = ins.args.first ?? 0
                 aaddr = self.flatKey(forEncoded: aaddr)
                 stack.append(aaddr)
             case "LDL":
-                var lad = ins.args.first ?? 0; lad = self.flatKey(forEncoded: lad); stack.append(memory[lad] ?? 0)
+                var lad = ins.args.first ?? 0
+                lad = self.flatKey(forEncoded: lad)
+                stack.append(memory[lad] ?? 0)
             case "LDM":
                 if let count = ins.args.first {
-                    guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
+                    guard stack.count >= 1 else {
+                        throw SimulatorError.stackUnderflow
+                    }
                     let addr = stack.removeLast()
                     for i in 0..<count { stack.append(memory[addr + i] ?? 0) }
                 }
 
             case "STM":
                 // Store n words from source (TOS) to destination (TOS-1)
-                if let count = ins.args.first { 
-                    guard stack.count >= 2 else { 
-                        throw SimulatorError.stackUnderflow 
+                if let count = ins.args.first {
+                    guard stack.count >= 2 else {
+                        throw SimulatorError.stackUnderflow
                     }
                     let src = stack.removeLast()
                     let dst = stack.removeLast()
-                    for i in 0..<count { 
-                        memory[dst + i] = memory[src + i] ?? 0 
-                    } 
+                    for i in 0..<count {
+                        memory[dst + i] = memory[src + i] ?? 0
+                    }
                 }
 
             case "ADJ":
                 // Adjust / drop n words from the stack (used for set adjustment)
                 if let n = ins.args.first {
                     guard n >= 0 else { break }
-                    guard stack.count >= n else { throw SimulatorError.stackUnderflow }
+                    guard stack.count >= n else {
+                        throw SimulatorError.stackUnderflow
+                    }
                     for _ in 0..<n { _ = stack.removeLast() }
                 }
 
             case "MOV":
                 // Move n words from source (TOS) to destination (TOS-1)
                 if let n = ins.args.first {
-                    guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
+                    guard stack.count >= 2 else {
+                        throw SimulatorError.stackUnderflow
+                    }
                     let src = stack.removeLast()
                     let dst = stack.removeLast()
                     for i in 0..<n { memory[dst + i] = memory[src + i] ?? 0 }
@@ -286,7 +322,9 @@ public final class Machine {
             case "SAS":
                 // String assign: copy n bytes from src (TOS) to dst (TOS-1)
                 if let n = ins.args.first {
-                    guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
+                    guard stack.count >= 2 else {
+                        throw SimulatorError.stackUnderflow
+                    }
                     let src = stack.removeLast()
                     let dst = stack.removeLast()
                     for i in 0..<n { memory[dst + i] = memory[src + i] ?? 0 }
@@ -294,57 +332,89 @@ public final class Machine {
 
             case "SRO", "STE":
                 // Store global/extended word: args[0] is encoded address (inserted by simInsns)
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
                 let val = stack.removeLast()
                 var addrEnc = ins.args.first ?? 0
                 addrEnc = self.flatKey(forEncoded: addrEnc)
                 memory[addrEnc] = val
-       
+
             case "ADI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a + b)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a + b)
 
             case "ADR":
                 // Add reals - emulate as integer add for now
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let br = stack.removeLast(); let ar = stack.removeLast(); stack.append(ar + br)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let br = stack.removeLast()
+                let ar = stack.removeLast()
+                stack.append(ar + br)
 
             case "ABI", "ABR":
                 // Absolute value (integer/real) - implement as integer abs
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let vabi = stack.removeLast(); stack.append(abs(vabi))
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let vabi = stack.removeLast()
+                stack.append(abs(vabi))
 
             case "MPR":
                 // Multiply reals - emulate as integer multiply
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let bm = stack.removeLast(); let am = stack.removeLast(); stack.append(am * bm)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let bm = stack.removeLast()
+                let am = stack.removeLast()
+                stack.append(am * bm)
 
             case "NGR":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let vngr = stack.removeLast(); stack.append(-vngr)
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let vngr = stack.removeLast()
+                stack.append(-vngr)
 
             case "FLO", "FLT":
                 // Floating conversions - noop in integer simulator
                 break
 
             case "SQI", "SQR":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let v = stack.removeLast(); stack.append(v * v)
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let v = stack.removeLast()
+                stack.append(v * v)
 
             case "STO":
                 // Store indirect: store TOS into address TOS-1
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let sval = stack.removeLast(); let saddr = stack.removeLast(); memory[saddr] = sval
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let sval = stack.removeLast()
+                let saddr = stack.removeLast()
+                memory[saddr] = sval
 
             case "UNI":
                 // Set union - emulate as bitwise OR
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let rb = stack.removeLast(); let ra = stack.removeLast(); stack.append(ra | rb)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rb = stack.removeLast()
+                let ra = stack.removeLast()
+                stack.append(ra | rb)
 
             case "LDE":
                 // Load extended word: args are [segment, offset]
                 if ins.args.count >= 2 {
-                    let seg = ins.args[0]; let off = ins.args[1]
+                    let seg = ins.args[0]
+                    let off = ins.args[1]
                     let enc = (seg & 0xff) << 24 | (0 << 16) | (off & 0xffff)
                     stack.append(memory[enc] ?? 0)
                 }
@@ -364,58 +434,105 @@ public final class Machine {
                 break
 
             case "MODI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let bmod = stack.removeLast(); let amod = stack.removeLast()
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let bmod = stack.removeLast()
+                let amod = stack.removeLast()
                 stack.append(bmod == 0 ? 0 : (amod % bmod))
 
             case "SBI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a - b)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a - b)
 
             case "MPI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a * b)
-            
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a * b)
+
             case "NGI":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let vngi = stack.removeLast(); stack.append(-vngi)
-            
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let vngi = stack.removeLast()
+                stack.append(-vngi)
+
             case "DVI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(b == 0 ? 0 : (a / b))
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(b == 0 ? 0 : (a / b))
 
             case let op where op.hasPrefix("LEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a <= b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a <= b ? 1 : 0)
 
             case let op where op.hasPrefix("LES"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a < b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a < b ? 1 : 0)
 
             case let op where op.hasPrefix("GEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a >= b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a >= b ? 1 : 0)
 
             case let op where op.hasPrefix("GRT"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a > b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a > b ? 1 : 0)
 
             case "LAND":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let rb = stack.removeLast(); let ra = stack.removeLast(); stack.append((ra != 0 && rb != 0) ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rb = stack.removeLast()
+                let ra = stack.removeLast()
+                stack.append((ra != 0 && rb != 0) ? 1 : 0)
 
             case "LOR":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let rb2 = stack.removeLast(); let ra2 = stack.removeLast(); stack.append((ra2 != 0 || rb2 != 0) ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rb2 = stack.removeLast()
+                let ra2 = stack.removeLast()
+                stack.append((ra2 != 0 || rb2 != 0) ? 1 : 0)
 
             case "LNOT":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let rv = stack.removeLast(); stack.append(rv == 0 ? 1 : 0)
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rv = stack.removeLast()
+                stack.append(rv == 0 ? 1 : 0)
 
             case "INC":
                 // INC <n> : increment TOS by n (params[0]) or by immediate arg in ins.args
                 if let n = ins.args.first {
-                    guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
+                    guard stack.count >= 1 else {
+                        throw SimulatorError.stackUnderflow
+                    }
                     let top = stack.removeLast()
                     stack.append(top + n)
                 } else {
@@ -433,10 +550,10 @@ public final class Machine {
                 laoAddr = self.flatKey(forEncoded: laoAddr)
                 stack.append(laoAddr)
 
-
-
             case "STL", "STR":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
                 let value = stack.removeLast()
                 var addr = ins.args.first ?? 0
                 addr = self.flatKey(forEncoded: addr)
@@ -451,44 +568,71 @@ public final class Machine {
                 if stack.count >= 1 {
                     let addr = stack.removeLast()
                     stack.append(memory[addr] ?? 0)
-                } else { throw SimulatorError.stackUnderflow }
+                } else {
+                    throw SimulatorError.stackUnderflow
+                }
             case "STB":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
                 let v = stack.removeLast()
                 var addr = ins.args.first ?? 0
                 addr = self.flatKey(forEncoded: addr)
                 memory[addr] = v & 0xFF
 
             case "IND":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let offset = stack.removeLast(); let base = stack.removeLast(); let effective = base + offset; stack.append(memory[effective] ?? 0)
-
-
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let offset = stack.removeLast()
+                let base = stack.removeLast()
+                let effective = base + offset
+                stack.append(memory[effective] ?? 0)
 
             case "SIND":
-                guard stack.count >= 3 else { throw SimulatorError.stackUnderflow }
-                let value = stack.removeLast(); let offset = stack.removeLast(); let base = stack.removeLast(); let effective = base + offset; memory[effective] = value
+                guard stack.count >= 3 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let value = stack.removeLast()
+                let offset = stack.removeLast()
+                let base = stack.removeLast()
+                let effective = base + offset
+                memory[effective] = value
 
             case "UJP":
                 nextPC = ins.args.first ?? nextPC
 
             case "FJP":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let cond = stack.removeLast(); if cond == 0 { nextPC = ins.args.first ?? nextPC }
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let cond = stack.removeLast()
+                if cond == 0 { nextPC = ins.args.first ?? nextPC }
 
             case "CIP":
-                let target = ins.args.first ?? nextPC; stack.append(nextPC); nextPC = target
+                let target = ins.args.first ?? nextPC
+                stack.append(nextPC)
+                nextPC = target
 
             case "RNP", "RBP":
-                halted = true; break
+                halted = true
+                break
 
             case let op where op.hasPrefix("EQL"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a == b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a == b ? 1 : 0)
 
             case let op where op.hasPrefix("NEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a != b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a != b ? 1 : 0)
 
             default:
                 throw SimulatorError.unknownOpcode(ins.mnemonic)
@@ -500,13 +644,22 @@ public final class Machine {
 
         if steps >= maxSteps { throw SimulatorError.maxStepsExceeded(maxSteps) }
 
-        return ExecutionResult(stack: stack, trace: trace, memory: memory, halted: halted)
+        return ExecutionResult(
+            stack: stack,
+            trace: trace,
+            memory: memory,
+            halted: halted
+        )
     }
 
     /// Execute a single instruction step. Returns (nextPC, callProcNumber?, didReturn)
     /// - If a call is encountered (CIP/CBP/CLP/CXP/CGP) the function will push the return IP
     ///   and allocate a frame, then return the callee proc number so the caller can dispatch.
-    public func executeStep(ins: SimInsn, currentPC: Int, defaultNextPC: Int? = nil) throws -> (nextPC: Int, callProc: Int?, returned: Bool) {
+    public func executeStep(
+        ins: SimInsn,
+        currentPC: Int,
+        defaultNextPC: Int? = nil
+    ) throws -> (nextPC: Int, callProc: Int?, returned: Bool) {
         // Use provided defaultNextPC (typically the next instruction's IC). Fall back to currentPC+1.
         var nextPC = defaultNextPC ?? (currentPC + 1)
         let op = ins.mnemonic.uppercased()
@@ -514,7 +667,7 @@ public final class Machine {
         case "CIP", "CBP", "CLP", "CXP", "CGP":
             // proc number expected in args[0]
             let procNum = ins.args.first ?? 0
-            stack.append(nextPC) // push return ip (the next instruction IC)
+            stack.append(nextPC)  // push return ip (the next instruction IC)
             _ = enterFrame(base: 0)
             return (nextPC, procNum, false)
         case "RNP", "RBP":
@@ -529,75 +682,182 @@ public final class Machine {
             // We'll perform the local logic inline for the same ops implemented in execute().
             switch op {
             case "SLDC", "LDC", "LDCI", "LDCN":
-                if let v = ins.args.first { stack.append(v) } else { stack.append(0) }
+                if let v = ins.args.first {
+                    stack.append(v)
+                } else {
+                    stack.append(0)
+                }
             case "ADI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a + b)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a + b)
             case "MODI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let bmod = stack.removeLast(); let amod = stack.removeLast(); stack.append(bmod == 0 ? 0 : (amod % bmod))
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let bmod = stack.removeLast()
+                let amod = stack.removeLast()
+                stack.append(bmod == 0 ? 0 : (amod % bmod))
             case "SBI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a - b)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a - b)
             case "MPI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a * b)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a * b)
             case "NGI":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let vngi = stack.removeLast(); stack.append(-vngi)
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let vngi = stack.removeLast()
+                stack.append(-vngi)
             case "DVI":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(b == 0 ? 0 : (a / b))
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(b == 0 ? 0 : (a / b))
             case let op where op.hasPrefix("LEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a <= b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a <= b ? 1 : 0)
             case let op where op.hasPrefix("LES"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a < b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a < b ? 1 : 0)
             case let op where op.hasPrefix("GEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a >= b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a >= b ? 1 : 0)
             case let op where op.hasPrefix("GRT"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a > b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a > b ? 1 : 0)
             case "LAND":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let rb = stack.removeLast(); let ra = stack.removeLast(); stack.append((ra != 0 && rb != 0) ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rb = stack.removeLast()
+                let ra = stack.removeLast()
+                stack.append((ra != 0 && rb != 0) ? 1 : 0)
             case "LOR":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }
-                let rb2 = stack.removeLast(); let ra2 = stack.removeLast(); stack.append((ra2 != 0 || rb2 != 0) ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rb2 = stack.removeLast()
+                let ra2 = stack.removeLast()
+                stack.append((ra2 != 0 || rb2 != 0) ? 1 : 0)
             case "LNOT":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }
-                let rv = stack.removeLast(); stack.append(rv == 0 ? 1 : 0)
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let rv = stack.removeLast()
+                stack.append(rv == 0 ? 1 : 0)
             case "INC":
-                if let n = ins.args.first { guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }; let top = stack.removeLast(); stack.append(top + n) }
+                if let n = ins.args.first {
+                    guard stack.count >= 1 else {
+                        throw SimulatorError.stackUnderflow
+                    }
+                    let top = stack.removeLast()
+                    stack.append(top + n)
+                }
             case "LOD", "LDO":
-                var addr = ins.args.first ?? 0; addr = self.flatKey(forEncoded: addr); stack.append(memory[addr] ?? 0)
+                var addr = ins.args.first ?? 0
+                addr = self.flatKey(forEncoded: addr)
+                stack.append(memory[addr] ?? 0)
             case "LAO":
-                var laoAddr = ins.args.first ?? 0; laoAddr = self.flatKey(forEncoded: laoAddr); stack.append(laoAddr)
+                var laoAddr = ins.args.first ?? 0
+                laoAddr = self.flatKey(forEncoded: laoAddr)
+                stack.append(laoAddr)
             case "STL", "STR":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }; let value = stack.removeLast(); var addr = ins.args.first ?? 0; addr = self.flatKey(forEncoded: addr); memory[addr] = value
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let value = stack.removeLast()
+                var addr = ins.args.first ?? 0
+                addr = self.flatKey(forEncoded: addr)
+                memory[addr] = value
             case "LDB":
-                var addr = ins.args.first ?? 0; addr = self.flatKey(forEncoded: addr); stack.append(memory[addr] ?? 0)
+                var addr = ins.args.first ?? 0
+                addr = self.flatKey(forEncoded: addr)
+                stack.append(memory[addr] ?? 0)
             case "LDP":
                 if stack.count >= 1 {
                     let addr = stack.removeLast()
                     stack.append(memory[addr] ?? 0)
-                } else { throw SimulatorError.stackUnderflow }
+                } else {
+                    throw SimulatorError.stackUnderflow
+                }
             case "STB":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }; let v = stack.removeLast(); var addr = ins.args.first ?? 0; addr = self.flatKey(forEncoded: addr); memory[addr] = v & 0xFF
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let v = stack.removeLast()
+                var addr = ins.args.first ?? 0
+                addr = self.flatKey(forEncoded: addr)
+                memory[addr] = v & 0xFF
             case "IND":
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }; let offset = stack.removeLast(); let base = stack.removeLast(); let effective = base + offset; stack.append(memory[effective] ?? 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let offset = stack.removeLast()
+                let base = stack.removeLast()
+                let effective = base + offset
+                stack.append(memory[effective] ?? 0)
             case "SIND":
-                guard stack.count >= 3 else { throw SimulatorError.stackUnderflow }; let value = stack.removeLast(); let offset = stack.removeLast(); let base = stack.removeLast(); let effective = base + offset; memory[effective] = value
+                guard stack.count >= 3 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let value = stack.removeLast()
+                let offset = stack.removeLast()
+                let base = stack.removeLast()
+                let effective = base + offset
+                memory[effective] = value
             case "UJP":
                 nextPC = ins.args.first ?? nextPC
             case "FJP":
-                guard stack.count >= 1 else { throw SimulatorError.stackUnderflow }; let cond = stack.removeLast(); if cond == 0 { nextPC = ins.args.first ?? nextPC }
+                guard stack.count >= 1 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let cond = stack.removeLast()
+                if cond == 0 { nextPC = ins.args.first ?? nextPC }
             case let op where op.hasPrefix("EQL"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }; let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a == b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a == b ? 1 : 0)
             case let op where op.hasPrefix("NEQ"):
-                guard stack.count >= 2 else { throw SimulatorError.stackUnderflow }; let b = stack.removeLast(); let a = stack.removeLast(); stack.append(a != b ? 1 : 0)
+                guard stack.count >= 2 else {
+                    throw SimulatorError.stackUnderflow
+                }
+                let b = stack.removeLast()
+                let a = stack.removeLast()
+                stack.append(a != b ? 1 : 0)
             default:
                 throw SimulatorError.unknownOpcode(ins.mnemonic)
             }
@@ -611,7 +871,12 @@ public final class Machine {
 // Encode a location as a compact Int: [segment:8][procOrLex:8][addr:16]
 // Encode a location as a compact Int: [segment:8][procOrLex:8][addr:16]
 // If isLex is true, the high bit of procOrLex is set to indicate lexical-level addressing.
-fileprivate func encodeLocation(segment: Int, procOrLex: Int, addr: Int, isLex: Bool = false) -> Int {
+private func encodeLocation(
+    segment: Int,
+    procOrLex: Int,
+    addr: Int,
+    isLex: Bool = false
+) -> Int {
     let s = (segment & 0xff) << 24
     var p = (procOrLex & 0xff)
     if isLex { p = p | 0x80 }
@@ -631,18 +896,26 @@ public func simInsns(from proc: Procedure) -> [SimInsn] {
             let seg = loc.segment
             let procOrLex = loc.lexLevel ?? loc.procedure ?? 0
             let isLex = (loc.lexLevel != nil)
-            let encoded = encodeLocation(segment: seg, procOrLex: procOrLex, addr: addr, isLex: isLex)
+            let encoded = encodeLocation(
+                segment: seg,
+                procOrLex: procOrLex,
+                addr: addr,
+                isLex: isLex
+            )
             args.insert(encoded, at: 0)
         } else if let dest = ins.destination, let addr = dest.addr {
             let seg = dest.segment
             let procOrLex = dest.lexLevel ?? dest.procedure ?? 0
             let isLex = (dest.lexLevel != nil)
-            let encoded = encodeLocation(segment: seg, procOrLex: procOrLex, addr: addr, isLex: isLex)
+            let encoded = encodeLocation(
+                segment: seg,
+                procOrLex: procOrLex,
+                addr: addr,
+                isLex: isLex
+            )
             args.insert(encoded, at: 0)
         }
 
         return SimInsn(ic: ic, mnemonic: ins.mnemonic, args: args)
     }
 }
-
-

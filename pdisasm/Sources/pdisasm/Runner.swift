@@ -2,16 +2,22 @@ import CodableCSV
 import Foundation
 
 private func importLabels(
-    fromCSV CSVFile: String, to labels: inout Set<Location>, metadataPrefix: String
+    fromCSV CSVFile: String,
+    to labels: inout Set<Location>,
+    appSupportDirectory: URL
 ) {
     do {
-        if let fileURL = URL(string: metadataPrefix)?.appendingPathComponent(CSVFile) {
-            if FileManager.default.fileExists(atPath: fileURL.path) {
-                let dec = CSVDecoder()
-                dec.headerStrategy = .firstLine
-                if let labelsData = try? Data(contentsOf: URL(fileURLWithPath: fileURL.path)) {
-                    labels = try dec.decode(Set<Location>.self, from: labelsData)
-                }
+        let fileURL = appSupportDirectory.appendingPathComponent(CSVFile)
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            let dec = CSVDecoder()
+            dec.headerStrategy = .firstLine
+            if let labelsData = try? Data(
+                contentsOf: URL(fileURLWithPath: fileURL.path)
+            ) {
+                labels = try dec.decode(
+                    Set<Location>.self,
+                    from: labelsData
+                )
             }
         }
     } catch {
@@ -20,102 +26,121 @@ private func importLabels(
 }
 
 private func exportLabels(
-    toCSV CSVfile: String, from labels: [Location], overwrite: Bool = false, metadataPrefix: String
+    toCSV CSVfile: String,
+    from labels: [Location],
+    overwrite: Bool = false,
+    appSupportDirectory: URL
 ) {
     do {
-        if let fileURL = URL(string: metadataPrefix)?.appendingPathComponent(CSVfile) {
-
-            // check if file exists and overwrite is false
-            if !overwrite && FileManager.default.fileExists(atPath: fileURL.path) {
-                return
-            }
-            // create backup first
-            let backupURL = fileURL.appendingPathExtension("bak")
-            if FileManager.default.fileExists(atPath: backupURL.path) {
-                try? FileManager.default.removeItem(at: backupURL)
-            }
-            if FileManager.default.fileExists(atPath: fileURL.path) {
-                try FileManager.default.copyItem(
-                    at: fileURL, to: backupURL)
-            }
-            let url = fileURL
-            let enc = CSVEncoder {
-                $0.headers = ["segment", "procedure", "lexLevel", "addr", "name", "type"]
-                $0.bufferingStrategy = .sequential
-            }
-            try enc.encode(labels, into: url)
+        let fileURL = appSupportDirectory.appendingPathComponent(CSVfile)
+        if !overwrite && FileManager.default.fileExists(atPath: fileURL.path) {
+            return
         }
+        let backupURL = fileURL.appendingPathExtension("bak")
+        if FileManager.default.fileExists(atPath: backupURL.path) {
+            try? FileManager.default.removeItem(at: backupURL)
+        }
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            try FileManager.default.copyItem(
+                at: fileURL,
+                to: backupURL
+            )
+        }
+        let enc = CSVEncoder {
+            $0.headers = [
+                "segment", "procedure", "lexLevel", "addr", "name", "type",
+            ]
+            $0.bufferingStrategy = .sequential
+        }
+        try enc.encode(labels, into: fileURL)
     } catch {
         print("Error writing \(CSVfile): \(error)")
     }
 }
 
 private func importProcedures(
-    fromCSV CSVFile: String, to allProcedures: inout [ProcIdentifier],
-    metadataPrefix: String
+    fromCSV CSVFile: String,
+    to allProcedures: inout [ProcIdentifier],
+    appSupportDirectory: URL
 ) {
     do {
-        if let fileURL = URL(string: metadataPrefix)?.appendingPathComponent(CSVFile) {
+        let fileURL = appSupportDirectory.appendingPathComponent(CSVFile)
 
-            if FileManager.default.fileExists(atPath: fileURL.path) {
-                let dec = CSVDecoder()
-                dec.headerStrategy = .firstLine
-                if let procData = try? Data(contentsOf: URL(fileURLWithPath: fileURL.path)) {
-                    allProcedures = try dec.decode([ProcIdentifier].self, from: procData)
-                }
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            let dec = CSVDecoder()
+            dec.headerStrategy = .firstLine
+            if let procData = try? Data(
+                contentsOf: URL(fileURLWithPath: fileURL.path)
+            ) {
+                allProcedures = try dec.decode(
+                    [ProcIdentifier].self,
+                    from: procData
+                )
             }
         }
+
     } catch {
         print("Error reading \(CSVFile): \(error)")
     }
 }
 
 private func exportProcedures(
-    toCSV CSVfile: String, from procedures: [ProcIdentifier], overwrite: Bool = false,
-    metadataPrefix: String
+    toCSV CSVfile: String,
+    from procedures: [ProcIdentifier],
+    overwrite: Bool = false,
+    appSupportDirectory: URL
 ) {
     do {
-        if let fileURL = URL(string: metadataPrefix)?.appendingPathComponent(CSVfile) {
+        let fileURL = appSupportDirectory.appendingPathComponent(CSVfile)
 
-            // check if file exists and overwrite is false
-            if !overwrite && FileManager.default.fileExists(atPath: fileURL.path) {
-                return
-            }
-
-            let backupURL = fileURL.appendingPathExtension("bak")
-            if FileManager.default.fileExists(atPath: backupURL.path) {
-                try? FileManager.default.removeItem(at: backupURL)
-            }
-            if FileManager.default.fileExists(atPath: fileURL.path) {
-                try FileManager.default.copyItem(at: fileURL, to: backupURL)
-            }
-            let enc = CSVEncoder { configuration in
-                configuration.headers = [
-                    "segmentNumber", "segmentName", "procNumber", "procName", "isFunction",
-                    "isAssembly", "parameters", "returnType",
-                ]
-            }
-            try enc.encode(procedures, into: fileURL)
+        // check if file exists and overwrite is false
+        if !overwrite
+            && FileManager.default.fileExists(atPath: fileURL.path)
+        {
+            return
         }
+
+        let backupURL = fileURL.appendingPathExtension("bak")
+        if FileManager.default.fileExists(atPath: backupURL.path) {
+            try? FileManager.default.removeItem(at: backupURL)
+        }
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            try FileManager.default.copyItem(at: fileURL, to: backupURL)
+        }
+        let enc = CSVEncoder { configuration in
+            configuration.headers = [
+                "segmentNumber", "segmentName", "procNumber", "procName",
+                "isFunction",
+                "isAssembly", "parameters", "returnType",
+            ]
+        }
+        try enc.encode(procedures, into: fileURL)
+
     } catch {
         print("Error writing \(CSVfile): \(error)")
     }
 }
 
 private func importGlobalLabels(
-    fromJson globalsFile: String, to globalNames: inout [Int: Identifier], metadataPrefix: String
+    fromJson globalsFile: String,
+    to globalNames: inout [Int: Identifier],
+    appSupportDirectory: URL
 ) {
-    if let fileURL = URL(string: metadataPrefix)?.appendingPathComponent(globalsFile) {
+    let fileURL = appSupportDirectory.appendingPathComponent(globalsFile)
 
-        if FileManager.default.fileExists(atPath: fileURL.path) {
+    if FileManager.default.fileExists(atPath: fileURL.path) {
 
-            let decoder = JSONDecoder()
+        let decoder = JSONDecoder()
 
-            if let globalData = try? Data(contentsOf: fileURL) {
-                globalNames = (try? decoder.decode([Int: Identifier].self, from: globalData)) ?? [:]
-            }
+        if let globalData = try? Data(contentsOf: fileURL) {
+            globalNames =
+                (try? decoder.decode(
+                    [Int: Identifier].self,
+                    from: globalData
+                )) ?? [:]
         }
     }
+
 }
 
 private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
@@ -136,19 +161,36 @@ private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
         let codeleng = Int(try diskInfo.readWord(at: segIdx * 4 + 2))
         var name = ""
         for j in 0...7 {
-            name.append(String(UnicodeScalar(Int(try segName.readByte(at: segIdx * 8 + j)))!))
+            name.append(
+                String(
+                    UnicodeScalar(
+                        Int(try segName.readByte(at: segIdx * 8 + j))
+                    )!
+                )
+            )
         }
         name = name.trimmingCharacters(in: [" "])
-        let kind = SegmentKind(rawValue: Int(try segKind.readWord(at: segIdx * 2)))
+        let kind = SegmentKind(
+            rawValue: Int(try segKind.readWord(at: segIdx * 2))
+        )
         var segNum = Int(try segInfo.readByte(at: segIdx * 2))
         if segNum == 0 { segNum = segIdx }
         let mType = Int(try segInfo.readByte(at: segIdx * 2 + 1) & 0x0F)
-        let version = Int((try segInfo.readByte(at: segIdx * 2 + 1) & 0xE0) >> 5)
+        let version = Int(
+            (try segInfo.readByte(at: segIdx * 2 + 1) & 0xE0) >> 5
+        )
         let text = try textAddr.readWord(at: segIdx * 2)
         if codeleng > 0 {
             segTable[segIdx] = Segment(
-                codeaddr: codeaddr, codeleng: codeleng, name: name, segkind: kind ?? .dataseg,
-                textaddr: Int(text), segNum: segNum, mType: mType, version: version)
+                codeaddr: codeaddr,
+                codeleng: codeleng,
+                name: name,
+                segkind: kind ?? .dataseg,
+                textaddr: Int(text),
+                segNum: segNum,
+                mType: mType,
+                version: version
+            )
         }
     }
 
@@ -162,45 +204,87 @@ private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
         }
     }
 
-    let commentStr = comment.data.filter { $0 > 0 }.compactMap { UnicodeScalar($0) }.map(
+    let commentStr = comment.data.filter { $0 > 0 }.compactMap {
+        UnicodeScalar($0)
+    }.map(
         String.init
     ).joined()
 
-    return SegDictionary(segTable: segTable, intrinsics: intrinsicSet, comment: commentStr)
+    return SegDictionary(
+        segTable: segTable,
+        intrinsics: intrinsicSet,
+        comment: commentStr
+    )
 }
 
-fileprivate func normaliseMemoryLocations(_ proc: Procedure, _ allCallers: Set<Call>) {
-proc.instructions.forEach { (_, inst) in
-                if let loc = inst.memLocation {
-                    // if no procedure is set, but lex level is set to non-system level...
-                    if loc.procedure == nil && loc.lexLevel != -1 {  
-                        // then we need to find procedure for this location
-
-                        // We want to find the procedure number for the location with
-                        // a matching lex level, segment, and address that is in the
-                        // calling hierarchy of this procedure, and update the memLocation
-                        // to have that procedure number.
-                        for caller in allCallers {
-                            if caller.target.segment == loc.segment
-                                && caller.target.lexLevel == loc.lexLevel
-                            {
-                                inst.memLocation?.procedure = caller.target.procedure
-                                break
+private func normaliseMemoryLocations(
+    _ proc: Procedure,
+    _ allCallers: Set<Call>
+) {
+    let missingDetail = proc.instructions.filter {
+        $0.value.memLocation != nil && $0.value.memLocation?.procedure == nil
+    }
+    if missingDetail.count > 0 {
+        missingDetail.forEach { (_, inst) in
+            if let loc = inst.memLocation {
+                // Is the memory location in the same segment as the procedure?
+                if proc.procType?.segment == loc.segment {
+                    // yes, same segment. Is it in the same lex level as this procedure?
+                    if proc.lexicalLevel == loc.lexLevel {
+                        // yes, same lex level - so it's a local variable or parameter.
+                        // We can set the procedure to be the same as the current procedure.
+                        inst.memLocation?.procedure = proc.procType?.procedure
+                    } else {
+                        if let lexLevel = loc.lexLevel, lexLevel == -1 {
+                            inst.memLocation?.procedure = 1
+                        } else {
+                            // same segment but different lex level. Need to trace up the call chain.
+                            let matchingCallers = allCallers.filter {
+                                $0.target.segment == proc.procType?.segment
+                                    && $0.target.procedure
+                                        == proc.procType?.procedure
+                                    && $0.origin.lexLevel ?? Int.max
+                                        == loc.lexLevel
                             }
-
+                            if matchingCallers.count == 0 {
+                                print(
+                                    "no matching callers found for procedure \(proc.procType?.description ?? "unknown") with lex level \(loc.lexLevel ?? -999)"
+                                )
+                            } else if matchingCallers.count > 1 {
+                                print(
+                                    "multiple matching callers found for procedure \(proc.procType?.description ?? "unknown") with lex level \(loc.lexLevel ?? -999) \(matchingCallers.map { $0.origin.description })"
+                                )
+                            } else {
+                                inst.memLocation?.procedure =
+                                    matchingCallers.first?.origin.procedure
+                            }
                         }
+                    }
+                } else {
+                    // not in the same segment, so lex level is not relevant.
+                    if let lexLevel = loc.lexLevel, lexLevel == -1 {
+                        inst.memLocation?.procedure = 1
+                    } else {
+                        print(
+                            "Memory location \(loc) in different segment from procedure \(proc.procType?.shortDescription ?? "unknown"). But not a global!"
+                        )
                     }
                 }
             }
+        }
+    }
 }
 
 /// Public entrypoint for the library to run the decompiler.
 /// This mirrors the original CLI behaviour but is exposed as a callable function
 /// so the `pdisasm-cli` executable can delegate to it.
 public func runPdisasm(
-    filename: String, verbose: Bool = false, rewrite: Bool = false, showMarkup: Bool = false,
-    showPCode: Bool = false, showPseudoCode: Bool = false,
-    metadataPrefix: String = "/Users/chris/Repos/chris-e-green.github.io/pdisasm/metadata"
+    filename: String,
+    verbose: Bool = false,
+    rewrite: Bool = false,
+    showMarkup: Bool = false,
+    showPCode: Bool = false,
+    showPseudoCode: Bool = false,
 )
     throws
 {
@@ -232,18 +316,43 @@ public func runPdisasm(
     let allProceduresCSVFile = "procedures_\(fileIdentifier).csv"
     let sysProceduresCSVFile = "procedures_ver_\(version).csv"
     let globalsFile = "globals_ver_\(version).json"
+    let appSupportDirectory = URL.applicationSupportDirectory
+        .appendingPathComponent("pdisasm")
+    try FileManager.default.createDirectory(
+        at: appSupportDirectory,
+        withIntermediateDirectories: true,
+        attributes: nil
+    )
 
-    importLabels(fromCSV: allLabelsCSVFile, to: &allLocations, metadataPrefix: metadataPrefix)
-    importLabels(fromCSV: sysLabelsCSVFile, to: &sysLocations, metadataPrefix: metadataPrefix)
+    importLabels(
+        fromCSV: allLabelsCSVFile,
+        to: &allLocations,
+        appSupportDirectory: appSupportDirectory
+    )
+    importLabels(
+        fromCSV: sysLabelsCSVFile,
+        to: &sysLocations,
+        appSupportDirectory: appSupportDirectory
+    )
 
     allLocations.formUnion(sysLocations)
 
-    importGlobalLabels(fromJson: globalsFile, to: &globalNames, metadataPrefix: metadataPrefix)
+    importGlobalLabels(
+        fromJson: globalsFile,
+        to: &globalNames,
+        appSupportDirectory: appSupportDirectory
+    )
 
     importProcedures(
-        fromCSV: allProceduresCSVFile, to: &allProcedures, metadataPrefix: metadataPrefix)
+        fromCSV: allProceduresCSVFile,
+        to: &allProcedures,
+        appSupportDirectory: appSupportDirectory
+    )
     importProcedures(
-        fromCSV: sysProceduresCSVFile, to: &sysProcedures, metadataPrefix: metadataPrefix)
+        fromCSV: sysProceduresCSVFile,
+        to: &sysProcedures,
+        appSupportDirectory: appSupportDirectory
+    )
 
     allProcedures.append(contentsOf: sysProcedures)
 
@@ -251,7 +360,10 @@ public func runPdisasm(
     for segment in segDict.segTable.sorted(by: { $0.key < $1.key }) {
         let seg = segment.value
         var offset = 0
-        let code = binaryData.getCodeBlock(at: seg.codeaddr, length: seg.codeleng)
+        let code = binaryData.getCodeBlock(
+            at: seg.codeaddr,
+            length: seg.codeleng
+        )
 
         // If the extracted code block is missing or too small to contain the
         // expected trailer bytes, skip this segment to avoid out-of-bounds
@@ -285,16 +397,20 @@ public func runPdisasm(
         if seg.segNum == 0 && seg.name == "PASCALSY" {
             if let extraSeg = segDict.segTable[15] {
                 extraCode = binaryData.getCodeBlock(
-                    at: extraSeg.codeaddr, length: extraSeg.codeleng)
+                    at: extraSeg.codeaddr,
+                    length: extraSeg.codeleng
+                )
                 let pascalProcCount = Int(code[code.endIndex - 1])
                 let lastProcHdrLoc = code.endIndex - 2 - pascalProcCount * 2
                 let cdForLast = CodeData(data: code, ipc: 0, header: 0)
-                let lastProcRelativeAddr = Int(try cdForLast.readWord(at: lastProcHdrLoc))
+                let lastProcRelativeAddr = Int(
+                    try cdForLast.readWord(at: lastProcHdrLoc)
+                )
                 let lastProcAbsAddr = lastProcRelativeAddr - lastProcHdrLoc
                 offset = lastProcAbsAddr + extraCode.endIndex - 2
             }
         }
-        if seg.segNum == 15 && seg.name == "         " {
+        if seg.segNum == 15 && seg.name == "" {
             // if we are processing the 'hidden' part of PASCALSY from
             // slot 15, skip it, because we will have processed all of
             // its procedures when we dealt with slot 0.
@@ -304,7 +420,10 @@ public func runPdisasm(
         let codeSeg: CodeSegment = CodeSegment(
             procedureDictionary: ProcedureDictionary(
                 segment: Int(code[code.endIndex - 2]),
-                procedureCount: Int(code[code.endIndex - 1]), procedurePointers: []), procedures: []
+                procedureCount: Int(code[code.endIndex - 1]),
+                procedurePointers: []
+            ),
+            procedures: []
         )
 
         let cdForPtrs = CodeData(data: code, ipc: 0, header: 0)
@@ -319,7 +438,9 @@ public func runPdisasm(
 
         var tempCallers: Set<Call> = []
 
-        for (procIdx, procPtr) in codeSeg.procedureDictionary.procedurePointers.enumerated() {
+        for (procIdx, procPtr) in codeSeg.procedureDictionary.procedurePointers
+            .enumerated()
+        {
             var proc = Procedure()
             var inCode: Data
             var addr = procPtr
@@ -344,7 +465,9 @@ public func runPdisasm(
 
             var procNumber = 0
             var isAssembler = false
-            if addr >= 0 && addr < inCode.count { procNumber = Int(inCode[addr]) }
+            if addr >= 0 && addr < inCode.count {
+                procNumber = Int(inCode[addr])
+            }
 
             // if it's assembler, proc# is based on the index alone.
             if procNumber == 0 && seg.mType == 7 {
@@ -366,7 +489,8 @@ public func runPdisasm(
                 // if it's a function, set locations 1 (and 2 for reals) to retval
                 if pt.isFunction == true {
                     if let ret = allLocations.first(where: {
-                        $0.segment == seg.segNum && $0.procedure == procNumber && $0.addr == 1
+                        $0.segment == seg.segNum && $0.procedure == procNumber
+                            && $0.addr == 1
                     }) {
                         ret.name = pt.procName ?? pt.shortDescription
                         ret.type = pt.returnType ?? "UNKNOWN"
@@ -374,13 +498,18 @@ public func runPdisasm(
                     } else {
                         allLocations.insert(
                             Location(
-                                segment: seg.segNum, procedure: procNumber, addr: 1,
+                                segment: seg.segNum,
+                                procedure: procNumber,
+                                addr: 1,
                                 name: pt.procName ?? pt.shortDescription,
-                                type: pt.returnType ?? "UNKNOWN"))
+                                type: pt.returnType ?? "UNKNOWN"
+                            )
+                        )
                     }
                     if proc.procType?.returnType == "REAL" {
                         if let ret = allLocations.first(where: {
-                            $0.segment == seg.segNum && $0.procedure == procNumber && $0.addr == 2
+                            $0.segment == seg.segNum
+                                && $0.procedure == procNumber && $0.addr == 2
                         }) {
                             ret.name = pt.procName ?? pt.shortDescription
                             ret.type = pt.returnType ?? "REAL"
@@ -388,9 +517,13 @@ public func runPdisasm(
                         } else {
                             allLocations.insert(
                                 Location(
-                                    segment: seg.segNum, procedure: procNumber, addr: 2,
+                                    segment: seg.segNum,
+                                    procedure: procNumber,
+                                    addr: 2,
                                     name: pt.procName ?? pt.shortDescription,
-                                    type: pt.returnType ?? "REAL"))
+                                    type: pt.returnType ?? "REAL"
+                                )
+                            )
                         }
                     }
                 }
@@ -402,7 +535,8 @@ public func runPdisasm(
                     procedureNumber: procNumber,
                     proc: &proc,
                     code: inCode,
-                    addr: addr)
+                    addr: addr
+                )
             } else {
                 decodePascalProcedure(
                     currSeg: seg,
@@ -423,18 +557,119 @@ public func runPdisasm(
         allCodeSegs[Int(seg.segNum)] = codeSeg
     }
 
-    // Amend relative memory locations in instructions by lex level (which we 
+    // Amend relative memory locations in instructions by lex level (which we
     // can't do until all procedures are decoded and we know the procedure calling hierarchy)
     for (_, codeSeg) in allCodeSegs {
         for proc in codeSeg.procedures {
-            normaliseMemoryLocations(proc, allCallers)
+            if let pt = proc.procType {
+                allCallers.forEach { call in
+                    if call.target.segment == pt.segment
+                        && call.target.procedure == pt.procedure
+                        && call.target.lexLevel == nil
+                    {
+                        allCallers.remove(call)
+                        call.target.lexLevel = proc.lexicalLevel
+                        allCallers.insert(call)
+                    }
+                }
+            }
         }
     }
 
-    // Do stack simulation and pseudocode generation 
+    // And now we can resolve any missing procedure values.
+    for (_, codeSeg) in allCodeSegs {
+        for proc in codeSeg.procedures {
+            normaliseMemoryLocations(proc, allCallers)
+            let missingLex = allLocations.filter({$0.lexLevel==nil && $0.segment == proc.procType?.segment && $0.procedure == proc.procType?.procedure})
+            missingLex.forEach { loc in
+                allLocations.remove(loc)
+                var updatedLoc = loc
+                updatedLoc.lexLevel = proc.lexicalLevel
+                allLocations.insert(updatedLoc)
+            }
+        }
+    }
+
+    // Now we can update memory locations that correspond to procedure/function parameters and returns.
+    for (_, codeSeg) in allCodeSegs {
+        for proc in codeSeg.procedures {
+            if let pt = proc.procType {
+                var paramAddr = 1
+
+                            
+                // if it's a function, set locations 1 (and 2 for reals) to retval
+
+                if pt.isFunction == true {
+                    if let ret = allLocations.first(where: {
+                        $0.segment == pt.segment && $0.procedure == pt.procedure
+                            && $0.addr == 1
+                    }) {
+                        ret.name = pt.procName ?? pt.shortDescription
+                        ret.type = pt.returnType ?? "UNKNOWN"
+                        allLocations.update(with: ret)
+                    } else {
+                        allLocations.insert(
+                            Location(
+                                segment: pt.segment,
+                                procedure: pt.procedure,
+                                lexLevel: proc.lexicalLevel,
+                                addr: 1,
+                                name: pt.procName ?? pt.shortDescription,
+                                type: pt.returnType ?? "UNKNOWN"
+                            )
+                        )
+                    }
+                    if proc.procType?.returnType == "REAL" {
+                        if let ret = allLocations.first(where: {
+                            $0.segment == pt.segment
+                                && $0.procedure == pt.procedure
+                                && $0.addr == 2
+                        }) {
+                            ret.name = pt.procName ?? pt.shortDescription
+                            ret.type = pt.returnType ?? "REAL"
+                            allLocations.update(with: ret)
+                        } else {
+                            allLocations.insert(
+                                Location(
+                                    segment: pt.segment,
+                                    procedure: pt.procedure,
+                                    lexLevel: proc.lexicalLevel,
+                                    addr: 2,
+                                    name: pt.procName ?? pt.shortDescription,
+                                    type: pt.returnType ?? "REAL"
+                                )
+                            )
+                        }
+                    }
+                    paramAddr = 3
+                }
+                for param in pt.parameters.reversed() {
+                    if let par = allLocations.first(where: {
+                        $0.segment == pt.segment && $0.procedure == pt.procedure
+                        && $0.addr == paramAddr }) {
+                        par.name = param.name
+                        par.type = param.type
+                        allLocations.update(with: par)
+                    } else {
+                        allLocations.insert(
+                            Location(
+                                segment: pt.segment,
+                                procedure: pt.procedure,
+                                lexLevel: proc.lexicalLevel,
+                                addr: paramAddr,
+                                name: param.name,
+                                type: param.type
+                            )
+                        )
+                    }
+                    paramAddr += 1
+                }
+            }
+        }
+    }
+
+    // Do stack simulation and pseudocode generation
     // once we have all procedures decoded.
-    // This will allow us to have full knowledge of the procedure calling
-    // hierarchy before we try to resolve memory locations.
     // As the stack plays a role in control flow, we need to handle them at the same time.
     for (_, codeSeg) in allCodeSegs {
         for proc in codeSeg.procedures {
@@ -443,28 +678,50 @@ public func runPdisasm(
                 continue
             }
             simulateStackandGeneratePseudocodeForProcedure(
-                proc: proc, allProcedures: &allProcedures, allLocations: &allLocations)
+                proc: proc,
+                allProcedures: &allProcedures,
+                allLocations: &allLocations
+            )
         }
     }
 
     // Output results using the existing helper
     outputResults(
-        sourceFilename: fileIdentifier, segDictionary: segDict,
-        codeSegs: allCodeSegs, allLocations: allLocations,
-        allProcedures: allProcedures, allCallers: allCallers,
-        verbose: verbose, showMarkup: showMarkup, showPCode: showPCode, showPseudoCode: showPseudoCode)
+        sourceFilename: fileIdentifier,
+        segDictionary: segDict,
+        codeSegs: allCodeSegs,
+        allLocations: allLocations,
+        allProcedures: allProcedures,
+        allCallers: allCallers,
+        verbose: verbose,
+        showMarkup: showMarkup,
+        showPCode: showPCode,
+        showPseudoCode: showPseudoCode
+    )
 
     exportLabels(
-        toCSV: allLabelsCSVFile, from: allLocations.filter { $0.segment != 0 }.sorted { $0 < $1 },
-        overwrite: rewrite, metadataPrefix: metadataPrefix)
+        toCSV: allLabelsCSVFile,
+        from: allLocations.filter { $0.segment != 0 }.sorted { $0 < $1 },
+        overwrite: rewrite,
+        appSupportDirectory: appSupportDirectory
+    )
     exportLabels(
-        toCSV: sysLabelsCSVFile, from: allLocations.filter { $0.segment == 0 }.sorted { $0 < $1 },
-        overwrite: rewrite, metadataPrefix: metadataPrefix)
+        toCSV: sysLabelsCSVFile,
+        from: allLocations.filter { $0.segment == 0 }.sorted { $0 < $1 },
+        overwrite: rewrite,
+        appSupportDirectory: appSupportDirectory
+    )
 
     exportProcedures(
-        toCSV: allProceduresCSVFile, from: allProcedures.filter { $0.segment != 0 },
-        overwrite: rewrite, metadataPrefix: metadataPrefix)
+        toCSV: allProceduresCSVFile,
+        from: allProcedures.filter { $0.segment != 0 },
+        overwrite: rewrite,
+        appSupportDirectory: appSupportDirectory
+    )
     exportProcedures(
-        toCSV: sysProceduresCSVFile, from: allProcedures.filter { $0.segment == 0 },
-        overwrite: rewrite, metadataPrefix: metadataPrefix)
+        toCSV: sysProceduresCSVFile,
+        from: allProcedures.filter { $0.segment == 0 },
+        overwrite: rewrite,
+        appSupportDirectory: appSupportDirectory
+    )
 }

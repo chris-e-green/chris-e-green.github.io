@@ -28,7 +28,9 @@ struct StackSimulator {
     ///   - type: the type to use if the popped value is UNKNOWN
     ///   - withoutParentheses: whether to return the value without parentheses
     /// - Returns: a tuple of the popped value and its type (if any)
-    mutating func pop(_ type: String, _ withoutParentheses: Bool = false) -> (String, String?) {
+    mutating func pop(_ type: String, _ withoutParentheses: Bool = false) -> (
+        String, String?
+    ) {
         let a = stack.popLast() ?? "underflow!"
         var parenthesized: String
         var locType: String
@@ -43,7 +45,8 @@ struct StackSimulator {
                 parenthesized = locName
             } else {
                 parenthesized =
-                    (locName.contains(" ") && locType != "STRING") ? "(\(locName))" : locName
+                    (locName.contains(" ") && locType != "STRING")
+                    ? "(\(locName))" : locName
             }
         } else {
             if withoutParentheses {
@@ -84,6 +87,33 @@ struct StackSimulator {
     }
 
     @discardableResult
+    /// Gets the top of the stack and any datatype without changing the stack
+    ///
+    /// - Parameter withoutParentheses:
+    /// - Returns: a tuple of the value at the top of the stack and its type (if any)
+    func peek(_ withoutParentheses: Bool = false) -> (String, String?) {
+        let a = stack.last ?? "underflow!"
+        if a.contains(sep) {
+            let parts = a.split(separator: sep, maxSplits: 1)
+            if withoutParentheses {
+                return (String(parts[0]), String(parts[1]))
+            } else {
+                let parenthesized =
+                    (String(parts[0]).contains(" ") && parts[1] != "STRING")
+                    ? "(\(parts[0]))" : String(parts[0])
+                return (parenthesized, String(parts[1]))
+            }
+        } else {
+            if withoutParentheses {
+                return (a, nil)
+            } else {
+                let parenthesized = a.contains(" ") ? "(\(a))" : a
+                return (parenthesized, nil)
+            }
+        }
+    }
+
+    @discardableResult
     /// Pops the top of the stack as a REAL value.
     /// - Returns: a tuple with the REAL value and the 'REAL' type
     mutating func popReal() -> (String, String?) {
@@ -94,10 +124,13 @@ struct StackSimulator {
         } else {
             let b = stack.popLast() ?? "underflow!"
             if let val1 = UInt16(a), let val2 = UInt16(b) {
-                let fraction: UInt32 = UInt32(val1) | (UInt32(val2) & 0x007f) << 16
+                let fraction: UInt32 =
+                    UInt32(val1) | (UInt32(val2) & 0x007f) << 16
                 let exponent = (val2 & 0x7f80) < 7
                 let sign = (val2 & 0x8000) == 0x8000
-                return ("\(sign == true  ? "-" : "")\(fraction)e\(exponent)", "REAL")
+                return (
+                    "\(sign == true  ? "-" : "")\(fraction)e\(exponent)", "REAL"
+                )
             } else {
                 return ("\(a).\(b)", "REAL")
             }

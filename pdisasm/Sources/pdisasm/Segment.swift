@@ -14,10 +14,20 @@ public struct Segment: CustomStringConvertible {
     public var version: Int = 0
 
     public var description: String {
-        return "Segment(name: \"\(name)\", codeaddr: \(String(format:"%04X", codeaddr)), len: \(codeleng))"
+        return
+            "Segment(name: \"\(name)\", codeaddr: \(String(format:"%04X", codeaddr)), len: \(codeleng))"
     }
 
-    public init(codeaddr: Int, codeleng: Int, name: String, segkind: SegmentKind, textaddr: Int, segNum: Int, mType: Int, version: Int) {
+    public init(
+        codeaddr: Int,
+        codeleng: Int,
+        name: String,
+        segkind: SegmentKind,
+        textaddr: Int,
+        segNum: Int,
+        mType: Int,
+        version: Int
+    ) {
         self.codeaddr = codeaddr
         self.codeleng = codeleng
         self.name = name
@@ -28,4 +38,3 @@ public struct Segment: CustomStringConvertible {
         self.version = version
     }
 }
-

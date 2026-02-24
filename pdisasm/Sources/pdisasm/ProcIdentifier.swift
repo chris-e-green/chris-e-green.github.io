@@ -9,9 +9,14 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
     }
 
     public init(
-        isFunction: Bool, isAssembly: Bool = false, segment: Int, segmentName: String? = nil,
-        procedure: Int, procName: String? = nil, parameters: [Identifier] = [],
-        returnType: String? = nil 
+        isFunction: Bool,
+        isAssembly: Bool = false,
+        segment: Int,
+        segmentName: String? = nil,
+        procedure: Int,
+        procName: String? = nil,
+        parameters: [Identifier] = [],
+        returnType: String? = nil
     ) {
         self.isFunction = isFunction
         self.isAssembly = isAssembly
@@ -28,11 +33,13 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
     public var description: String {
         var s =
             (isFunction
-            ? "FUNCTION "
-            : "PROCEDURE ") + (segmentName ?? "SEG" + String(segment)) + "."
-                + (procName ?? (isFunction ? "FUNC" : "PROC") + String(procedure))
+                ? "FUNCTION "
+                : "PROCEDURE ") + (segmentName ?? "SEG" + String(segment)) + "."
+            + (procName ?? (isFunction ? "FUNC" : "PROC") + String(procedure))
         if !parameters.isEmpty {
-            s += "(" + parameters.map({ $0.description }).joined(separator: "; ") + ")"
+            s +=
+                "(" + parameters.map({ $0.description }).joined(separator: "; ")
+                + ")"
         }
         if isFunction {
             s += ": " + (returnType ?? "UNKNOWN")
@@ -57,22 +64,48 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
 
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.segment = try container.decode(Int.self, forKey: CodingKeys.segmentNumber)
-        self.procedure = try container.decode(Int.self, forKey: CodingKeys.procNumber)
-        self.segmentName = try container.decodeIfPresent(String.self, forKey: CodingKeys.segmentName)
-        self.procName = try container.decodeIfPresent(String.self, forKey: CodingKeys.procName)
-        let paramStr = try container.decode(String.self, forKey: CodingKeys.parameters)
+        self.segment = try container.decode(
+            Int.self,
+            forKey: CodingKeys.segmentNumber
+        )
+        self.procedure = try container.decode(
+            Int.self,
+            forKey: CodingKeys.procNumber
+        )
+        self.segmentName = try container.decodeIfPresent(
+            String.self,
+            forKey: CodingKeys.segmentName
+        )
+        self.procName = try container.decodeIfPresent(
+            String.self,
+            forKey: CodingKeys.procName
+        )
+        let paramStr = try container.decode(
+            String.self,
+            forKey: CodingKeys.parameters
+        )
         self.parameters = paramStr.split(separator: ";").map {
-            let parts = $0.split(separator: ":", maxSplits: 1).map { String($0) }
+            let parts = $0.split(separator: ":", maxSplits: 1).map {
+                String($0)
+            }
             if parts.count == 2 {
                 return Identifier(name: parts[0], type: parts[1])
             } else {
                 return Identifier(name: parts[0], type: "")
             }
         }
-        self.returnType = try container.decode(String.self, forKey: CodingKeys.returnType)
-        self.isAssembly = try container.decode(Bool.self, forKey: CodingKeys.isAssembly)
-        self.isFunction = try container.decode(Bool.self, forKey: CodingKeys.isFunction)
+        self.returnType = try container.decode(
+            String.self,
+            forKey: CodingKeys.returnType
+        )
+        self.isAssembly = try container.decode(
+            Bool.self,
+            forKey: CodingKeys.isAssembly
+        )
+        self.isFunction = try container.decode(
+            Bool.self,
+            forKey: CodingKeys.isFunction
+        )
         if !self.isFunction {
             self.returnType = nil
         }
@@ -84,7 +117,10 @@ public class ProcIdentifier: CustomStringConvertible, Hashable, Codable {
         try container.encode(self.procedure, forKey: CodingKeys.procNumber)
         try container.encode(self.segmentName, forKey: CodingKeys.segmentName)
         try container.encode(self.procName, forKey: CodingKeys.procName)
-        try container.encode(self.parameters.map { $0.description}.joined(separator:";"), forKey: CodingKeys.parameters)
+        try container.encode(
+            self.parameters.map { $0.description }.joined(separator: ";"),
+            forKey: CodingKeys.parameters
+        )
         try container.encode(self.returnType, forKey: CodingKeys.returnType)
         try container.encode(self.isAssembly, forKey: CodingKeys.isAssembly)
         try container.encode(self.isFunction, forKey: CodingKeys.isFunction)

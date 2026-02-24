@@ -38,12 +38,28 @@ struct PseudoCodeGenerator {
             let (b, _) = stack.pop()
             return "\(b):\(bwid):\(bbit) := \(a)"
         case stb:
-            let (src, _) = stack.pop()
+            let (src, _) = stack.pop(true)
             let (dstoffs, _) = stack.pop()
             let (dstaddr, _) = stack.pop()
             return "\(dstaddr)[\(dstoffs)] := \(src)"
+        case stm:
+            let stmCount = inst.params[0]
+            var src: String = ""
+            var prevElement: String = ""
+            var srcdata: [String] = []
+            for _ in 0..<stmCount {
+                let (element, _) = stack.pop()
+                let elementParts = element.split(separator: "{")
+                if String(elementParts[0]) != prevElement {
+                    prevElement = String(elementParts[0])
+                    srcdata.append(String(elementParts[0]))
+                }
+            }
+            src = srcdata.joined(separator: ", ")
+            let (dst, _) = stack.pop()  // destination address
+            return "\(dst) := \(src)"
         case sro, str, stl, ste:
-            let (src, srcType) = stack.pop()
+            let (src, srcType) = stack.pop(true)
             if srcType == "UNKNOWN" {
                 _ = 0
             }
@@ -86,7 +102,9 @@ struct PseudoCodeGenerator {
         }
     }
 
-    func handleCallProcedure(_ loc: Location, stack: inout StackSimulator) -> String? {
+    func handleCallProcedure(_ loc: Location, stack: inout StackSimulator)
+        -> String?
+    {
         let lookupKey = "\(loc.segment):\(loc.procedure ?? -1)"
         guard let called = procLookup[lookupKey] else {
             return nil
@@ -98,25 +116,46 @@ struct PseudoCodeGenerator {
             _ = stack.pop()
             _ = stack.pop()
         }
-        for i in 0..<parmCount {
+        var i = parmCount - 1
+        while i >= 0 {
             // TODO: SET values contain a length on the stack but not in function parameters,
             // so we probably need to pop it as a set, not just blindly.
-            let (a, _) = stack.pop()
             switch called.parameters[i].type {
             case "CHAR":
+                let (a, _) = stack.pop()
                 if let ch = Int(a), ch >= 0x20 && ch <= 0x7E {
                     aParams.append("'\(String(format: "%c", ch))'")
                 } else {
                     aParams.append(a)
                 }
+                i -= 1
             case "BOOLEAN":
+                let (a, _) = stack.pop()
                 if a == "0" {
                     aParams.append("FALSE")
                 } else if a == "1" {
                     aParams.append("TRUE")
                 }
+                i -= 1
+            case let pfx where pfx.hasPrefix("SET"):
+                let (a, at) = stack.peek()
+                if at == "INTEGER" {
+                    let (setLen, setData) = stack.popSet()
+                    aParams.append(setData)
+                    i -= setLen
+                } else {
+                    if let ai = Int(a), ai > 0 {
+                        aParams.append(a)
+                        i -= ai
+                    } else {
+                        aParams.append(a)
+                        i -= 1
+                    }
+                }
             default:
+                let (a, _) = stack.pop()
                 aParams.append(a)
+                i -= 1
             }
         }
 
