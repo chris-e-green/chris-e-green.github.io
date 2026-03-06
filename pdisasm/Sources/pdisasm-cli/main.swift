@@ -7,7 +7,7 @@ struct PdisasmCLI: @preconcurrency ParsableCommand {
     var filename: String = "../code/SYSTEM.PASCAL-04-00.bin"
     // var filename: String = "../code/SET40COLS.CODE-04-00.bin"
     @Option(help: "Run with verbose output.")
-    var verbose: Bool = true
+    var verbose: Bool = false
     @Option(help: "Rewrite reference data.")
     var rewrite: Bool = false
     @Option(help: "Show markup in output.")
@@ -16,6 +16,8 @@ struct PdisasmCLI: @preconcurrency ParsableCommand {
     var showPcode: Bool = false
     @Option(help: "Show pseudocode in output.")
     var showPseudocode: Bool = false
+    @Option(help: "Show graphviz DOT file for call tree in output.")
+    var showDot: Bool = false
     @MainActor mutating func run() throws {
         print(
             "pdisasm-cli: running decompiler on \(filename) (verbose=\(verbose))"
@@ -27,7 +29,8 @@ struct PdisasmCLI: @preconcurrency ParsableCommand {
                 rewrite: rewrite,
                 showMarkup: showMarkup,
                 showPCode: showPcode,
-                showPseudoCode: showPseudocode
+                showPseudoCode: showPseudocode,
+                showDot: showDot
             )
         } catch {
             print("Error running pdisasm: \(error)")

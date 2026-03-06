@@ -117,6 +117,7 @@ func decodePascalProcedure(
             var finalMnemonic = decoded.mnemonic
             var finalComment = decoded.comment
             var bytesConsumed = decoded.bytesConsumed
+            var params = decoded.params
             var comparatorDataType: String = ""
 
             if decoded.requiresComparator {
@@ -198,7 +199,7 @@ func decodePascalProcedure(
             case lde:
                 ic += bytesConsumed
             case csp:
-                ic += 2
+                ic += bytesConsumed
             case ldcn:
                 ic += bytesConsumed
             case adj:
@@ -236,17 +237,18 @@ func decodePascalProcedure(
                 done = true
             case cip:
                 // Call intermediate procedure
-                let procNum = Int(try cd.readByte(at: ic + 1))
+                let procNum = Int(decoded.params[0])
                 let loc =
                     allLocations.first(where: {
                         $0.segment == segment && $0.procedure == procNum
                             && $0.addr == nil
                     })
                     ?? Location(segment: segment, procedure: procNum, addr: nil)
+                allLocations.insert(loc)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                ic += 2
+                ic += bytesConsumed
             case eql:
                 ic += bytesConsumed
             case geq:
@@ -298,23 +300,24 @@ func decodePascalProcedure(
                 done = true
             case cbp:
                 // Call base procedure
-                let procNum = Int(try cd.readByte(at: ic + 1))
+                let procNum = Int(params[0])
                 let loc =
                     allLocations.first(where: {
                         $0.segment == segment && $0.procedure == procNum
                             && $0.addr == nil
                     })
                     ?? Location(segment: segment, procedure: procNum, addr: nil)
+                allLocations.insert(loc)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                ic += 2
+                ic += bytesConsumed
             case equi:
                 ic += bytesConsumed
             case geqi:
                 ic += bytesConsumed
             case grti:
-                ic += 1
+                ic += bytesConsumed
             case lla:
                 ic += bytesConsumed
             case ldci:
@@ -331,44 +334,47 @@ func decodePascalProcedure(
                 ic += bytesConsumed
             case cxp:
                 // Call external procedure
-                let seg = Int(try cd.readByte(at: ic + 1))
-                let procNum = Int(try cd.readByte(at: ic + 2))
+                let seg = Int(params[0])
+                let procNum = Int(params[1])
                 let loc =
                     allLocations.first(where: {
                         $0.segment == seg && $0.procedure == procNum
                             && $0.addr == nil
-                    })
-                    ?? Location(segment: seg, procedure: procNum, addr: nil)
+                    }) ?? Location(segment: seg, procedure: procNum, addr: nil)
+                allLocations.insert(loc)
                 if procNum != procedure || seg != segment {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                ic += 3
+                ic += bytesConsumed
             case clp:
                 // Call local procedure
-                let procNum = Int(try cd.readByte(at: ic + 1))
-                let loc: Location =
-                    allLocations.first(where: {
-                        $0.segment == segment && $0.procedure == procNum
-                            && $0.addr == nil
-                    })
-                    ?? Location(segment: segment, procedure: procNum, addr: nil)
-                if procNum != procedure {  // don't add if recursive
-                    callers.insert(Call(from: myLoc, to: loc))
-                }
-                ic += 2
-            case cgp:
-                // Call global procedure
-                let procNum = Int(try cd.readByte(at: ic + 1))
+                let procNum = Int(params[0])
                 let loc =
                     allLocations.first(where: {
                         $0.segment == segment && $0.procedure == procNum
                             && $0.addr == nil
                     })
                     ?? Location(segment: segment, procedure: procNum, addr: nil)
+                allLocations.insert(loc)
                 if procNum != procedure {  // don't add if recursive
                     callers.insert(Call(from: myLoc, to: loc))
                 }
-                ic += 2
+                ic += bytesConsumed
+            case cgp:
+                // Call global procedure
+                let procNum = Int(params[0])
+                let loc =
+                    allLocations.first(where: {
+                        $0.segment == segment && $0.procedure == procNum
+                            && $0.addr == nil
+                    })
+                    ?? Location(segment: segment, procedure: procNum, addr: nil)
+
+                allLocations.insert(loc)
+                if procNum != procedure {  // don't add if recursive
+                    callers.insert(Call(from: myLoc, to: loc))
+                }
+                ic += bytesConsumed
             case lpa:
                 ic += bytesConsumed
             case ste:
@@ -443,32 +449,6 @@ func decodePascalProcedure(
             }
         }
     }
-
-//    // go through the parameters/function return and update the
-//    // labels for locations after processing the procedure.
-//    if let pt = proc.procType {
-//        // if it's a function, set locations 1 (and 2 for reals) to retval
-//        if pt.isFunction == true {
-//            if let ret = allLocations.first(where: {
-//                $0.segment == segment && $0.procedure == procedure
-//                    && $0.addr == 1
-//            }) {
-//                ret.name = pt.procName ?? pt.shortDescription
-//                ret.type = pt.returnType ?? "UNKNOWN"
-//                allLocations.update(with: ret)
-//            }
-//            if proc.procType?.returnType == "REAL" {
-//                if let ret = allLocations.first(where: {
-//                    $0.segment == segment && $0.procedure == procedure
-//                        && $0.addr == 2
-//                }) {
-//                    ret.name = pt.procName ?? pt.shortDescription
-//                    ret.type = pt.returnType ?? "REAL"
-//                    allLocations.update(with: ret)
-//                }
-//            }
-//        }
-//    }
 
     if let p = proc.procType {
         if !allProcedures.contains(where: {
@@ -679,7 +659,17 @@ func simulateStackandGeneratePseudocodeForProcedure(
             simulator.pushReal("-\(a)")
         case lnot:
             // Logical NOT (~TOS)
-            let (a, _) = simulator.pop("BOOLEAN")
+            let (a, t) = simulator.pop("BOOLEAN")
+            if t == "BOOLEAN" {
+                // check if we were operating on an un-typed location and
+                // if so, set the type to be BOOLEAN
+                if a.contains(/_P[0-9]*_L[0-9]*_A/) {
+                    // convert string location to Location
+                    let l = Location(from: a)
+                    // find in allLocations and set type
+                    allLocations.first(where: { $0 == l })?.type = "BOOLEAN"
+                }
+            }
             simulator.push(("NOT \(a)", "BOOLEAN"))
         case srs:
             // Subrange set [TOS-1..TOS] (creates set on stack)
@@ -896,7 +886,6 @@ func simulateStackandGeneratePseudocodeForProcedure(
             }
         case lsa:
             // Load string address
-            // let strLen = inst.params[0]
             let s = inst.stringParameter ?? ""
             simulator.push(("\'\(s)\'", "STRING"))
         case lae:
@@ -935,12 +924,6 @@ func simulateStackandGeneratePseudocodeForProcedure(
                     loc: loc
                 )
             }
-        // case xjp:
-        //     // Case jump
-        //     _ = 0
-        // case rnp:
-        // Return from non-base procedure
-        // let retCount = inst.params[0]
         case cip:
             // Call intermediate procedure
             if let loc = inst.destination {

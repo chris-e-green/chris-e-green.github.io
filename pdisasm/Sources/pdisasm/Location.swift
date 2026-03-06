@@ -68,6 +68,29 @@ public final class Location: Hashable, CustomStringConvertible, Comparable,
         self.type = type
     }
 
+    public init(from str: String) {
+        self.procedure = nil
+        self.lexLevel = nil
+        self.addr = nil
+        self.segment = 0
+        self.name = ""
+        self.type = ""
+        if str.contains("_") {
+            let sa = str.split(separator: "_")
+            for sai in sa {
+                if sai.starts(with: "P") {
+                    self.procedure = Int(sai.dropFirst())
+                } else if sai.starts(with: "L") {
+                    self.lexLevel = Int(sai.dropFirst())
+                } else if sai.starts(with: "S") {
+                    self.segment = Int(sai.dropFirst()) ?? -1
+                } else if sai.starts(with: "A") {
+                    self.addr = Int(sai.dropFirst())
+                }
+            }
+        }
+    }
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.segment, forKey: CodingKeys.segment)

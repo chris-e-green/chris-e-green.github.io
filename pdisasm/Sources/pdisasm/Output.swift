@@ -14,8 +14,20 @@ func outputResults(
     verbose: Bool = false,
     showMarkup: Bool = true,
     showPCode: Bool = true,
-    showPseudoCode: Bool = true
+    showPseudoCode: Bool = true,
+    showDot: Bool = false
 ) {
+    if showDot {
+        print("digraph {")
+        allCallers.sorted(by: { $0.origin < $1.origin }).forEach{
+            if $0.target.segment == $0.origin.segment && $0.target.lexLevel ?? -999 < $0.origin.lexLevel ?? -999 {
+                // ignore it
+            } else {
+                print("\"\($0.origin)\" -> \"\($0.target)\"")
+            }
+        }
+        print("}")
+    }
     if showMarkup {
         print("# ", sourceFilename, "\n")
         print(segDictionary)

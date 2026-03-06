@@ -1,3 +1,4 @@
+import Algorithms
 import CodableCSV
 import Foundation
 
@@ -217,57 +218,68 @@ private func readCodeFileStructure(codeData: CodeData) throws -> SegDictionary {
     )
 }
 
+/// Resolve any memory locations where the procedure number has not been determined and update.
+/// If the memory location is in the same segment as the code using it, finding the relevant procedure
+/// will depend on the lex level. If the lex level is the same as the current procedure, it'll be a local variable.
+/// If the lex level is -1, it'll be a system global in segment 0, procedure 1. If it's lex level 0, it'll be a
+/// program global (i.e. in the main procedure of segment 1). Otherwise, it'll be somewhere up the call
+/// chain, so we'll have to follow it up until we find a matching lex level.
 private func normaliseMemoryLocations(
     _ proc: Procedure,
-    _ allCallers: Set<Call>
+    _ allCallers: Set<Call>,
+    _ verbose: Bool
 ) {
     let missingDetail = proc.instructions.filter {
         $0.value.memLocation != nil && $0.value.memLocation?.procedure == nil
     }
     if missingDetail.count > 0 {
         missingDetail.forEach { (_, inst) in
-            if let loc = inst.memLocation {
-                // Is the memory location in the same segment as the procedure?
-                if proc.procType?.segment == loc.segment {
-                    // yes, same segment. Is it in the same lex level as this procedure?
-                    if proc.lexicalLevel == loc.lexLevel {
-                        // yes, same lex level - so it's a local variable or parameter.
-                        // We can set the procedure to be the same as the current procedure.
-                        inst.memLocation?.procedure = proc.procType?.procedure
-                    } else {
-                        if let lexLevel = loc.lexLevel, lexLevel == -1 {
-                            inst.memLocation?.procedure = 1
-                        } else {
-                            // same segment but different lex level. Need to trace up the call chain.
-                            let matchingCallers = allCallers.filter {
-                                $0.target.segment == proc.procType?.segment
-                                    && $0.target.procedure
-                                        == proc.procType?.procedure
-                                    && $0.origin.lexLevel ?? Int.max
-                                        == loc.lexLevel
-                            }
-                            if matchingCallers.count == 0 {
-                                print(
-                                    "no matching callers found for procedure \(proc.procType?.description ?? "unknown") with lex level \(loc.lexLevel ?? -999)"
-                                )
-                            } else if matchingCallers.count > 1 {
-                                print(
-                                    "multiple matching callers found for procedure \(proc.procType?.description ?? "unknown") with lex level \(loc.lexLevel ?? -999) \(matchingCallers.map { $0.origin.description })"
-                                )
-                            } else {
-                                inst.memLocation?.procedure =
-                                    matchingCallers.first?.origin.procedure
-                            }
-                        }
-                    }
-                } else {
-                    // not in the same segment, so lex level is not relevant.
-                    if let lexLevel = loc.lexLevel, lexLevel == -1 {
-                        inst.memLocation?.procedure = 1
+
+            if let loc = inst.memLocation, let lexLevel = loc.lexLevel {
+                switch lexLevel {
+                case -1:
+                    inst.memLocation?.segment = 0
+                    inst.memLocation?.procedure = 1
+                case 0:
+                    if let p = allCallers.first(where: {
+                        $0.origin.lexLevel == 0
+                    }) {
+                        inst.memLocation?.procedure = p.origin.procedure
+                        inst.memLocation?.segment = p.origin.segment
                     } else {
                         print(
-                            "Memory location \(loc) in different segment from procedure \(proc.procType?.shortDescription ?? "unknown"). But not a global!"
+                            "\(proc.abbrevDescription): Memory location \(loc) doesn't match any caller"
                         )
+                    }
+                case proc.lexicalLevel:
+                    print(
+                        "\(proc.abbrevDescription): Memory location \(loc) has lex level \(lexLevel) and is local ",
+                        terminator: " "
+                    )
+                    inst.memLocation?.procedure = proc.procType?.procedure
+                    print("Memory location is now \(loc).")
+                default:
+                    var parents = allCallers.filter {
+                        $0.target.segment == proc.procType?.segment
+                            && $0.target.procedure
+                                == proc.procType?.procedure
+                    }.map(\.origin)
+                    var foundMatch = false
+                    while parents.isEmpty == false && !foundMatch {
+                        for parent in parents {
+                            if parent.lexLevel == lexLevel {
+                                inst.memLocation?.procedure =
+                                    parent.procedure
+                                inst.memLocation?.segment = parent.segment
+                                foundMatch = true
+                                break
+                            }
+                            parents = allCallers.filter {
+                                $0.target.segment == parent.segment
+                                    && $0.target.procedure
+                                        == parent.procedure
+                            }.map(\.origin)
+                        }
                     }
                 }
             }
@@ -285,6 +297,7 @@ public func runPdisasm(
     showMarkup: Bool = false,
     showPCode: Bool = false,
     showPseudoCode: Bool = false,
+    showDot: Bool = false
 )
     throws
 {
@@ -571,6 +584,14 @@ public func runPdisasm(
                         call.target.lexLevel = proc.lexicalLevel
                         allCallers.insert(call)
                     }
+                    if call.origin.segment == pt.segment
+                        && call.origin.procedure == pt.procedure
+                        && call.origin.lexLevel == nil
+                    {
+                        allCallers.remove(call)
+                        call.origin.lexLevel = proc.lexicalLevel
+                        allCallers.insert(call)
+                    }
                 }
             }
         }
@@ -579,11 +600,14 @@ public func runPdisasm(
     // And now we can resolve any missing procedure values.
     for (_, codeSeg) in allCodeSegs {
         for proc in codeSeg.procedures {
-            normaliseMemoryLocations(proc, allCallers)
-            let missingLex = allLocations.filter({$0.lexLevel==nil && $0.segment == proc.procType?.segment && $0.procedure == proc.procType?.procedure})
+            normaliseMemoryLocations(proc, allCallers, verbose)
+            let missingLex = allLocations.filter({
+                $0.lexLevel == nil && $0.segment == proc.procType?.segment
+                    && $0.procedure == proc.procType?.procedure
+            })
             missingLex.forEach { loc in
                 allLocations.remove(loc)
-                var updatedLoc = loc
+                let updatedLoc = loc
                 updatedLoc.lexLevel = proc.lexicalLevel
                 allLocations.insert(updatedLoc)
             }
@@ -596,7 +620,6 @@ public func runPdisasm(
             if let pt = proc.procType {
                 var paramAddr = 1
 
-                            
                 // if it's a function, set locations 1 (and 2 for reals) to retval
 
                 if pt.isFunction == true {
@@ -646,7 +669,8 @@ public func runPdisasm(
                 for param in pt.parameters.reversed() {
                     if let par = allLocations.first(where: {
                         $0.segment == pt.segment && $0.procedure == pt.procedure
-                        && $0.addr == paramAddr }) {
+                            && $0.addr == paramAddr
+                    }) {
                         par.name = param.name
                         par.type = param.type
                         allLocations.update(with: par)
@@ -696,7 +720,8 @@ public func runPdisasm(
         verbose: verbose,
         showMarkup: showMarkup,
         showPCode: showPCode,
-        showPseudoCode: showPseudoCode
+        showPseudoCode: showPseudoCode,
+        showDot: showDot
     )
 
     exportLabels(
