@@ -135,20 +135,27 @@ public final class Location: Hashable, CustomStringConvertible, Comparable,
     }
 
     public var description: String {
+        var retval:String
+        
         if !name.isEmpty {
-            return "\(name):\(type)"
+            retval = name
+        } else {
+            var locationString = "S\(segment)"
+            if let procedure = procedure {
+                locationString += "_P\(procedure)"
+            }
+            if let lexLevel = lexLevel {
+                locationString += "_L\(lexLevel)"
+            }
+            if let addr = addr {
+                locationString += "_A\(addr)"
+            }
+            retval = locationString
         }
-        var locationString = "S\(segment)"
-        if let procedure = procedure {
-            locationString += "_P\(procedure)"
+        if !type.isEmpty {
+            retval += ":\(type)"
         }
-        if let lexLevel = lexLevel {
-            locationString += "_L\(lexLevel)"
-        }
-        if let addr = addr {
-            locationString += "_A\(addr)"
-        }
-        return locationString
+        return retval
     }
 
     public var longDescription: String {
@@ -163,7 +170,10 @@ public final class Location: Hashable, CustomStringConvertible, Comparable,
             s.append("_A\(addr)")
         }
         if !name.isEmpty {
-            s.append("_\(name):\(type)")
+            s.append("_\(name)")
+        }
+        if !type.isEmpty {
+            s.append(":\(type)")
         }
         return s
     }

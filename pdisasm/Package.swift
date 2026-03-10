@@ -23,7 +23,6 @@ let package = Package(
                 .product(name: "CodableCSV", package: "CodableCSV"),
                 .product(name: "Algorithms", package: "swift-algorithms"),
             ],
-            exclude: ["ModelTwo.swift.old"]
         ),
         .executableTarget(
             name: "pdisasm-cli",

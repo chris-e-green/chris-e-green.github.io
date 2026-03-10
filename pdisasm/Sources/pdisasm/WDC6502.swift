@@ -225,6 +225,7 @@ func decodeAssemblerProcedure(
     var done = false
     repeat {
         if let opcode = wdc6502[op] {
+            if op == 0x60 || ipc > code.count { done = true }  // RTS is the only guaranteed end of code. If we are past the end of the code, just stop disassembling.
             var param = 0
             var machCodeStr = String(format: "%02x", op)
             if opcode.paramLength == 1 {
@@ -233,13 +234,14 @@ func decodeAssemblerProcedure(
 
                 if isBranch {
                     // it's a relative branch of some sort
-                    var offset = Int(try cd.readByte(at: ipc + 1))
+                    let rawOffset = Int(try cd.readByte(at: ipc + 1))
+                    var offset = rawOffset
                     if offset > 127 {
                         offset -= 256
                     }
                     param = ipc + 2 + offset
                     proc.entryPoints.insert(param)
-                    machCodeStr += String(format: " %04x ", param)
+                    machCodeStr += String(format: " %02x   ", rawOffset)
                 } else {
                     param = Int(try cd.readByte(at: ipc + 1))
                     machCodeStr += String(format: " %02x   ", param)
@@ -285,10 +287,9 @@ func decodeAssemblerProcedure(
             }
 
         }
-        // TODO: fix this because the RTS is ending up in the wrong place
-        if op == 0x60 { done = true }
         op = code[ipc]
     } while !done
+    
     var s = ""
     var sh = ""
     var i = ipc

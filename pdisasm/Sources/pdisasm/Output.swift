@@ -1,9 +1,5 @@
 import Foundation
 
-func prettyStack(_ s: [String]) -> String {
-    "[" + s.joined(separator: ", ") + "]"
-}
-
 func outputResults(
     sourceFilename: String,
     segDictionary: SegDictionary,
@@ -17,6 +13,10 @@ func outputResults(
     showPseudoCode: Bool = true,
     showDot: Bool = false
 ) {
+    func prettyStack(_ s: [String]) -> String {
+        "[" + s.joined(separator: ", ") + "]"
+    }
+
     if showDot {
         print("digraph {")
         allCallers.sorted(by: { $0.origin < $1.origin }).forEach{
@@ -199,7 +199,12 @@ func outputResults(
                             }
                             print(" " + prettyStack(inst.stackState ?? []))
                         } else {
-                            print(inst.mnemonic)
+                            print(inst.mnemonic, terminator: "")
+                            if inst.comment != nil {
+                                print(" ; \(inst.comment!)")
+                            } else {
+                                print()
+                            }
                         }
                     }
                     if showPseudoCode {
