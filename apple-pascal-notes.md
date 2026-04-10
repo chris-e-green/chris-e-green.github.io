@@ -91,16 +91,25 @@ My current workflow looks like this:
   `/tmp/boot.bin` will be the boot code. The ordering above deals with the sector skewing.
 2. Use DiskBrowser to extract the P-Code interpreter (`RTSTRP.APPLE` or `SYSTEM.APPLE`).
 3. Get an Apple II+/IIe ROM file and a 16-sector Disk II controller card ROM (the P5).
-4. Create a new project in Ghidra, using the boot code as the initial file. Load it using 6502 language, as block name `BOOT` at \$0800.
+4. Create a new project in Ghidra, using the Pascal boot code as the initial file. Load it using 6502 language, as block name `BOOT` at \$0800.
 5. Add the Apple ROM as an overlay, block name `ROM`. If it's a 16K ROM image (Apple IIe), load it at base address \$C000, if it's Apple II+, load it at base address \$D000. Loading the ROM as an overlay makes life easier later, because *most* calls from the runtime into higher addresses are not into the ROM.
 6. Add the Disk II ROM, __*not*__ as an overlay, block name `DISKII`, base address \$C600.
 7. The following applies to the 16K runtime.
-8. There is code that starts in bank1 and continues in the LC RAM, so to make it easier to follow, we will load the interpreter in parts. 
-9. Add it to the project, __*not*__ as an overlay, block name BANK1, at 0xD000, file offset 0x3000, length 0x1000
-10. Add it to the project again, as an overlay, block name BANK2, at base address 0xD000, file offset 0x0, length 0x1000
-11. Add it to the project once more, __*not*__ as an overlay, block name BANK2a, at base address 0xE000, file offset 0x1000, length 0x2000.
+8. There is code that starts in bank 1 and continues in the LC RAM, so to make it easier to follow, we will load the interpreter in parts. 
+9. Add it to the project, __*not*__ as an overlay, block name `BANK1`, at 0xD000, file offset 0x3000, length 0x1000.
+10. Add it to the project again, as an overlay, block name `BANK2`, at base address 0xD000, file offset 0x0, length 0x1000.
+11. Add it to the project once more, __*not*__ as an overlay, block name `BANK2a`, at base address 0xE000, file offset 0x1000, length 0x2000.
 12. At this point we have more or less replicated the memory layout at the conclusion of the boot load process.
-13. There are also some RAM regions that we can add at this point to the project. Ghidra should have already created `ZERO_PAGE` at 0x0000 length 0x100 and `STACK` at 0x0100 length 0x100. We can add to that: `IN` at 0x0200 length 0x100, `BUF` from 0x0300 length 0x100, `TEXT1` at 0x0400 length 0x400, `PDATA` at 0xBD00 length 0x300 and `SSW` at 0xC000 length 0x100. These can all be created in the Memory Map window in Ghidra. While there we can turn on the Write and Execute flags for BANK2 and turn on the Execute flag for ROM. 
+13. There are also some RAM regions that we can add at this point to the project. Ghidra should have already created 
+    `ZERO_PAGE` at 0x0000 length 0x100
+    `STACK` at 0x0100 length 0x100. 
+    We can add to that: 
+    `IN` at 0x0200 length 0x100
+    `BUF` at 0x0300 length 0x100
+    `TEXT1` at 0x0400 length 0x400
+    `PDATA` at 0xBD00 length 0x300
+    `SSW` at 0xC000 length 0x100. 
+    These can all be created in the Memory Map window in Ghidra. While there we can turn on the Write and Execute flags for `BANK2` and turn on the Execute flag for `ROM`. 
 14. We can now start disassembly.
 
 ## Disassembly
