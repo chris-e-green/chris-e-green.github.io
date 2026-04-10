@@ -101,14 +101,18 @@ My current workflow looks like this:
 11. Add it to the project once more, __*not*__ as an overlay, block name `BANK2a`, at base address 0xE000, file offset 0x1000, length 0x2000.
 12. At this point we have more or less replicated the memory layout at the conclusion of the boot load process.
 13. There are also some RAM regions that we can add at this point to the project. Ghidra should have already created 
+
     `ZERO_PAGE` at 0x0000 length 0x100
     `STACK` at 0x0100 length 0x100. 
+
     We can add to that: 
+
     `IN` at 0x0200 length 0x100
     `BUF` at 0x0300 length 0x100
     `TEXT1` at 0x0400 length 0x400
     `PDATA` at 0xBD00 length 0x300
     `SSW` at 0xC000 length 0x100. 
+
     These can all be created in the Memory Map window in Ghidra. While there we can turn on the Write and Execute flags for `BANK2` and turn on the Execute flag for `ROM`. 
 14. We can now start disassembly.
 
