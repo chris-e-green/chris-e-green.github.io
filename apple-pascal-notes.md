@@ -80,15 +80,15 @@ I've used a few different tools along the way, but what I've finally settled on 
 
 My current workflow looks like this:
 1. Extract the boot code from a Pascal disk. I use a script 
-```bash
-#!/bin/bash
-dd if=$1 of=/tmp/boot0.bin bs=256 count=1
-dd if=$1 of=/tmp/boot1.bin bs=256 count=1 skip=14
-dd if=$1 of=/tmp/boot2.bin bs=256 count=1 skip=13
-dd if=$1 of=/tmp/boot3.bin bs=256 count=1 skip=12
-cat /tmp/boot0.bin /tmp/boot1.bin /tmp/boot2.bin /tmp/boot3.bin > /tmp/boot.bin
-```
-`/tmp/boot.bin` will be the boot code. The ordering above deals with the sector skewing.
+  ```bash
+  #!/bin/bash
+  dd if=$1 of=/tmp/boot0.bin bs=256 count=1
+  dd if=$1 of=/tmp/boot1.bin bs=256 count=1 skip=14
+  dd if=$1 of=/tmp/boot2.bin bs=256 count=1 skip=13
+  dd if=$1 of=/tmp/boot3.bin bs=256 count=1 skip=12
+  cat /tmp/boot0.bin /tmp/boot1.bin /tmp/boot2.bin /tmp/boot3.bin > /tmp/boot.bin
+  ```
+  `/tmp/boot.bin` will be the boot code. The ordering above deals with the sector skewing.
 2. Use DiskBrowser to extract the P-Code interpreter (`RTSTRP.APPLE` or `SYSTEM.APPLE`).
 3. Get an Apple II+/IIe ROM file and a 16-sector Disk II controller card ROM (the P5).
 4. Create a new project in Ghidra, using the boot code as the initial file. Load it using 6502 language, as block name `BOOT` at \$0800.
