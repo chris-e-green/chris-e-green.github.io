@@ -227,6 +227,11 @@ and the part in slot 0 (\$0C56 bytes long) is loaded to finish at \$FE7C, so sta
   all versions. The documentation records the parameters as being
 `W1,W2,<chars>,W3`. However, the actual implementation is `W1,W2,W3,<chars>`. This matches the UCSD documentation for that call.  
 
+- The documentation for the `FLO` instruction is also wrong - even the description of the instruction is wrong, compared to the implementation!
+  The documentation reads "**Float next to top-of-stack.** tos is a real, tos- 1 is an integer. Convert tos-1 to a real number, and push the result."
+  In fact, what it actually does is convert tos-1 to a real number, and replace tos-1 with the real, preserving the original stack order. The description
+  as written suggests that the converted real would be the new TOS, because that's what would happen if you 'pushed the result'...  
+
 - Flavor was introduced at the same time as the version number, but in version
   1.1 it was an enumeration (documented as 1-9) whereas in versions 1.2 and 1.3
 it was a bit field. As a result, there is no relationship between the values in
