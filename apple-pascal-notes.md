@@ -284,3 +284,15 @@ For 1.1, the boot code loads the entire RTSTRP.APPLE directly into memory
 starting at \$9200. While the file is 12k long, it only loads \$2d sectors, so 
 it occupies \$9200-\$BFFF.
 
+# Notes to be integrated later
+
+There's a series of interpreters that have interesting names: RT0003.APPLE, RT0004.APPLE, RT0005.APPLE and RT0006.APPLE. 
+
+It seems that they may be early runtimes (perhaps pre-1.1). RT0003.APPLE and RT0004.APPLE are used as a pair, and RT0005.APPLE and RT0006.APPLE are a similar pair.
+
+RT0003.APPLE and RT0005.APPLE are used on 64K machines, while RT0004.APPLE and RT0006.APPLE are used on 48K.
+
+RT0003 is loaded at \$DB00, while RT0005 is loaded at \$D200. The initialisation is at \$FFF8 for both.
+
+RT0004 is loaded at \$9A00, while RT0006 is loaded at \$9000. The initialisation is at \$BEF8 for both.
+
