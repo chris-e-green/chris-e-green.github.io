@@ -1,69 +1,69 @@
-# Apple II Pascal notes
+# Apple II Pascal Technical Reference
 
-In an effort to fill an (apparent) gap in the available information on the
-behaviour of the various Apple II Pascal p-machine implementations, I have been
-progressively pulling apart and deciphering the different flavours.
+> A reverse-engineered reference to the Apple II implementations of the UCSD Pascal p-machine.
 
-So that the information I work out isn't lost, I plan to document what I find
-here.
+## Introduction
 
-## Acknowledgements and References
+This document is a long-term effort to fill an apparent gap in the available information about the behaviour of the various Apple II Pascal p-machine implementations. It records the results of progressively pulling apart and deciphering the different interpreter flavours so that the information is not lost.
 
-I have read a wide collection of documentation to get to where I am so far in this exercise.
-These include:
+The material combines a catalogue of known interpreters with implementation findings, boot-loader analysis, and a reproducible reverse-engineering workflow. It is intended to remain a living technical reference as further variants are located and understood.
 
-- Apple Pascal Operating System Reference Manual
-- Apple Pascal Language Reference Manual
-- Apple Pascal Update 1.1
-- Apple II Pascal 1.2 Device and Interrupt Support Tools Manual
-- Apple IIe Reference Manual
-- Apple Pascal 1.2 Update Manual
-- Apple IIe Technical Reference Manual
-- Apple II Pascal 1.3 (Workbench)
-- Addendum to the Apple Pascal Language Reference Manual
-- Apple IIe Reference Manual Addendum Monitor ROM Listings
-- Addendum to the Apple II Pascal 1.2 Update
-- Apple II Pascal ATTACH
-- Apple IIc Delta Guide
-- Apple II Pascal 1.1 P-Code Interpreter 6502 Disassembly (Willi Kusche)
-- Beneath Apple DOS ProDOS
-- Hyde's P-Source A guide to the Apple Pascal System 1983
-- Software Control of IWM
-- Apple II Technical Notes
+### Scope
 
-I have also used various websites that cover different related Apple II components.
-Some of those websites include:
-- [Apple II ROM Disassembly](https://6502disassembly.com/a2-rom/) is useful when making sense of the boot process. It also documents the Disk II ROM (some of which is effectively replicated in the Pascal boot code *and* in the runtime)
-- [Undocumented Secrets of Apple Pascal](https://llx.com/Neil/a2/passec.html) has some useful information.
-- [ProDOS 8 Technical Reference Manual](https://prodos8.com/docs/techref/) has useful information for the later runtimes that were able to use ProDOS block devices.
+The current scope covers:
 
-I have also of course used various programs (and web apps) along the way to help with disassembly and annotation.
-Some of those programs and web apps are:
+- known developer and runtime interpreter variants;
+- interpreter version and flavour identification;
+- the developer and 48K runtime boot processes;
+- the memory layout used to analyse a 16K runtime;
+- p-code and CSP dispatch tables;
+- Apple II soft switches relevant to the runtimes;
+- reverse-engineering methods, scripts, and disassembly notes; and
+- implementation details that differ from, clarify, or correct the available documentation.
 
-- [White Flame interactive 6502 disassembler (WFDis)](https://www.white-flame.com/wfdis/) I used this disassembler for quite a while as it's great for quickly getting an idea what the code does
-- [DiskBrowser](https://github.com/dmolony/DiskBrowser) is very useful for browsing Apple II disk images and extracting files
-- [Ghidra](https://github.com/NationalSecurityAgency/ghidra) This is like using a sledgehammer to crack a walnut but it is very powerful
-- [Ivan Izaguirre's izApple2 emulator](https://github.com/ivanizag/izapple2) is the emulator that I started playing around with, which led me down a lonnng rabbit hole leading to wanting to know how the P-machine on the Apple II worked....
-- [Peter Miller's UCSD P-System tools - Operating System](https://github.com/jdykstra/ucsd-psystem-os) A fork of the original which seems harder to locate. Handy for getting an idea what was intended to be stored in the SYSCOM memory area (the Apple II versions are at least similar where they're not the same)
-- [CiderPress2](https://ciderpress2.com/) makes extracting files from the Pascal disks a lot easier, and scriptable.
+### Goals
 
-I'm bound to have missed some but these have all been very useful. Even when they were not 100% correct, they were close enough to make it easier to work out what was actually happening.
+The goals of this reference are to:
 
-I've also written a program that attempts to decompile p-code files. This is called [pdisasm](https://github.com/chris-e-green/pdisasm.git). It started out with intention of being a p-code disassembler, but as I've written it, and learned more about the internals, I've been progressively extending it to produce something at least akin to the original source. Some of the memory locations that show up in the `SYSCOM` area in the interpreter that are otherwise (almost) a complete mystery are obvious once you can see the source for `SYSTEM.PASCAL` and `SYSTEM.LIBRARY`.
+1. document how the Apple II Pascal p-machine implementations behave;
+2. record differences among releases, interpreter flavours, and memory configurations;
+3. distinguish established implementation details from work that remains unresolved;
+4. make the analysis reproducible; and
+5. provide a structure that can accommodate future research without losing earlier findings.
 
-## Sources
+## Quick Navigation
+
+- [Research Status](#research-status)
+- [Version Catalogue](#version-catalogue)
+- [Architecture Overview](#architecture-overview)
+- [Boot Process](#boot-process)
+- [Reverse Engineering](#reverse-engineering)
+- [Implementation Notes](#implementation-notes)
+- [Open Questions](#open-questions)
+- [References](#references)
+- [Acknowledgements](#acknowledgements)
+
+## Research Status
+
+The version catalogue, initial boot-loader comparison, interpreter loading layouts, and core disassembly workflow are documented below. Research is continuing into early runtime pairs, the split layout of `SYSTEM.PASCAL`, and procedure-table relationships.
+
+Statements that express uncertainty—such as “it appears,” “I am not sure,” or “I’m still working out”—are intentionally retained. They identify findings that should not yet be treated as settled.
+
+# Version Catalogue
+
+This catalogue records the interpreter variants located to date. Developer versions are relatively straightforward to obtain because they shipped with Apple Pascal. Runtime versions are harder to locate: they generally have to be recovered from software written in Apple Pascal and distributed with a runtime interpreter.
 
 Getting the developer versions is relatively straightforward, as they are the
 ones that shipped with Apple Pascal. The runtime versions are harder to find
 because it seems your best bet is to find something that was written in Apple
 Pascal and shipped using the runtime interpreter, and finding out what it was.
 Unfortunately for the software archaeologist, the version number is populated
-at runtime by the initialisation code (version number into \$BF21, flavor into
+at runtime by the initialisation code (version number into \$BF21, flavour into
 \$BF22, for versions 1.1 and above).
 
 To date, I've been able to locate:
 
-| Filename | User version | Lib version | Interp. version | Flavor | RAM | Type | Notes |
+| Filename | User version | Lib version | Interp. version | Flavour | RAM | Type | Notes |
 | -------- | ------------ | ----------- | --------------- | ------ | --- | ---- | ----- |
 | RT0003.APPLE | 1.0 | 1 | 0 |  0 | 64K | developer | No USTAT, no IDS/TRS, no FP, no sets |
 | RT0004.APPLE | 1.0 | 1 | 0 |  0 | 48K | runtime | No USTAT, no IDS/TRS, no FP, no sets |
@@ -72,8 +72,8 @@ To date, I've been able to locate:
 | SYSTEM.APPLE | 1.1 | 2 | 2 |  1 | 64K | developer | |
 | RTSTND.APPLE | 1.1 | 2 | 2 |  2 | 48K | runtime | No IDS/TRS |
 | RTSTRP.APPLE | 1.1 | 2 | 2 |  5 | 48K | runtime | No IDS/TRS, no FP, no sets |
-| SYSTEM.APPLE | 1.1 | 2 | 2 |  A | 64K | runtime | No IDS/TRS (undocumented flavor) |
-| SYSTEM.APPLE | 1.1 | 2 | 2 |  B | 64K | runtime | No IDS/TRS (undocumented flavor) |
+| SYSTEM.APPLE | 1.1 | 2 | 2 |  A | 64K | runtime | No IDS/TRS (undocumented flavour) |
+| SYSTEM.APPLE | 1.1 | 2 | 2 |  B | 64K | runtime | No IDS/TRS (undocumented flavour) |
 | SYSTEM.APPLE | 1.2 | 5 | 3 |  0 | 64K | developer | |
 | SYSTEM.APPLE | 1.2 | 5 | 3 |  1 | 64K | runtime | No IDS/TRS |
 | SYSTEM.APPLE | 1.2 | 5 | 3 |  1 | 64K | runtime | No IDS/TRS, some addresses differ! |
@@ -86,9 +86,93 @@ To date, I've been able to locate:
 | SYSTEM.APPLE | 1.3 | 6 | 4 | 40 | 128K | developer | No IDS/TRS |
 | SYSTEM.APPLE | 1.3 | 6 | 4 | 41 | 128K | runtime | No IDS/TRS |
 
+# Architecture Overview
+
+The Apple II Pascal environment spans the boot loader, the p-code interpreter, the operating-system core, and the Apple II memory and soft-switch interfaces. The sections below give the architectural context needed by the more detailed boot and disassembly discussions.
+
+## Interpreter and memory layout
+
+For the 16K runtime examined here, the interpreter occupies both language-card banks. The first $3000 bytes are loaded into language-card RAM and bank 2 at $D000-$FFFF; the remaining $1000 bytes are loaded into bank 1 at $D000-$DFFF.
+
+For analysis, the interpreter is divided into three Ghidra blocks:
+
+| Block | Address | File offset | Length | Overlay |
+| --- | --- | --- | --- | --- |
+| `BANK1` | $D000 | $3000 | $1000 | No |
+| `BANK2` | $D000 | $0000 | $1000 | Yes |
+| `BANK2a` | $E000 | $1000 | $2000 | No |
+
+Additional working regions are described in the [reverse-engineering workflow](#workflow).
+
+## Dispatch tables
+
+The beginning of `BANK1` contains two pointer tables. The table at $D000-$D0FF contains addresses of primary p-code opcode handlers. The table at $D100-$D151 contains addresses of CSP sub-opcode handlers. Each entry points to a Pascal p-code routine.
+
+Code begins immediately after the tables at $D152. It jumps to a routine high in RAM that copies the runtime initialisation code to $6800.
+
+## Apple II hardware interface
+
+The interpreters interact directly with Apple II soft switches for language-card banking, RAM and ROM selection, display state, communications, and disk access. Correctly distinguishing fixed soft-switch references from slot-indexed references is essential: otherwise, bank and device accesses can be misidentified. The relevant symbols and instruction patterns are documented under [Disassembly](#disassembly).
+
+# Boot Process
+
+Understanding how the interpreter is loaded requires first understanding the boot code on an Apple Pascal disk.
+
+To fully understand the load behaviour of the interpreter, you have to first
+understand the behaviour of the boot code on an Apple Pascal disk.
+
+First point: as the boot code is loaded from the disk controller firmware, it treats the disk as a DOS-formatted (256-byte sectors rather than Pascal 512-byte blocks) volume. When extracting the boot sectors, don't forget the DOS sector interleave...
+
+So, on a 16-sector track, the boot code will load logical DOS sectors 0, 2, 4 and 6 (physical sectors \$0, \$E, \$D and \$C) into \$0800-\$0BFF.
+
+The boot code contains a subset of the Pascal code to read blocks and also simplified code to scan a Pascal directory so that it can find the interpreter file.
+
+## Developer boot code
+
+It appears that versions 1.0, 1.1 and 1.2 all used the same boot loader, while
+1.3 used a new loader.
+
+The main functional difference between the 1.3 boot loader and the previous ones is that the newer one supported booting from slots 4, 5 or 6, rather than only slot 6 as had been the case previously. Once the 1.3 boot code has loaded the interpreter, it adjusts the internal `DISKNUM` table in memory to match the drive sequence:
+
+| Pascal Unit# | Slot 4 boot | Slot 5 boot | Slot 6 boot |
+| ------------ | ----------- | ----------- | ----------- |
+| 4            | 4 (S4, D1)  | 2 (S5, D1)  | 0 (S6, D1)  |
+| 5            | 5 (S4, D2)  | 3 (S5, D2)  | 1 (S6, D2)  |
+| 9            | 0 (S6, D1)  | 4 (S4, D1)  | 4 (S4, D1)  |
+| 10           | 1 (S6, D2)  | 5 (S4, D2)  | 5 (S4, D2)  |
+| 11           | 2 (S5, D1)  | 0 (S6, D1)  | 2 (S5, D1)  |
+| 12           | 3 (S5, D2)  | 1 (S6, D2)  | 3 (S5, D2)  |
+
+All of the boot loaders do the same thing as far as load addresses are
+concerned.
+
+The file (`SYSTEM.APPLE`) is always 16K long, no matter which version or flavour.
+
+The first $3000 bytes are loaded into the LC RAM and bank 2, from
+\$D000-\$FFFF.  The remaining \$1000 bytes are loaded into bank 1 from
+\$D000-\$DFFF.
+
+## 48K runtime boot code
+
+The 48K runtime version(s?) used a completely different boot loader to the
+development flavour.
+
+To date I have only been able to find a version 1.1 48K runtime interpreter, so
+I am not sure what other versions (if they existed) did.
+
+For 1.1, the boot code loads the entire `RTSTRP.APPLE` directly into memory
+starting at \$9200. While the file is 12k long, it only loads \$2d sectors, so
+it occupies \$9200-\$BFFF.
+
+# Reverse Engineering
+
+This chapter records the workflow used to extract boot code and interpreters, reconstruct their in-memory layout, identify metadata, and begin disassembly.
+
 ## Methodology
 
 I've used a few different tools along the way, but what I've finally settled on is Ghidra, plus DiskBrowser/CiderPress2.
+
+### Workflow
 
 My current workflow looks like this:
 1. Extract the boot code from a Pascal disk. I use a script
@@ -141,7 +225,7 @@ My current workflow looks like this:
     These can all be created in the Memory Map window in Ghidra. While there we can turn on the Write and Execute flags for `BANK2` and turn on the Execute flag for `ROM`.
 14. We can now start disassembly.
 
-### Utility scripts
+## Utility scripts
 
 After a lot of experimentation and examination of boot sectors, I have come up with this pair of scripts to automate a lot of the extraction of metadata from the interpreters.
 
@@ -266,7 +350,7 @@ I often start by running an automatic disassembly at \$C600. The last bit of tha
 
 At this point it's quite useful to associate names with the various soft-switches in the \$C0 page (and also some names associated with fixed locations in the zero page).
 
-This file contains the soft switch names below in a format that can be imported directly into ghidra using the ImportSymbolsScript.py:
+This file contains the soft switch names below in a format that can be imported directly into Ghidra using the ImportSymbolsScript.py:
 [soft_switches.txt](soft_switches.txt)
 
 This file contains key zero-page named locations that can be imported in the same fashion:
@@ -346,7 +430,9 @@ Our efforts earlier when we loaded the runtime in three parts, and loaded the Ap
 
 Immediately following the tables (at \$D152) is the start of some code, so disassemble that. You'll find that it is a jump to an address fairly high in RAM that contains a routine to copy the runtime's initialisation code to \$6800.
 
-## Curiosities
+# Implementation Notes
+
+These findings capture implementation details, documentation discrepancies, version differences, and coding techniques observed in the interpreters.
 
 - `SYSTEM.PASCAL` is in two parts... the first part shows up in the directory listing but only contains the first part of the operating system core. The balance is stored in a separate unnamed file in slot 15 of
 the segment directory, and is loaded by the interpreter at a fixed memory location during initialisation.
@@ -377,7 +463,7 @@ and the part in slot 0 (\$0C56 bytes long) is loaded to finish at \$FE7C, so sta
   In fact, what it actually does is convert tos-1 to a real number, and replace tos-1 with the real, preserving the original stack order. The description
   as written suggests that the converted real would be the new TOS, because that's what would happen if you 'pushed the result'...
 
-- Flavor was introduced at the same time as the version number, but in version
+- Flavour was introduced at the same time as the version number, but in version
   1.1 it was an enumeration (documented as 1-9) whereas in versions 1.2 and 1.3
 it was a bit field. As a result, there is no relationship between the values in
 1.1 and 1.2/1.3.
@@ -386,56 +472,16 @@ it was a bit field. As a result, there is no relationship between the values in
 
 - There are more than a few instances of clever coding in the interpreter (where *clever* has all the pros and cons often associated with the word). Examples are using `BEQ` and `BNE` on consecutive lines, so that the second instruction is effectively a `JMP` without the extra overhead. Another pattern (particularly in later interpreters) is avoiding relatively costly `PHA` and `PLA` instructions by copying the stack pointer across to the `X` register and then using indexed memory access to retrieve values directly out of the stack, doing whatever needs to be done with the values, and putting them back into the stack, and adjusting the stack pointer accordingly. In a stack-based 16-bit pseudo-machine like the UCSD one, this can avoid a dozen 8-bit `PLA` instructions to manipulate six word-length parameters...
 
+# Open Questions
 
-## Boot code
+The following points remain unresolved or require more evidence:
 
-To fully understand the load behaviour of the interpreter, you have to first
-understand the behaviour of the boot code on an Apple Pascal disk.
+- How does the `SYSTEM.PASCAL` procedure table refer to procedures stored in the unnamed file in segment-directory slot 15?
+- Which releases and products used the early `RT0003.APPLE`, `RT0004.APPLE`, `RT0005.APPLE`, and `RT0006.APPLE` interpreter pairs?
+- Were there 48K runtime interpreters other than the version 1.1 example located to date?
+- What accounts for the address differences between the two known Apple Pascal 1.2, flavour 1, 64K runtime variants?
 
-First point: as the boot code is loaded from the disk controller firmware, it treats the disk as a DOS-formatted (256-byte sectors rather than Pascal 512-byte blocks) volume. When extracting the boot sectors, don't forget the DOS sector interleave...
-
-So, on a 16-sector track, the boot code will load logical DOS sectors 0, 2, 4 and 6 (physical sectors \$0, \$E, \$D and \$C) into \$0800-\$0BFF.
-
-The boot code contains a subset of the Pascal code to read blocks and also simplified code to scan a Pascal directory so that it can find the interpreter file.
-
-### Developer boot code
-
-It appears that versions 1.0, 1.1 and 1.2 all used the same boot loader, while
-1.3 used a new loader.
-
-The main functional difference between the 1.3 boot loader and the previous ones is that the newer one supported booting from slots 4, 5 or 6, rather than only slot 6 as had been the case previously. Once the 1.3 boot code has loaded the interpreter, it adjusts the internal `DISKNUM` table in memory to match the drive sequence:
-
-| Pascal Unit# | Slot 4 boot | Slot 5 boot | Slot 6 boot |
-| ------------ | ----------- | ----------- | ----------- |
-| 4            | 4 (S4, D1)  | 2 (S5, D1)  | 0 (S6, D1)  |
-| 5            | 5 (S4, D2)  | 3 (S5, D2)  | 1 (S6, D2)  |
-| 9            | 0 (S6, D1)  | 4 (S4, D1)  | 4 (S4, D1)  |
-| 10           | 1 (S6, D2)  | 5 (S4, D2)  | 5 (S4, D2)  |
-| 11           | 2 (S5, D1)  | 0 (S6, D1)  | 2 (S5, D1)  |
-| 12           | 3 (S5, D2)  | 1 (S6, D2)  | 3 (S5, D2)  |
-
-All of the boot loaders do the same thing as far as load addresses are
-concerned.
-
-The file (`SYSTEM.APPLE`) is always 16k long, no matter which version or flavor.
-
-The first $3000 bytes are loaded into the LC RAM and bank 2, from
-\$D000-\$FFFF.  The remaining \$1000 bytes are loaded into bank 1 from
-\$D000-\$DFFF.
-
-### 48k runtime boot code
-
-The 48k runtime version(s?) used a completely different boot loader to the
-development flavor.
-
-To date I have only been able to find a version 1.1 48k runtime interpreter, so
-I am not sure what other versions (if they existed) did.
-
-For 1.1, the boot code loads the entire `RTSTRP.APPLE` directly into memory
-starting at \$9200. While the file is 12k long, it only loads \$2d sectors, so
-it occupies \$9200-\$BFFF.
-
-# Notes to be integrated later
+## Early runtime interpreters
 
 There's a series of interpreters that have interesting names: `RT0003.APPLE`, `RT0004.APPLE`, `RT0005.APPLE` and `RT0006.APPLE`.
 
@@ -446,3 +492,54 @@ It seems that they may be early runtimes (perhaps pre-1.1). `RT0003.APPLE` and `
 `RT0003` is loaded at \$DB00, while `RT0005` is loaded at \$D200. The initialisation is at \$FFF8 for both.
 
 `RT0004` is loaded at \$9A00, while `RT0006` is loaded at \$9000. The initialisation is at \$BEF8 for both.
+
+# References
+
+I have read a wide collection of documentation to get to where I am so far in this exercise.
+These include:
+
+- Apple Pascal Operating System Reference Manual
+- Apple Pascal Language Reference Manual
+- Apple Pascal Update 1.1
+- Apple II Pascal 1.2 Device and Interrupt Support Tools Manual
+- Apple IIe Reference Manual
+- Apple Pascal 1.2 Update Manual
+- Apple IIe Technical Reference Manual
+- Apple II Pascal 1.3 (Workbench)
+- Addendum to the Apple Pascal Language Reference Manual
+- Apple IIe Reference Manual Addendum Monitor ROM Listings
+- Addendum to the Apple II Pascal 1.2 Update
+- Apple II Pascal ATTACH
+- Apple IIc Delta Guide
+- Apple II Pascal 1.1 P-Code Interpreter 6502 Disassembly (Willi Kusche)
+- Beneath Apple DOS ProDOS
+- Hyde's P-Source A guide to the Apple Pascal System 1983
+- Software Control of IWM
+- Apple II Technical Notes
+
+I have also used various websites that cover different related Apple II components.
+Some of those websites include:
+- [Apple II ROM Disassembly](https://6502disassembly.com/a2-rom/) is useful when making sense of the boot process. It also documents the Disk II ROM (some of which is effectively replicated in the Pascal boot code *and* in the runtime)
+- [Undocumented Secrets of Apple Pascal](https://llx.com/Neil/a2/passec.html) has some useful information.
+- [ProDOS 8 Technical Reference Manual](https://prodos8.com/docs/techref/) has useful information for the later runtimes that were able to use ProDOS block devices.
+
+I have also of course used various programs (and web apps) along the way to help with disassembly and annotation.
+Some of those programs and web apps are:
+
+- [White Flame interactive 6502 disassembler (WFDis)](https://www.white-flame.com/wfdis/) I used this disassembler for quite a while as it's great for quickly getting an idea what the code does
+- [DiskBrowser](https://github.com/dmolony/DiskBrowser) is very useful for browsing Apple II disk images and extracting files
+- [Ghidra](https://github.com/NationalSecurityAgency/ghidra) This is like using a sledgehammer to crack a walnut but it is very powerful
+- [Ivan Izaguirre's izApple2 emulator](https://github.com/ivanizag/izapple2) is the emulator that I started playing around with, which led me down a lonnng rabbit hole leading to wanting to know how the P-machine on the Apple II worked....
+- [Peter Miller's UCSD P-System tools - Operating System](https://github.com/jdykstra/ucsd-psystem-os) A fork of the original which seems harder to locate. Handy for getting an idea what was intended to be stored in the SYSCOM memory area (the Apple II versions are at least similar where they're not the same)
+- [CiderPress2](https://ciderpress2.com/) makes extracting files from the Pascal disks a lot easier, and scriptable.
+
+I'm bound to have missed some but these have all been very useful. Even when they were not 100% correct, they were close enough to make it easier to work out what was actually happening.
+
+I've also written a program that attempts to decompile p-code files. This is called [pdisasm](https://github.com/chris-e-green/pdisasm.git). It started out with intention of being a p-code disassembler, but as I've written it, and learned more about the internals, I've been progressively extending it to produce something at least akin to the original source. Some of the memory locations that show up in the `SYSCOM` area in the interpreter that are otherwise (almost) a complete mystery are obvious once you can see the source for `SYSTEM.PASCAL` and `SYSTEM.LIBRARY`.
+
+# Acknowledgements
+
+This work depends on the manuals, disassemblies, tools, emulators, disk utilities, and source material listed in [References](#references). Even where a source was not completely accurate, it was often close enough to make determining the actual behaviour substantially easier.
+
+Additional sources may have been consulted and inadvertently omitted; the reference list will continue to be updated as the research progresses.
+
