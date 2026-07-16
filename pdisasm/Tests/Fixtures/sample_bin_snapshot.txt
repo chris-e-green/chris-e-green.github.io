@@ -1,4 +1,0 @@
-Filename: sample.bin
-Size: 5486
-
-Segments: 0
