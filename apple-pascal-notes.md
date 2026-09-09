@@ -65,7 +65,7 @@ To date, I've been able to locate:
 
 | Filename | User version | Lib version | Interp. version | Flavour | RAM | Type | Notes |
 | -------- | ------------ | ----------- | --------------- | ------ | --- | ---- | ----- |
-| RT0003.APPLE | 1.0 | 1 | 0 |  0 | 64K | developer | No USTAT, no IDS/TRS, no FP, no sets |
+| RT0003.APPLE | 1.0 | 1 | 0 |  0 | 64K | runtime | No USTAT, no IDS/TRS, no FP, no sets |
 | RT0004.APPLE | 1.0 | 1 | 0 |  0 | 48K | runtime | No USTAT, no IDS/TRS, no FP, no sets |
 | RT0006.APPLE | 1.0 | 1 | 0 |  0 | 48K | runtime | No USTAT, no IDS/TRS |
 | SYSTEM.APPLE | 1.0 | 1 | 0 |  0 | 64K | developer | No USTAT |
