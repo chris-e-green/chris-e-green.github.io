@@ -1,6 +1,16 @@
-theme: jekyll-theme-hacker
-title: Welcome to Massey-Green Software Development Labs
-description: A random collection of random software for random people
-github:
-  is_project_page: false
-  
+title: Media Grid Software Development Labs
+description: Independent software for creative work and curious minds.
+url: https://www.mgsdl.com
+baseurl: ""
+markdown: kramdown
+kramdown:
+  input: GFM
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+exclude:
+  - README.md
+plugins:
+  - jekyll-optional-front-matter

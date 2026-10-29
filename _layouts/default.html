@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title and page.title != 'Home' %}{{ page.title | escape }} · {% endif %}{{ site.title | escape }}</title>
+  <meta name="description" content="{{ page.description | default: site.description | escape }}">
+  <link rel="icon" href="{{ '/assets/brand/favicon.ico' | relative_url }}" sizes="any">
+  <link rel="icon" href="{{ '/assets/brand/favicon.svg' | relative_url }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ '/assets/brand/icon-180.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ '/' | relative_url }}" aria-label="Media Grid Software Development Labs — Home">
+      <img class="brand-full" src="{{ '/assets/brand/mgsdl-horizontal-light.svg' | relative_url }}" alt="Media Grid Software Development Labs" width="455" height="108">
+      <img class="brand-symbol" src="{{ '/assets/brand/mgsdl-symbol-light.svg' | relative_url }}" alt="" width="56" height="56">
+      <span class="brand-name">Media Grid<br>Software Development Labs</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} aria-current="page"{% endif %}>Home</a>
+      <a href="{{ '/prsf-reader/' | relative_url }}"{% if page.url == '/prsf-reader/' %} aria-current="page"{% endif %}>Reader</a>
+      <a href="{{ '/open-source/' | relative_url }}"{% if page.url == '/open-source/' %} aria-current="page"{% endif %}>Open Source</a>
+      <a href="{{ '/support/' | relative_url }}"{% if page.url == '/support/' %} aria-current="page"{% endif %}>Support</a>
+    </nav>
+  </header>
+  <main id="main" tabindex="-1">{{ content }}</main>
+  <footer>
+    <p><strong>Media Grid Software Development Labs</strong><br>Christopher Edward Green, sole trader · ABN 98 783 256 814</p>
+    <p><a href="{{ '/privacy/' | relative_url }}">Privacy</a> · <a href="{{ '/support/' | relative_url }}">Support</a><br><a href="mailto:support@mgsdl.com">support@mgsdl.com</a></p>
+  </footer>
+</body>
+</html>

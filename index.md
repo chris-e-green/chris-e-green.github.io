@@ -1,14 +1,37 @@
-# New:
-I've started [documenting](./apple-pascal-notes.md) my exploration of the Apple II Pascal p-code runtimes.
+---
+layout: default
+title: Home
+---
 
-# Projects here:
+<div class="eyebrow">Independent software · Australia</div>
 
-[BBoot](https://github.com/chris-e-green/b-boot) - an ancient DOS boot sector (in 80x86 assembler) to allow booting from the second floppy drive
+# Tools for creative work.<br>Room for curiosity.
 
-[DirStat](https://github.com/chris-e-green/dirstat) - an ancient DOS program (in Turbo Pascal) to display disk usage
+Media Grid Software Development Labs is the independent software practice of
+Christopher Edward Green. Our current focus is helping actors and teachers find
+material for auditions, classes and rehearsal.
 
-[NFormat](https://github.com/chris-e-green/nformat) - an ancient DOS program (in Turbo Pascal) to make the FORMAT command safer
+## Screenplay Finder Reader
 
-[ShftLock](https://github.com/chris-e-green/shftlock) - an ancient DOS TSR (in 80x86 assembler) to make a keyboard behave like a typewriter. For youngsters, typewriter shift keys weren't the same as computer caps-lock keys, because they literally 'shifted' the rack of letters up. The result was that not only were letters in capitals, but every other key also behaved as if shift was being pressed (eg, when shift-lock was on, typing '8' produced a *). Typists who came from traditional typewriters, as well as those who came from 'professional' word-processing computers, found generic computer keyboards awkward to use. This TSR was designed to address that issue.
+Find monologues, two-person scenes and larger scenes in prepared screenplay
+catalogues. Search by length, roles, casting profiles and tone, then organise
+selections into private favourites and shortlists.
 
-[StarSystems](https://github.com/chris-e-green/star-systems) - a utility (written in Swift) to generate Traveller(TM) star systems using the classic rules plus book 6 (Scouts), with support for some variants. Can produce hand-crafted PDF subsector maps.
+The Reader is currently being tested on iPhone and iPad. Included reading copies
+are available where the catalogue's permissions allow them. Your searches and
+collections are stored locally on your device.
+
+[Explore the Reader →](/prsf-reader/)
+
+For enquiries about the Reader or beta testing, contact
+[support@mgsdl.com](mailto:support@mgsdl.com).
+
+---
+
+## Open Source
+
+Alongside our current work, we maintain a collection of software projects and
+technical research, from classic DOS utilities to Apple II Pascal explorations
+and a Swift tool for generating Traveller star systems.
+
+[Explore Open Source →](/open-source/)
