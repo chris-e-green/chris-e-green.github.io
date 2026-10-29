@@ -4,8 +4,6 @@ title: Reader support
 permalink: /support/
 ---
 
-> Draft for review — not yet published.
-
 # Reader support
 
 Contact support@mgsdl.com for help with Screenplay Finder Reader.

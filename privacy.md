@@ -6,7 +6,7 @@ permalink: /privacy/
 
 # Screenplay Finder Reader — Privacy Policy
 
-> Draft for review — updated 29 October 2026. Effective date will be set on publication.
+Effective date: 29 October 2026.
 
 Screenplay Finder Reader is provided by Christopher Edward Green, trading as
 Media Grid Software Development Labs, ABN 98 783 256 814, Australia. Contact:

@@ -4,8 +4,6 @@ title: Screenplay Finder Reader
 permalink: /prsf-reader/
 ---
 
-> Draft for review — not yet published.
-
 # Screenplay Finder Reader
 
 Find material for auditions, acting classes and rehearsal.
