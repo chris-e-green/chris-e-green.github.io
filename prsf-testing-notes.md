@@ -6,11 +6,23 @@ You can test one app or several. You do not need all three, and no account or si
 
 ## Which app am I installing?
 
-| App | What it is for | Where your material comes from |
-| --- | --- | --- |
-| **Screenplay Analyser Lite** | Import and review screenplays, identify characters and acting passages, and create catalogues for Reader. | Fountain files or PDFs you import. |
-| **Screenplay Finder Reader** | Find, organise and rehearse acting material from prepared catalogues. | The included catalogue and additional Reader catalogues you open. |
-| **Script Library Prototype** | Import your own scripts, review their analysis, and read and rehearse the resulting material in one app. | Your own imported scripts; the library starts empty. |
+### Screenplay Analyser Lite
+
+Import and review screenplays, identify characters and acting passages, and create catalogues for Reader.
+
+**Bring your own material:** Fountain files or PDFs you import.
+
+### Screenplay Finder Reader
+
+Find, organise and rehearse acting material from prepared catalogues.
+
+**Start with:** the included catalogue, or additional Reader catalogues you open.
+
+### Script Library Prototype
+
+Import your own scripts, review their analysis, and read and rehearse the resulting material in one app.
+
+**Bring your own material:** the library starts empty.
 
 Analyser Lite is not a trial-size app. Its focus is on local screenplay analysis and catalogue preparation; it does not provide the desktop Analyser’s more complex language-model enrichment.
 
@@ -91,11 +103,11 @@ Scripts and analysis are stored locally in the app. There is no automatic cross-
 
 Use the backup appropriate to the app:
 
-| App | What to keep |
-| --- | --- |
-| **Analyser Lite** | Use **Save project backup** for your editable library. A Reader catalogue is not an editable project backup. |
-| **Reader** | Use personal backup and recovery for your reading data. Keep your catalogue source files separately. |
-| **Script Library Prototype** | Use **Library backup and recovery** for a complete copy of scripts and reading data. |
+- **Analyser Lite:** use **Save project backup** for your editable library. A Reader catalogue is not an editable project backup.
+
+- **Reader:** use personal backup and recovery for your reading data. Keep your catalogue source files separately.
+
+- **Script Library Prototype:** use **Library backup and recovery** for a complete copy of scripts and reading data.
 
 Exported files and backups may contain private screenplay material. Choose carefully where you save or share them, and keep a backup before installing beta updates or trying a restore.
 
